@@ -1,0 +1,5 @@
+PVP Generator Block:
+* replaces NXI PXI chassis for creating dac biases
+* takes in 24-bit commands for the AD5971 DAC, stores them, and then outputs them on trigger from tproc
+* covers a 256x256 step space 
+
