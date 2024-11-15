@@ -1,32 +1,28 @@
-module signal_gen (
+module pvp_fsm_gen (
 	// Reset and clock.
 	rstn			,
 	clk				,
 
+	// AXIS Slave to queue waveforms.
+	s1_axis_tdata 		,
+	s1_axis_tvalid		,
+	s1_axis_tready		,
+
 	// Fifo interface.
 	fifo_rd_en_o	,
 	fifo_empty_i	,
-	fifo_dout_i		,
+	fifo_din_o		,
 
-	// Memory interface.
-	mem_addr_o		,
-	mem_dout_real_i	,
-	mem_dout_imag_i	,
+	// Iterator Interface.
+	iter_rd_en	,
+	iter_full_i		,
+	iter_din_o	,
 
-	// M_AXIS for output.
-	m_axis_tready_i	,
-	m_axis_tvalid_o	,
-	m_axis_tdata_o
 	);
 
 /**************/
 /* Parameters */
 /**************/
-// Memory address size.
-parameter N = 16;
-
-// Number of parallel dds blocks.
-parameter [31:0] N_DDS = 16;
 
 /*********/
 /* Ports */
@@ -34,13 +30,17 @@ parameter [31:0] N_DDS = 16;
 input						rstn;
 input						clk;
 
+input 	[49:0]			s1_axis_tdata_i;
+input					s1_axis_tvalid_i;
+output					s1_axis_tready_o;
+
 output						fifo_rd_en_o;
 input						fifo_empty_i;
-input		[159:0]			fifo_dout_i;
+output		[23:0]			fifo_din_o;
 
-output 		[N-1:0]			mem_addr_o;
-input 		[N_DDS*16-1:0]	mem_dout_real_i;
-input 		[N_DDS*16-1:0]	mem_dout_imag_i;
+output						iter_rd_en_o;
+input						iter_empty_i;
+output		[23:0]			iter_din_o;
 
 input						m_axis_tready_i;
 output						m_axis_tvalid_o;
@@ -49,72 +49,14 @@ output		[N_DDS*16-1:0]	m_axis_tdata_o;
 /********************/
 /* Internal signals */
 /********************/
-// Memory address.
-wire		[N-1:0]			mem_addr_int;
-reg			[N-1:0]			mem_addr_int_r;
-
-// DDS input control.
-reg							dds_tvalid_r;
-wire 		[N_DDS*72-1:0]	dds_ctrl_int;
-reg 		[N_DDS*72-1:0]	dds_ctrl_int_r;
-
-// DDS output.
-wire 		[31:0]			dds_dout		[0:N_DDS-1];
-reg			[31:0]			dds_dout_r1		[0:N_DDS-1];
-wire		[31:0]			dds_dout_la		[0:N_DDS-1];
-wire		[15:0]			dds_la_mux		[0:N_DDS-1];
-
-// Memory data.
-reg			[15:0]			mem_real_r1		[0:N_DDS-1];
-reg			[15:0]			mem_imag_r1		[0:N_DDS-1];
-wire		[15:0]			mem_real_la		[0:N_DDS-1];
-wire		[15:0]			mem_imag_la		[0:N_DDS-1];
-wire		[15:0]			mem_la_mux		[0:N_DDS-1];
-
-// Product.
-wire signed	[15:0]			prod_a_real			[0:N_DDS-1];
-wire signed	[15:0]			prod_a_imag			[0:N_DDS-1];
-wire signed	[15:0]			prod_b_real			[0:N_DDS-1];
-wire signed	[15:0]			prod_b_imag			[0:N_DDS-1];
-wire signed [31:0]			prod_y_full_real_a	[0:N_DDS-1];
-wire signed [31:0]			prod_y_full_real_b	[0:N_DDS-1];
-reg	 signed [31:0]			prod_y_full_real_a_r[0:N_DDS-1];
-reg  signed [31:0]			prod_y_full_real_b_r[0:N_DDS-1];
-wire signed [31:0]			prod_y_full_imag_a	[0:N_DDS-1];
-wire signed [31:0]			prod_y_full_imag_b	[0:N_DDS-1];
-reg  signed [31:0]			prod_y_full_imag_a_r[0:N_DDS-1];
-reg  signed [31:0]			prod_y_full_imag_b_r[0:N_DDS-1];
-wire signed [31:0]			prod_y_full_real	[0:N_DDS-1];
-wire 		[15:0]			prod_y_real			[0:N_DDS-1];
-wire		[15:0] 			prod_y				[0:N_DDS-1];
-reg			[15:0]			prod_y_r1			[0:N_DDS-1];
-reg			[15:0]			prod_y_r2			[0:N_DDS-1];
 
 // Muxed output.
 wire		[15:0]			dout_mux			[0:N_DDS-1];
 wire		[15:0]			dout_mux_la			[0:N_DDS-1];
 
-// Product with Gain.
-wire		[15:0]			gain_int;
-wire signed	[15:0]			gain_la;
-wire signed	[15:0]			prodg_a_real		[0:N_DDS-1];
-wire signed [31:0]			prodg_y_full_real	[0:N_DDS-1];
-reg signed 	[31:0]			prodg_y_full_real_r	[0:N_DDS-1];
-
-// Rounding.
-wire 		[15:0]			round				[0:N_DDS-1];
-reg 		[15:0]			round_r				[0:N_DDS-1];
-
-// Last sample register.
-reg 		[15:0]			last_r				[0:N_DDS-1];
-
 // Output source selection.
 wire		[1:0]			src_int;
 wire		[1:0]			src_la;
-
-// Steady value selection.
-wire						stdy_int;
-wire						stdy_la;
 
 // Output enable.
 wire						en_int;

@@ -95,6 +95,14 @@ output	[1:0]			s_axi_rresp;
 output					s_axi_rvalid;
 input					s_axi_rready;
 
+/**
+input					s0_axis_aclk;
+input					s0_axis_aresetn;
+input 	[31:0]			s0_axis_tdata;
+input					s0_axis_tvalid;
+output					s0_axis_tready;
+*/
+
 input					aresetn;
 input					aclk;
 
@@ -167,6 +175,15 @@ pvp_gen_top
 		// Reset and clock.
     	.aresetn			(aresetn			),
 		.aclk				(aclk				),
+
+/**
+    	// AXIS Slave to load memory samples.
+    	.s0_axis_aresetn	(s0_axis_aresetn	),
+		.s0_axis_aclk		(s0_axis_aclk		),
+		.s0_axis_tdata_i	(s0_axis_tdata		),
+		.s0_axis_tvalid_i	(s0_axis_tvalid		),
+		.s0_axis_tready_o	(s0_axis_tready		),
+		*/
 
     	// AXIS Slave to queue waveforms.
 		.s1_axis_tdata_i	(s1_axis_tdata 		),
