@@ -3,14 +3,14 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.MATH_REAL.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity fifo is
+entity fifo_pvp is
     Generic
     (
         -- Data width.
-        B : Integer := 16;
+        B : Integer := 24;
         
         -- Fifo depth.
-        N : Integer := 4
+        N : Integer := 256
     );
     Port
     ( 
@@ -23,7 +23,7 @@ entity fifo is
         
         -- Read I/F.
         rd_en  	: in std_logic;
-        dout   	: out std_logic_vector (B-1 downto 0);
+        dout   	: out std_logic_vector (B/3-1 downto 0);
         
         -- Flags.
         full    : out std_logic;        
@@ -71,12 +71,12 @@ signal empty_i  : std_logic;
 begin
 
 -- FIFO memory.
-mem_i : bram_simple_dp
+mem_i : bram_pvp_dp
     Generic map (
-        -- Memory address size.
+        -- Memory address size. DOUBLE CHECK SIZING -- make sure that if its 1/3 of the initial, it an still be used
         N       => N_LOG2,
         -- Data width.
-        B       => B
+        B       => 8
     )
     Port map ( 
         clk    	=> clk						,

@@ -161,25 +161,25 @@ axi_slv axi_slv_i
 		.WE_REG			(WE_REG	 		)
 	);
 
-signal_gen_top
+pvp_gen_top
 	#(
 		.N		(N		),
 		.N_DDS	(N_DDS	)
 	)
-	signal_gen_top_i
+	pvp_gen_top_i
 	(
 		// Reset and clock.
     	.aresetn			(aresetn			),
 		.aclk				(aclk				),
 
-    	// AXIS Slave to load memory samples.
+    	// AXIS Slave to load memory samples. -> FSM
     	.s0_axis_aresetn	(s0_axis_aresetn	),
 		.s0_axis_aclk		(s0_axis_aclk		),
 		.s0_axis_tdata_i	(s0_axis_tdata		),
 		.s0_axis_tvalid_i	(s0_axis_tvalid		),
 		.s0_axis_tready_o	(s0_axis_tready		),
 
-    	// AXIS Slave to queue waveforms.
+    	// AXIS Slave to queue waveforms. -> FIFOs, SPI
 		.s1_axis_tdata_i	(s1_axis_tdata 		),
 		.s1_axis_tvalid_i	(s1_axis_tvalid		),
 		.s1_axis_tready_o	(s1_axis_tready		),
