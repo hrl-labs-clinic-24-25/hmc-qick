@@ -1,4 +1,4 @@
-module pvp_gen_top 
+module signal_gen_top 
 	(
 		// Reset and clock.
     	aresetn				,

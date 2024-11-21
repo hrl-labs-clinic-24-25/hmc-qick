@@ -3,7 +3,7 @@
 // s0_axis_aclk	: clock for s0_axis_*
 // aclk			: clock for s1_axis_* and m_axis_*
 //
-module axis_pvp_gen_v1
+module axis_signal_gen_v6
 	( 
 		// AXI Slave I/F for configuration.
 		s_axi_aclk		,
@@ -157,12 +157,12 @@ axi_slv axi_slv_i
 		.WE_REG			(WE_REG	 		)
 	);
 
-pvp_gen_top
+signal_gen_top
 	#(
 		.N		(N		),
 		.N_DDS	(N_DDS	)
 	)
-	pvp_gen_top_i
+	signal_gen_top_i
 	(
 		// Reset and clock.
     	.aresetn			(aresetn			),
