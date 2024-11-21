@@ -33,15 +33,6 @@ module axis_pvp_gen_v1
 		s_axi_rvalid	,
 		s_axi_rready	,
 
-/**
-    	// AXIS Slave to load memory samples. (FSM)
-		s0_axis_aclk	,
-		s0_axis_aresetn	,
-		s0_axis_tdata	,
-		s0_axis_tvalid	,
-		s0_axis_tready	,
-*/
-
 		// s1_* and m_* reset/clock.
 		aclk			,
 		aresetn			,
@@ -62,8 +53,6 @@ module axis_pvp_gen_v1
 /**************/
 parameter N		= 12;
 
-// Number of parallel dds blocks.
-parameter [31:0] N_DDS = 16;
 
 /*********/
 /* Ports */
@@ -95,16 +84,9 @@ output	[1:0]			s_axi_rresp;
 output					s_axi_rvalid;
 input					s_axi_rready;
 
-/**
-input					s0_axis_aclk;
-input					s0_axis_aresetn;
-input 	[31:0]			s0_axis_tdata;
-input					s0_axis_tvalid;
-output					s0_axis_tready;
-*/
-
 input					aresetn;
 input					aclk;
+
 
 input 	[49:0]			s1_axis_tdata;
 input					s1_axis_tvalid;
@@ -112,7 +94,7 @@ output					s1_axis_tready;
 
 input					m_axis_tready;
 output					m_axis_tvalid;
-output	[N_DDS*16-1:0]	m_axis_tdata;
+output	[XXX:0]			m_axis_tdata;
 
 /********************/
 /* Internal Signals */
@@ -176,24 +158,15 @@ pvp_gen_top
     	.aresetn			(aresetn			),
 		.aclk				(aclk				),
 
-/**
-    	// AXIS Slave to load memory samples.
-    	.s0_axis_aresetn	(s0_axis_aresetn	),
-		.s0_axis_aclk		(s0_axis_aclk		),
-		.s0_axis_tdata_i	(s0_axis_tdata		),
-		.s0_axis_tvalid_i	(s0_axis_tvalid		),
-		.s0_axis_tready_o	(s0_axis_tready		),
-		*/
-
     	// AXIS Slave to queue waveforms.
 		.s1_axis_tdata_i	(s1_axis_tdata 		),
 		.s1_axis_tvalid_i	(s1_axis_tvalid		),
 		.s1_axis_tready_o	(s1_axis_tready		),
 
 		// M_AXIS for output.
-		.m_axis_tready_i	(m_axis_tready		),
-		.m_axis_tvalid_o	(m_axis_tvalid		),
-		.m_axis_tdata_o		(m_axis_tdata		),
+		.m_axis_tready_o	(m_axis_tready		),
+		.m_axis_tvalid_i	(m_axis_tvalid		),
+		.m_axis_tdata_i		(m_axis_tdata		),
 
 		// Registers.
 		.START_ADDR_REG		(START_ADDR_REG		),

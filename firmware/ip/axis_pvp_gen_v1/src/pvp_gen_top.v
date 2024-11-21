@@ -53,6 +53,7 @@ wire					fifo_empty;
 wire					iter_rd_en;
 wire					iter_empty_i;
 wire	[23:0]			iter_din;
+wire    [7:0]			iter_dout;
 
 // output to spi
 wire	[7:0]			fifo_dout;

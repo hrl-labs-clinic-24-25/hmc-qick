@@ -3,14 +3,14 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.MATH_REAL.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity fifo is
+entity fifo_pvp is
     Generic
     (
         -- Data width.
-        B : Integer := 16;
+        B : Integer := 24;
         
         -- Fifo depth.
-        N : Integer := 4
+        N : Integer := 256
     );
     Port
     ( 
@@ -23,7 +23,7 @@ entity fifo is
         
         -- Read I/F.
         rd_en  	: in std_logic;
-        dout   	: out std_logic_vector (B-1 downto 0);
+        dout   	: out std_logic_vector (THREE_N_SPI-1 downto 0);
         
         -- Flags.
         full    : out std_logic;        
@@ -34,13 +34,14 @@ end fifo;
 architecture rtl of fifo is
 
 -- Number of bits of depth.
-constant N_LOG2 : Integer := Integer(ceil(log2(real(N))));
+constant THREE_N_SPI : Integer := Integer(9);
+constant READ_THROUGH_SPI : Integer := Integer(3);
 
 -- Dual port, single clock  BRAM.
-component bram_simple_dp is
+component bram_pvp_dp is
     Generic (
         -- Memory address size.
-        N       : Integer := 16;
+        N       : Integer := 4;
         -- Data width.
         B       : Integer := 16
     );
@@ -57,8 +58,8 @@ component bram_simple_dp is
 end component;
 
 -- Pointers.
-signal wptr   	: unsigned (N_LOG2-1 downto 0);
-signal rptr   	: unsigned (N_LOG2-1 downto 0);
+signal wptr   	: unsigned (THREE_N_SPI-1 downto 0);
+signal rptr   	: unsigned (READ_THROUGH_SPI-1 downto 0);
 
 -- Memory signals.
 signal mem_wea	: std_logic;
@@ -71,12 +72,12 @@ signal empty_i  : std_logic;
 begin
 
 -- FIFO memory.
-mem_i : bram_simple_dp
+mem_i : bram_pvp_dp
     Generic map (
-        -- Memory address size.
-        N       => N_LOG2,
+        -- Memory address size. DOUBLE CHECK SIZING -- make sure that if its 1/3 of the initial, it an still be used
+        N       => READ_THROUGH_SPI,
         -- Data width.
-        B       => B
+        B       => 24
     )
     Port map ( 
         clk    	=> clk						,
