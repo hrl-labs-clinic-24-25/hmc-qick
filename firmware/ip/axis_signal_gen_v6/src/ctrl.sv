@@ -494,4 +494,3 @@ assign stdy_o		= stdysel_r7;
 assign en_o			= en_reg_r8;
 
 endmodule
-
