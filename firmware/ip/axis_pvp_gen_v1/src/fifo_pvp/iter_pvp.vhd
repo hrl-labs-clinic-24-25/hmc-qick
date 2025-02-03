@@ -3,13 +3,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.MATH_REAL.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity fifo_pvp is
+entity iter is
     Generic
     (
         -- Data width.
-        B : Integer := 24;
+        B : Integer := 32;
         
-        -- Fifo depth.
+        -- iter depth.
         N : Integer := 256
     );
     Port
@@ -29,9 +29,9 @@ entity fifo_pvp is
         full    : out std_logic;        
         empty   : out std_logic
     );
-end fifo;
+end iter;
 
-architecture rtl of fifo is
+architecture rtl of iter is
 
 -- Number of bits of depth.
 constant THREE_N_SPI : Integer := Integer(9);
@@ -43,7 +43,7 @@ component bram_pvp_dp is
         -- Memory address size.
         N       : Integer := 4;
         -- Data width.
-        B       : Integer := 16
+        B       : Integer := 32
     );
     Port ( 
         clk    	: in STD_LOGIC;
@@ -58,8 +58,9 @@ component bram_pvp_dp is
 end component;
 
 -- Pointers.
-signal wptr   	: unsigned (THREE_N_SPI-1 downto 0);
-signal rptr   	: unsigned (READ_THROUGH_SPI-1 downto 0);
+signal wptr   	: unsigned (THREE_N_SPI-1 downto 0); --write pointer
+signal rptr   	: unsigned (READ_THROUGH_SPI-1 downto 0); --read pointer
+signal rptr_initial: unsigned (READ_THROUGH_SPI-1 downto 0); --initial pointer position
 
 -- Memory signals.
 signal mem_wea	: std_logic;
@@ -71,7 +72,7 @@ signal empty_i  : std_logic;
 
 begin
 
--- FIFO memory.
+-- iter memory.
 mem_i : bram_pvp_dp
     Generic map (
         -- Memory address size. DOUBLE CHECK SIZING -- make sure that if its 1/3 of the initial, it an still be used
@@ -107,6 +108,7 @@ begin
         if ( rstn = '0' ) then
             wptr <= (others => '0');
             rptr    <= (others => '0');
+            rptr_initial <= (others => '0');
         else
             -- Write.
             if ( wr_en = '1' and full_i = '0' ) then
@@ -120,8 +122,11 @@ begin
             if ( rd_en = '1' and empty_i = '0' ) then
                 -- Read data.
                 
-                -- Increment pointer.
-                rptr <= rptr + 1;
+                if rptr = N-1 then
+                    rptr <= rptr_initial; -- Reset rptr
+                else
+                    rptr <= rptr + 1; -- Increment pointer.
+                end if;
             end if;
         end if;
     end if;
