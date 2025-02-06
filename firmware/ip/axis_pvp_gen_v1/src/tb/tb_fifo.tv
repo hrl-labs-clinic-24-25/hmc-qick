@@ -1,0 +1,29 @@
+// HRL CLinic 24-25
+// Ellie Sundheim esundheim at hmc dot 
+// Test vectors for fifo testbench
+
+// format:
+// r_en_ wr_en_ din[23:0]_dout[23:0]_full_empty
+
+// make sure outputs don't come through if we don't write enable
+0_0_1111_0000_0_1
+1_0_0001_0000_0_1
+
+// filling up fifo and reading it all out
+0_1_0001_0000_0_0
+0_1_0010_0000_0_0
+0_1_0011_0000_0_0
+0_1_0100_0000_1_0
+1_0_1111_0001_1_0
+1_0_1111_0010_1_0
+1_0_1111_0011_1_0
+1_0_1111_0100_1_0
+
+// legally write another value
+0_1_0101_0000_1_0
+
+// read out everything again
+1_0_1111_0010_1_0
+1_0_1111_0011_1_0
+1_0_1111_0100_1_0
+1_0_1111_0101_1_0
