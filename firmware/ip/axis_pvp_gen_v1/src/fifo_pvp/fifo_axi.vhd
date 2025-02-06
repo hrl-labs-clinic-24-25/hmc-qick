@@ -3,13 +3,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.MATH_REAL.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity fifo_axi is
+entity iter_axi is
     Generic
     (
         -- Data width.
         B : Integer := 16;
         
-        -- Fifo depth.
+        -- iter depth.
         N : Integer := 4
     );
     Port
@@ -29,18 +29,18 @@ entity fifo_axi is
         full    : out std_logic;        
         empty   : out std_logic
     );
-end fifo_axi;
+end iter_axi;
 
-architecture rtl of fifo_axi is
+architecture rtl of iter_axi is
 
--- FIFO.
-component fifo is
+-- iter.
+component iter is
     Generic
     (
         -- Data width.
         B : Integer := 16;
         
-        -- Fifo depth.
+        -- iter depth.
         N : Integer := 4
     );
     Port
@@ -62,7 +62,7 @@ component fifo is
     );
 end component;
 
--- FIFO read to AXI adapter.
+-- iter read to AXI adapter.
 component rd2axi is
     Generic
     (
@@ -74,10 +74,10 @@ component rd2axi is
         rstn		: in std_logic;
         clk 		: in std_logic;
 
-        -- FIFO Read I/F.
-        fifo_rd_en 	: out std_logic;
-        fifo_dout  	: in std_logic_vector (B-1 downto 0);
-        fifo_empty  : in std_logic;
+        -- iter Read I/F.
+        iter_rd_en 	: out std_logic;
+        iter_dout  	: in std_logic_vector (B-1 downto 0);
+        iter_empty  : in std_logic;
         
         -- Read I/F.
         rd_en 		: in std_logic;
@@ -92,14 +92,14 @@ signal empty_i  : std_logic;
 
 begin
 
--- FIFO.
-fifo_i : fifo
+-- iter.
+iter_pvp_i : iter
     Generic map
     (
         -- Data width.
         B => B,
         
-        -- Fifo depth.
+        -- iter depth.
         N => N
     )
     Port map
@@ -120,7 +120,7 @@ fifo_i : fifo
         empty   => empty_i
     );
 
--- FIFO read to AXI adapter.
+-- iter read to AXI adapter.
 rd2axi_i : rd2axi
     Generic map
     (
@@ -132,10 +132,10 @@ rd2axi_i : rd2axi
         rstn		=> rstn		,
         clk 		=> clk		,
 
-        -- FIFO Read I/F.
-        fifo_rd_en 	=> rd_en_i	,
-        fifo_dout  	=> dout_i	,
-        fifo_empty  => empty_i	,
+        -- iter Read I/F.
+        iter_rd_en 	=> rd_en_i	,
+        iter_dout  	=> dout_i	,
+        iter_empty  => empty_i	,
         
         -- Read I/F.
         rd_en 		=> rd_en	,

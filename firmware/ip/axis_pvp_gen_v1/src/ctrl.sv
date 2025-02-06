@@ -1,17 +1,14 @@
 //Format of waveform interface:
-// |---------|----------|---------|
-// | 49  48  | 47 .. 24 | 23 .. 0 |
-// |---------|----------|---------|
-// |  mux    | dac_2    | dac_1   |
-// |---------|----------|---------|
-// mux 	    : 2 bits
-// dac_2 	: 24 bits
-// dac_1 	: 24 bits
 
-// deleted: mode_int --> determines whether the output is a one shot or periodic. We are assuming "one shot" atm; we don't need a counter.
-// deleted: the state machine - we aren't following the periodic/single time read idea
-
-// need to map out timing for this block -- i'm pretty sure we just load and the raise the "en_o" flag
+// mem_i
+// |---------|-----|---------|---------|--------|--------|
+// | 97      | 96  | 95:72   | 71:48   |  47:24	| 23:0   |
+// |---------|-----|---------|---------|--------|--------|
+// | trigger | mux | dac_4   |  dac_3  | dac_2  | dac_1 |
+// |---------|-----|---------|---------|--------|--------|
+// dac_1 	: if mux = 1, the last three bits are the values for each select mux (i.e. 6:0 for bits 23:0)
+	//      : if mux = 0, 24 bits dedicated to the SPI output to be stored
+// mux -- 1 if this is loading the mux values for the dacs
 
 module ctrl (
 	// Reset and clock.
@@ -19,42 +16,45 @@ module ctrl (
 	clk				,
 
 	// Memory/AXI interface.
-	mem_input_i		,
+	mem_i		,
 
+	// save
 	// dac control.
 	dac_1_o		,
 	dac_2_o		,
+	dac_3_o		,
+	dac_4_o		,
 
 	// Output mux selection.
 	mux_o			,
 	
 	// Output enable.
-	en_o			);
+	trigger_o,
+	en_o			
+);
 
 // Ports.
 input					rstn;
 input					clk;
-input	[49:0]			mem_input_r;
-output	[23:0]			dac_1_o;
-output	[23:0]			dac_2_o;
-output	[2:0]			mux_o;
+input	[97:0]			mem_input_r;  // 97 bits for the data
+output	[23:0]			dac_o;
+output  [4:0]           mux_o;
+output 					trigger_o;
 output					en_o;
 
-// Input register. Only assigned when load_r is true (i.e. we're allowed to read)
-reg		[49:0]	mem_input_r;
+// wires combinational only
+// Muxes.
+reg [4:0]  mux_1, n_mux_1;
+reg [4:0]  mux_2, n_mux_2;
+reg [4:0]  mux_3, n_mux_3;
+reg [4:0]  mux_4, n_mux_4;
 
-// DAC vectors.
-wire	[23:0]	dac_1;
-wire	[23:0]	dac_2;
+// DAC
+reg [23:0] dac_1;
+reg [23:0] dac_2;
+reg [23:0] dac_3;
+reg [23:0] dac_4;
 
-// Mux Vector
-wire    [1:0]   mux;
-
-// Counter.
-reg		[23:0]	cnt;
-
-// Output enable register.
-reg				en_reg;
 
 // Registers.
 always @(posedge clk) begin
@@ -63,47 +63,57 @@ always @(posedge clk) begin
 		// DAC registers.
 		dac_1 			<= 0;
 		dac_2 			<= 0;
+		dac_3 			<= 0;
+		dac_4 			<= 0;
 
-		// Memory dout register.
-		mem_input_r		<= 0;
+		// Muxes.
+		mux_1 			<= 0;
+		mux_2 			<= 0;
+		mux_3 			<= 0;
+		mux_4 			<= 0;
 
-		// Load enable flag.
-		load_r			<= 0;
-
-		// Counter.
-		cnt				<= 0;
-
-		// Output enable register.
-		en_reg			<= 0;
+		en_o  			<= 0;
+		trigger_o       <= 0;
 	end
 	else begin
 
-		dac_1 		<= dac_1_int;
-		dac_2		<= mem_input_r[47:0];
-		mux 		<= mem_input_r[49:48];
+		en_o <= 1;
+		trigger <= mem_i[97];
 
-		en_reg_r1		<= en_reg;
+		mux_1 <= n_mux_1;
+		mux_2 <= n_mux_2;
+		mux_3 <= n_mux_3;
+		mux_4 <= n_mux_4;
+
+		// load muxes
+		if (mem_i[96]) begin  // set the mux values
+			// DAC registers.
+			dac_1 			<= 0;
+			dac_2 			<= 0;
+			dac_3 			<= 0;
+			dac_4 			<= 0;
+
+		end else begin
+			dac_1 			<= dac_1[23:0];
+			dac_2 			<= dac_2[47:24];
+			dac_3 			<= dac_3[71:48];
+			dac_4 			<= dac_4[95:72];
+
+		end
+
 	end
 end 
 
-// Assigning variables
-assign dac_1_int = mem_input_r[23:0];
-assign dac_2_int = mem_input_r[47:0];
-assign mux_int 	 = mem_input_r[49:48];
-assign en_reg    = 1;
+assign n_mux_1 = mem_i[6:0];
+assign n_mux_2 = mem_i[30:24];
+assign n_mux_3 = mem_i[56:48];
+assign n_mux_4 = mem_i[78:72];
 
-// Assigning outputs
 assign dac_1_o = dac_1;
 assign dac_2_o = dac_2;
-assign mux_o   = mux;
-assign en_reg  = en_reg;
+assign dac_3_o = dac_3;
+assign dac_4_o = dac_4;
 
-// Assign load_int, which determines if we are loading the register or not.
-// rd_en_int depends on the state originally (i.e. whether we're in READ or CNTR state; since we aren't doing periodic for now, though, we'll leave it as 1)
-// assign load_int 	= rd_en_int & ~fifo_empty_i;
-// READ state is entered when in reset mode, or when cnt == nsamp_int-2
-// CNT  state is entered when in periodic mode and the fifo stack isn't empty
-// we don't need this ability yet, so it's been removed along with the state machine
 
 endmodule
 
