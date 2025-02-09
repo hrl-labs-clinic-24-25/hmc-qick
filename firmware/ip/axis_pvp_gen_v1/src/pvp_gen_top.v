@@ -40,7 +40,10 @@ input           		WE_REG;
 /********************/
 // iter.
 wire					iter_wr_en;
-wire	[23:0]			iter_din;
+
+
+wire	[23:0]			iter_din_1;
+
 wire					iter_rd_en;
 wire					iter_full;
 wire					iter_empty;
@@ -100,7 +103,16 @@ pvp_fsm_gen
 		.iter_rd_en_o	(iter_rd_en			),
 		.iter_empty_i	(iter_empty			),
 		.iter_full_i	(iter_full	     	),
-		.iter_din_o     (iter_din			)
+
+        .iter_din_1_o   (iter_din_1),
+        .iter_din_2_o   (iter_din_2),
+        .iter_din_3_o   (iter_din_3),
+        .iter_din_4_o   (iter_din_4),
+
+        .c_mux_1_o   (c_mux_1),
+        .c_mux_2_o   (c_mux_2),
+        .c_mux_3_o   (c_mux_3),
+        .c_mux_4_o   (c_mux_4)
 	);
 
 

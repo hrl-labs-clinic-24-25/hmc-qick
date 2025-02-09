@@ -125,7 +125,7 @@ assign dac_2 = (~mem_i[96] & mem_i[97]) ? mem_i[47:24] : 0;
 assign dac_3 = (~mem_i[96] & mem_i[97]) ? mem_i[71:48] : 0;
 assign dac_4 = (~mem_i[96] & mem_i[97]) ? mem_i[95:72] : 0;
 
-assign sendorload_o = sendorload;
+assign sendorload_o = trigger;
 assign mux_en_o = mux_en;
 
 endmodule
