@@ -1,0 +1,8 @@
+Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/ctrl.sv {1 {vlog -work work -vopt -sv -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/ctrl.sv
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module ctrl
+
+Top level modules:
+	ctrl
+
+} {} {}}

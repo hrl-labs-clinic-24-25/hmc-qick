@@ -33,7 +33,7 @@ module pvp_fsm_tb();
   logic					 iter_empty_i;
   logic	         iter_full_i;
 
-  logic	[23:0]   iter_din_o;
+  logic	[31:0]   iter_din_o;
 
   logic [4:0] c_mux_o;
 
@@ -49,6 +49,7 @@ module pvp_fsm_tb();
 
     .iter_rd_en_o,
     .iter_wr_en_o,
+
     .iter_empty_i,
 	  .iter_full_i,
 

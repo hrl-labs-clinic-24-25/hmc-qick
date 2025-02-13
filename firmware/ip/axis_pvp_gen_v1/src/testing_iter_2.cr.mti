@@ -50,6 +50,13 @@ Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
 -- Compiling entity fifo_dc_axi
 -- Compiling architecture rtl of fifo_dc_axi
 
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/tb/tb_fifo.sv {1 {vlog -work work -vopt -sv -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/tb/tb_fifo.sv
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module tb_fifo
+
+Top level modules:
+	tb_fifo
+
 } {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/fifo_axi.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/fifo_axi.vhd
 Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
 -- Loading package STANDARD

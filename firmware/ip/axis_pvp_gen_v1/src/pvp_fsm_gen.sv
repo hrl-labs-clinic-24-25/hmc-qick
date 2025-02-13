@@ -18,8 +18,7 @@ module pvp_fsm_gen (
 		iter_full_i,
 
         iter_din_o,
-
-        c_mux_o,
+        c_mux_o
 		
 	);
 
@@ -45,7 +44,7 @@ input						iter_empty_i;
 input	            	    iter_full_i;
 
 
-output	[23:0]         	    iter_din_o;
+output	[31:0]         	    iter_din_o;
 output	[4:0]         	    c_mux_o;
 
 
@@ -65,10 +64,10 @@ reg muxes_enabled;
 reg sendorload_trigger;
 reg iter_full;
 
-reg	[23:0]         	    iter_din_1_o;
-reg	[23:0]         	    iter_din_2_o;
-reg	[23:0]         	    iter_din_3_o;
-reg	[23:0]         	    iter_din_4_o;
+reg	[31:0]         	    iter_din_1_o;
+reg	[31:0]         	    iter_din_2_o;
+reg	[31:0]         	    iter_din_3_o;
+reg	[31:0]         	    iter_din_4_o;
 
 reg	[4:0]         	    c_mux_1_o;
 reg	[4:0]         	    c_mux_2_o;
@@ -206,10 +205,10 @@ assign iter_rd_en_o = (curr_state == LOAD & ~muxes_enabled); // wait until after
 assign iter_empty = iter_empty_i;
 assign iter_full  = iter_full_i;
 
-assign iter_din_1_o = (curr_state == LOAD & sendorload_trigger) ? dac_1 : 24'b0;
-assign iter_din_2_o = (curr_state == LOAD & sendorload_trigger) ? dac_2 : 24'b0;
-assign iter_din_3_o = (curr_state == LOAD & sendorload_trigger) ? dac_3 : 24'b0;
-assign iter_din_4_o = (curr_state == LOAD & sendorload_trigger) ? dac_4 : 24'b0;
+assign iter_din_1_o = (curr_state == LOAD & sendorload_trigger) ? {8'b0, dac_1} : 32'b0;
+assign iter_din_2_o = (curr_state == LOAD & sendorload_trigger) ? {8'b0, dac_2} : 32'b0;
+assign iter_din_3_o = (curr_state == LOAD & sendorload_trigger) ? {8'b0, dac_3} : 32'b0;
+assign iter_din_4_o = (curr_state == LOAD & sendorload_trigger) ? {8'b0, dac_4} : 32'b0;
 
 
 assign curr_state = next_state;

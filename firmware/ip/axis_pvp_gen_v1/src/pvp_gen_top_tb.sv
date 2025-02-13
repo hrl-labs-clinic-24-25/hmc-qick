@@ -16,7 +16,7 @@
 `default_nettype none
 `define N_TV 1
 
-module pvp_fsm_tb();
+module pvp_gen_top();
 
  // Set up test signals
 // logic clk, reset; 					// clk is necessary in all test benches
@@ -25,37 +25,31 @@ module pvp_fsm_tb();
 // logic trigger, en, 
 
   logic clk, rstn;
-  logic [97:0]	 data_i;
-  logic					 tvalid_i;
+  logic [97:0]	 s1_axis_tdata_i;
+  logic					 s1_axis_tvalid_i;
+  logic          s1_axis_tready_o
 
-  logic					 iter_rd_en_o;
-  logic					 iter_wr_en_o;
-  logic					 iter_empty_i;
-  logic	         iter_full_i;
+  logic	[23:0]	m_axis_tdata_i;
+  logic         m_axis_tready_i;
+	logic         m_axis_tvalid_o;
 
-  logic	[23:0]   iter_din_o;
-
-  logic [4:0] c_mux_o;
-
-  logic [10:0] placeholder;
 
  // Instatiation of lab 1's top module
-    pvp_fsm_gen fsm (
-    .rstn,
-	  .clk,
+    pvp_gen_top topfile ( 
+	(
+		// Reset and clock.
+    	aresetn				,
+		aclk				,
 
-    .data_i,
-	  .tvalid_i,
+    	// AXIS Slave to queue waveforms.
+		s1_axis_tdata_i		,
+		s1_axis_tvalid_i	,
+		s1_axis_tready_o	,
 
-    .iter_rd_en_o,
-    .iter_wr_en_o,
-
-    .iter_empty_i,
-	  .iter_full_i,
-
-    .iter_din_o,
-    .c_mux_o
-   );
+		// M_AXIS for output.
+		m_axis_tready_i		,
+		m_axis_tvalid_o
+	);
    
  // Create dumpfile
  initial

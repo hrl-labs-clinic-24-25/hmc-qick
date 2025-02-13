@@ -10,9 +10,11 @@ module pvp_gen_top
 		s1_axis_tready_o	,
 
 		// M_AXIS for output.
-		m_axis_tready_i		,
+		m_axis_tready_o		,
 		m_axis_tvalid_o		,
-		m_axis_tdata_o
+
+		// MUXING LINES
+		select
 	);
 
 /**************/
@@ -29,11 +31,13 @@ input 	[23:0]			s1_axis_tdata_i;
 input					s1_axis_tvalid_i;
 output					s1_axis_tready_o;
 
-input					m_axis_tready_i;
+input					m_axis_tready_o;
 output					m_axis_tvalid_o;
 output	[23:0]      	m_axis_tdata_o;
 
-input           		WE_REG;
+output [4:0]			select;
+
+// input           		WE_REG;
 
 /********************/
 /* Internal signals */
@@ -42,7 +46,7 @@ input           		WE_REG;
 wire					iter_wr_en;
 
 
-wire	[23:0]			iter_din_1;
+wire	[31:0]			iter_din;
 
 wire					iter_rd_en;
 wire					iter_full;
@@ -65,7 +69,7 @@ iter_pvp
         .B	(32),
         
         // iter depth.
-        .N	(256)
+        .N	(4)
     )
     iter_pvp_i
 	( 
@@ -77,7 +81,7 @@ iter_pvp
         .din    (iter_din	),  // assign in pvp_fsm (dac1 automatically - we'll add logic when we need to for loop through everything)
         
         // Read I/F.
-        .rd_en 	(iter_rd_en_o), // fed into fsm
+        .rd_en 	(iter_rd_en), // fed into fsm
         .dout  	(iter_dout	),
 
 		.full   (iter_full_i), // fed into fsm
@@ -85,6 +89,8 @@ iter_pvp
     );
 
 assign iter_wr_en	= s1_axis_tvalid_i;
+assign m_axis_tdata_o = iter_rd_en ? iter_din[23:0] : 0;
+assign select = iter_rd_en ? c_mux : 0;
 
 // custom fsm gen. 
 pvp_fsm_gen 
@@ -104,20 +110,13 @@ pvp_fsm_gen
 		.iter_empty_i	(iter_empty			),
 		.iter_full_i	(iter_full	     	),
 
-        .iter_din_1_o   (iter_din_1),
-        .iter_din_2_o   (iter_din_2),
-        .iter_din_3_o   (iter_din_3),
-        .iter_din_4_o   (iter_din_4),
-
-        .c_mux_1_o   (c_mux_1),
-        .c_mux_2_o   (c_mux_2),
-        .c_mux_3_o   (c_mux_3),
-        .c_mux_4_o   (c_mux_4)
+        .iter_din_o   (iter_din),
+        .c_mux_o 		(c_mux)
 	);
 
 
 // Assign outputs.
-assign s1_axis_tready_o	= ~iter_full;
+assign s1_axis_tready_o	= iter_full;
 
 endmodule
 
