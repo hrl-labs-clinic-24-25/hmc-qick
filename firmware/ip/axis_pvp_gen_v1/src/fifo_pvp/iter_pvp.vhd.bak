@@ -78,7 +78,7 @@ mem_i : bram_simple_dp
         -- Memory address size. DOUBLE CHECK SIZING -- make sure that if its 1/3 of the initial, it can still be used
         N       => READ_THROUGH_SPI,
         -- Data width.
-        B       => B
+        B       => 32
     )
     Port map ( 
         clk    	=> clk						,

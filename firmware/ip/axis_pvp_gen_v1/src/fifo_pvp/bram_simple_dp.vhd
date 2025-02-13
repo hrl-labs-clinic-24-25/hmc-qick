@@ -5,9 +5,9 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity bram_simple_dp is
     Generic (
         -- Memory address size.
-        N       : Integer := 16;
+        N       : Integer := 32;
         -- Data width.
-        B       : Integer := 16
+        B       : Integer := 32
     );
     Port ( 
         clk    	: in STD_LOGIC;
