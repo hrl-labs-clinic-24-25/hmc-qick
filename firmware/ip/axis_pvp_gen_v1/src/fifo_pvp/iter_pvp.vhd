@@ -10,7 +10,7 @@ entity iter is
         B : Integer := 32;
         
         -- iter depth.
-        N : Integer := 256
+        N : Integer := 32
     );
     Port
     ( 
@@ -35,7 +35,7 @@ architecture rtl of iter is
 
 -- Number of bits of depth.
 constant THREE_N_SPI : Integer := Integer(32);
-constant READ_THROUGH_SPI : Integer := Integer(32);
+constant READ_THROUGH_SPI : Integer := Integer(4);
 
 -- Dual port, single clock  BRAM.
 component bram_simple_dp is

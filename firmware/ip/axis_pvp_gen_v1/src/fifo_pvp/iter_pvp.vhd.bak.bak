@@ -34,7 +34,7 @@ end iter;
 architecture rtl of iter is
 
 -- Number of bits of depth.
-constant THREE_N_SPI : Integer := Integer(4);
+constant THREE_N_SPI : Integer := Integer(32);
 constant READ_THROUGH_SPI : Integer := Integer(4);
 
 -- Dual port, single clock  BRAM.

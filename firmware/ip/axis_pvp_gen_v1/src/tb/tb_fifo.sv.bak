@@ -36,7 +36,7 @@ module tb_fifo();
 	if (dout != dout_exp) $display("%h: Dout should be %h, but is %h,", counter, dout_exp, dout);
 	if (full_exp != full) $display("%h: Full should be %h, but is %h,", counter, full_exp, full);
 	if (empty_exp != empty) $display("%h: Empty should be %h, but is %h,", counter, empty_exp, empty);
-	#10;
+	#20;
 	counter = counter +1;
     end 
 
