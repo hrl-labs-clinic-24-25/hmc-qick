@@ -38,6 +38,8 @@ module tb_fifo();
 	if (empty_exp != empty) $display("%h: Empty should be %h, but is %h,", counter, empty_exp, empty);
 	#10;
 	counter = counter +1;
+	if (counter == 20) rstn = 0;
+	else 		   rstn = 1;
     end 
 
     always @(negedge clk)
