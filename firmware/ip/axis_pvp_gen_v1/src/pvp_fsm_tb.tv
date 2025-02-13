@@ -1,0 +1,18 @@
+// subbytes_test.tv
+// Zoe Worrall
+// zworrall@g.hmc.edu
+// 02.05.2025
+//
+// 
+//
+// underscore is ignored
+// // indicates comment
+//
+// select is 5 bits showing where the muxes are
+//
+// .rstn, .clk, .data_i, .tvalid_i, .data_o, .select, .iter_rd_en_o, .iter_wr_en_o, .iter_empty_i, .iter_full_i, .iter_din_o
+//
+// rstn, data_i (23:0), tvalid, iter_empty_i, iter_full_i, -- data_o (23:0), select (4:0), iter_rd_en_o, iter_wr_en_o, iter_din_o
+
+// WAIT_LOAD
+1__1111_0000_1111_0000_1010_0011__0__0__0________0000_0000_0000_0000_0000__00000__

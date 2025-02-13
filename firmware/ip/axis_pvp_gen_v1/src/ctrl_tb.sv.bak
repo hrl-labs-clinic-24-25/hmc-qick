@@ -1,0 +1,145 @@
+/***
+  A Testbench meant to test all possible cases of switch pins used within the lab.
+	Based off of the fulladder testbench inside of the MicroP's page.
+
+  Calls on a text file "lab02_testvectors.tv", however due to odd pathing the full
+	address of the file to computer needed to be written. For future users, it
+	will be necessary to replace this current pathing with their own to ensure
+	the right connection and no errors being thrown during Simulation.
+
+  @author: zoe worrall
+	   zworrall@g.hmc.edu
+  @version: 09/05/2024
+  
+*/
+`timescale 1ns/1ns
+`default_nettype none
+`define N_TV 1
+
+module ctrl_tb();
+
+ // Set up test signals
+// logic clk, reset; 					// clk is necessary in all test benches
+// logic [23:0] dac1, dac2, dac3, dac4;
+// logic [4:0] mux;
+// logic trigger, en, 
+ logic [255:0] vectornum, errors;     // the way that we iterate through the table of test vectors
+ logic [255:0] testvectors [10000:0]; // Vectors of format state[15:0], next_state[15:0]
+ logic shift_enable;
+ assign shift_enable = 1;
+
+/***
+			logic state,  // statetype variable letting us know whether display 0 or display 1 is on
+	 input	logic  [3:0] s1, s2,
+	 output  logic [6:0] seg,  // GPIO power for seg1 and seg 2
+	 output logic 		anode_display1, anode_display2 */
+
+ // Instatiation of lab 1's top module
+   `timescale 10ns/1ns
+
+    logic rstn, clk;
+    logic [97:0] mem_i;
+    logic [23:0] dac_1_o, dac_2_o, dac_3_o, dac_4_o;
+    logic [4:0] mux_1, mux_2, mux_3, mux_4, mux_1_o, mux_2_o, mux_3_o, mux_4_o;
+    logic [8:0] i;
+
+    logic trigger_o, en_o, load;
+
+ ctrl ctrl_block (
+    .rstn			,
+	.clk			,
+	.mem_i			,
+	.dac_1_o		,
+	.dac_2_o		,
+	.dac_3_o		,
+	.dac_4_o		,
+	.mux_1_o		,
+	.mux_2_o		,
+	.mux_3_o		,
+	.mux_4_o		,
+	.trigger_o		,
+	.en_o	
+   );
+
+ // Create dumpfile
+ initial
+   begin
+     $dumpfile("testbench_ctrl_tb.vcd");
+     $dumpvars(0, ctrl_tb);
+   end
+    
+    // generate clock and load signals
+		always begin
+				clk = 1'b0; #5;
+				clk = 1'b1; #5;
+		end
+        
+    initial begin
+		// to do
+		// 1. nothing
+		// 2. load the muxes
+		// 3. load values into the DACs
+		// 4. check that the value that is output is the correct mux and the correct dac spi
+
+      i = 0;
+	  mem_i = 98'b0_0_000000000000000000000000_000000000000000000000000_000000000000000000000000_000000000000000000000000;
+	  #21;
+
+	  if (dac_1_o == 24'b000000000000000000000000 || dac_2_o == 24'b000000000000000000000000 || dac_3_o == 24'b000000000000000000000000 || dac_4_o == 24'b000000000000000000000000) begin
+            #1;
+			$display("Testbench ran successfully");
+      end else begin
+        // Delay to make sure that the answer is held correctly on the cyphertext before shifting out
+        #1; 
+		$display("Error 1: Dac 1 = %h, Dac 2 = %h, Dac 3 = %h, Dac 4 = %h", dac_1_o, dac_2_o, dac_3_o, dac_4_o );
+	  end
+
+      i = 0;
+      load = 1'b1;
+	  rstn = 1;
+	  load = 0;
+	  mem_i = 98'b0_0_000000000000000000010101_000000000000000000010111_000000000000000000011101_000000000000000000010000;
+	#30;	  
+
+	if (dac_1_o == 24'b000000000000000000000000 || dac_2_o == 24'b000000000000000000000000 || dac_3_o == 24'b000000000000000000000000 || dac_4_o == 24'b000000000000000000000000) begin
+        #1; 
+            $display("Testbench ran successfully");
+      end else begin
+        #1; // Delay to make sure that the answer is held correctly on the cyphertext before shifting out
+        $display("Error 2v2: Dac 1 = %h, Dac 2 = %h, Dac 3 = %h, Dac 4 = %h", dac_1_o, dac_2_o, dac_3_o, dac_4_o );
+	  end
+      
+	mem_i = 98'b0_1_000000000000000000010101_000000000000000000010111_000000000000000000011101_000000000000000000010000;
+	#20;
+
+	if (mux_4_o == 5'b10101 && mux_3_o == 5'b10111 && mux_2_o == 5'b11101 && mux_1_o == 5'b10000 ) begin
+        #1; 
+            $display("Testbench ran successfully");
+      end else begin
+        #1; // Delay to make sure that the answer is held correctly on the cyphertext before shifting out
+        $display("Error 3: Mux 1 = %h, Mux 2 = %h, Mux 3 = %h, Mux 4 = %h", mux_1_o, mux_2_o, mux_3_o, mux_4_o );
+	  end
+    
+	mem_i = 98'b1_1_000000000000000000010101_000000000000000000010111_000000000000000000011101_000000000000000000010000; // illegal command - we can't enable while also loading muxes
+	#20;
+
+	if (dac_1_o == 0 && dac_2_o == 0 && dac_3_o == 0 && dac_4_o == 0 && mux_1_o == 0 && mux_2_o == 0 && mux_3_o == 0 && mux_4_o == 0 ) begin
+        #1; 
+            $display("Testbench ran successfully");
+      end else begin
+        #1; // Delay to make sure that the answer is held correctly on the cyphertext before shifting out
+        $display("Error 4: Mux 1 = %h, Mux 2 = %h, Mux 3 = %h, Mux 4 = %h", mux_1_o, mux_2_o, mux_3_o, mux_4_o );
+	  end
+
+	mem_i = 98'b1_0_010101010101010101010101_110011001100110011001100_111100001111000011110000_111111111111000000000000;
+	#20;
+	if (dac_1_o == 24'b010101010101010101010101 && dac_2_o == 24'b110011001100110011001100 && dac_3_o == 24'b111100001111000011110000 && dac_4_o == 24'b111111111111000000000000 && mux_1_o == 0 && mux_2_o == 0 && mux_3_o == 0 && mux_4_o == 0 ) begin
+        #1; 
+            $display("Testbench ran successfully");
+      end else begin
+        #1; // Delay to make sure that the answer is held correctly on the cyphertext before shifting out
+        $display("Error 4: Mux 1 = %h, Mux 2 = %h, Mux 3 = %h, Mux 4 = %h", mux_1_o, mux_2_o, mux_3_o, mux_4_o );
+	  end
+
+
+endmodule
