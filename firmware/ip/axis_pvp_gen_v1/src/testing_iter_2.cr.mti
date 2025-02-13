@@ -1,0 +1,110 @@
+Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/bram_dp.vhd {2 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/bram_dp.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling entity bram_dp
+-- Compiling architecture rtl of bram_dp
+** Warning: Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/bram_dp.vhd(32): (vcom-1236) Shared variables must be of a protected type.
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/gray2bin.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/gray2bin.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package MATH_REAL
+-- Loading package NUMERIC_STD
+-- Compiling entity gray2bin
+-- Compiling architecture rtl of gray2bin
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/bram_pvp_dp.vhd {0 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/bram_pvp_dp.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling entity bram_pvp_dp
+** Error: Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/bram_pvp_dp.vhd(17): near "/": (vcom-1576) expecting IDENTIFIER.
+** Note: Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/bram_pvp_dp.vhd(17): VHDL Compiler exiting
+
+} {9.0 10.0} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/rd2axi.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/rd2axi.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package MATH_REAL
+-- Loading package NUMERIC_STD
+-- Compiling entity rd2axi
+-- Compiling architecture rtl of rd2axi
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/fifo_dc_axi.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/fifo_dc_axi.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package MATH_REAL
+-- Loading package NUMERIC_STD
+-- Compiling entity fifo_dc_axi
+-- Compiling architecture rtl of fifo_dc_axi
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/fifo_axi.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/fifo_axi.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package MATH_REAL
+-- Loading package NUMERIC_STD
+-- Compiling entity iter_axi
+-- Compiling architecture rtl of iter_axi
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/tb/tb_fifo.sv {1 {vlog -work work -vopt -sv -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/tb/tb_fifo.sv
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module tb_fifo
+
+Top level modules:
+	tb_fifo
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/bin2gray.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/bin2gray.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package MATH_REAL
+-- Loading package NUMERIC_STD
+-- Compiling entity bin2gray
+-- Compiling architecture rtl of bin2gray
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/bram_simple_dp.vhd {2 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/bram_simple_dp.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling entity bram_simple_dp
+-- Compiling architecture rtl of bram_simple_dp
+** Warning: Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/bram_simple_dp.vhd(28): (vcom-1236) Shared variables must be of a protected type.
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/synchronizer_vect.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/synchronizer_vect.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity synchronizer_vect
+-- Compiling architecture rtl of synchronizer_vect
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/fifo_dc.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v1/src/fifo_pvp/fifo_dc.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package MATH_REAL
+-- Loading package NUMERIC_STD
+-- Compiling entity fifo_dc
+-- Compiling architecture rtl of fifo_dc
+
+} {} {}}

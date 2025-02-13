@@ -58,7 +58,7 @@ component bram_simple_dp is
 end component;
 
 -- Pointers.
-signal wptr   	: unsigned (THREE_N_SPI-1 downto 0); --write pointer
+signal wptr   	: unsigned (4-1 downto 0); --write pointer
 signal rptr   	: unsigned (READ_THROUGH_SPI-1 downto 0); --read pointer
 signal rptr_initial: unsigned (READ_THROUGH_SPI-1 downto 0); --initial pointer position
 
@@ -96,9 +96,9 @@ mem_wea <= 	wr_en when full_i = '0' else
 			'0';
 
 -- Full/empty signals.
-full_i 	<=  '1' when wptr = rptr - 1 else 
+full_i 	<=  '1' when wptr = 4 else 
             '0';           
-empty_i	<= 	'1' when wptr = rptr else
+empty_i	<= 	'1' when wptr = 0 else
 			'0';
 
 -- wr_clk registers.

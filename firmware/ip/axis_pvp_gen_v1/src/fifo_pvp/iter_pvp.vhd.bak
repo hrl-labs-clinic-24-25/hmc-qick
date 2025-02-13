@@ -10,7 +10,7 @@ entity iter is
         B : Integer := 32;
         
         -- iter depth.
-        N : Integer := 4
+        N : Integer := 32
     );
     Port
     ( 
@@ -34,7 +34,7 @@ end iter;
 architecture rtl of iter is
 
 -- Number of bits of depth.
-constant THREE_N_SPI : Integer := Integer(4);
+constant THREE_N_SPI : Integer := Integer(32);
 constant READ_THROUGH_SPI : Integer := Integer(4);
 
 -- Dual port, single clock  BRAM.
@@ -58,7 +58,7 @@ component bram_simple_dp is
 end component;
 
 -- Pointers.
-signal wptr   	: unsigned (THREE_N_SPI-1 downto 0); --write pointer
+signal wptr   	: unsigned (4-1 downto 0); --write pointer
 signal rptr   	: unsigned (READ_THROUGH_SPI-1 downto 0); --read pointer
 signal rptr_initial: unsigned (READ_THROUGH_SPI-1 downto 0); --initial pointer position
 
@@ -96,9 +96,9 @@ mem_wea <= 	wr_en when full_i = '0' else
 			'0';
 
 -- Full/empty signals.
-full_i 	<=  '1' when wptr = rptr - 1 else 
+full_i 	<=  '1' when wptr = 3 else 
             '0';           
-empty_i	<= 	'1' when wptr = rptr else
+empty_i	<= 	'1' when wptr = 0 else
 			'0';
 
 -- wr_clk registers.

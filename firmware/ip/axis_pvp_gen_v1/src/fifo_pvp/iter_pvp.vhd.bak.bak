@@ -10,7 +10,7 @@ entity iter is
         B : Integer := 32;
         
         -- iter depth.
-        N : Integer := 4
+        N : Integer := 32
     );
     Port
     ( 
@@ -35,7 +35,7 @@ architecture rtl of iter is
 
 -- Number of bits of depth.
 constant THREE_N_SPI : Integer := Integer(32);
-constant READ_THROUGH_SPI : Integer := Integer(4);
+constant READ_THROUGH_SPI : Integer := Integer(32);
 
 -- Dual port, single clock  BRAM.
 component bram_simple_dp is
@@ -96,7 +96,7 @@ mem_wea <= 	wr_en when full_i = '0' else
 			'0';
 
 -- Full/empty signals.
-full_i 	<=  '1' when wptr = rptr - 1 else 
+full_i 	<=  '1' when (wptr = READ_THROUGH_SPI-1) else 
             '0';           
 empty_i	<= 	'1' when wptr = rptr else
 			'0';
