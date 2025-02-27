@@ -33,21 +33,30 @@ module axis_pvp_gen_v2
 		s_axi_rvalid	,
 		s_axi_rready	,
 
-    	// AXIS Slave to load memory samples.
-		s0_axis_aclk	,
-		s0_axis_aresetn	,
-		s0_axis_tdata	, // to be sent out to AXI_LITE of SPI
-		s0_axis_tvalid	,
-		s0_axis_tready	,
-
-		// s1_* and m_* reset/clock.
-		aclk			,
-		aresetn			,
-
 		// AXIS Master for output.
-		m_axis_tready	,
-		m_axis_tvalid	,
-		m_axis_tdata	,
+		m_axi_awaddr	,
+		m_axi_awprot	,
+		m_axi_awvalid	,
+		m_axi_awready	,
+
+		m_axi_wdata		,
+		m_axi_wstrb		,
+		m_axi_wvalid	,
+		m_axi_wready	,
+
+		m_axi_bresp		,
+		m_axi_bvalid	,
+		m_axi_bready	,
+
+		m_axi_araddr	,
+		m_axi_arprot	,
+		m_axi_arvalid	,
+		m_axi_arready	,
+
+		m_axi_rdata		,
+		m_axi_rresp		,
+		m_axi_rvalid	,
+		m_axi_rready	,
 
 		// Start Sending
 		trigger
@@ -64,6 +73,8 @@ parameter [31:0] N_DDS = 16;
 /*********/
 /* Ports */
 /*********/
+
+// S AXIS
 input					s_axi_aclk;
 input					s_axi_aresetn;
 
@@ -91,28 +102,33 @@ output	[1:0]			s_axi_rresp;
 output					s_axi_rvalid;
 input					s_axi_rready;
 
-// INPUTS MAINLY USED FOR 
 
-input					s0_axis_aclk;
-input					s0_axis_aresetn;
-input 	[31:0]			s0_axis_tdata;
-input					s0_axis_tvalid;
-output					s0_axis_tready;
+// M AXIS
 
-input					aresetn;
-input					aclk;
+output	[5:0]			m_axi_awaddr;
+output	[2:0]			m_axi_awprot;
+output					m_axi_awvalid;
+input					m_axi_awready;
 
-input 	[39:0]			s1_axis_tdata;
-input					s1_axis_tvalid;
-output					s1_axis_tready;
+output	[31:0]			m_axi_wdata;
+output	[3:0]			m_axi_wstrb;
+output					m_axi_wvalid;
+input					m_axi_wready;
 
-input					m_axis_tready;
-output					m_axis_tvalid;
-output	[N_DDS*16-1:0]	m_axis_tdata;
+input	[1:0]			m_axi_bresp;
+input					m_axi_bvalid;
+output					m_axi_bready;
 
-input					m1_axis_tready;
-output					m1_axis_tvalid;
-output	[23:0]			m1_axis_tdata;
+output	[5:0]			m_axi_araddr;
+output	[2:0]			m_axi_arprot;
+output					m_axi_arvalid;
+input					m_axi_arready;
+
+input	[31:0]			m_axi_rdata;
+input	[1:0]			m_axi_rresp;
+input					m_axi_rvalid;
+output					m_axi_rready;
+
 
 /********************/
 /* Internal signals */
@@ -122,45 +138,76 @@ wire	[19:0]			START_VAL_REG;
 wire	[19:0]			STEP_SIZE_REG;
 wire	[23:0]			OUTPUT_REG;
 
-
+wire    [23:0] 			mosi_output;
 
 /**********************/
 /* Begin Architecture */
 /**********************/
 // AXI Slave.
-axi_slv axi_slv_i
+axil_slv axil_slv_i
 	(
-		.aclk			(s_axi_aclk	 	),
-		.aresetn		(s_axi_aresetn	),
+		.clk			(s_axi_aclk	 	),
+		.rst		    (~s_axi_aresetn	),
 
+		// INPUT AXI
 		// Write Address Channel.
-		.awaddr			(s_axi_awaddr 	),
-		.awprot			(s_axi_awprot 	),
-		.awvalid		(s_axi_awvalid	),
-		.awready		(s_axi_awready	),
+		.s_axil_awaddr			(s_axi_awaddr 	),
+		.s_axil_awprot			(s_axi_awprot 	),
+		.s_axil_awvalid		(s_axi_awvalid	),
+		.s_axil_awready		(s_axi_awready	),
 
 		// Write Data Channel.
-		.wdata			(s_axi_wdata	),
-		.wstrb			(s_axi_wstrb	),
-		.wvalid			(s_axi_wvalid   ),
-		.wready			(s_axi_wready	),
+		.s_axil_wdata			(s_axi_wdata	),
+		.s_axil_wstrb			(s_axi_wstrb	),
+		.s_axil_wvalid			(s_axi_wvalid   ),
+		.s_axil_wready			(s_axi_wready	),
 
 		// Write Response Channel.
-		.bresp			(s_axi_bresp	),
-		.bvalid			(s_axi_bvalid	),
-		.bready			(s_axi_bready	),
+		.s_axil_bresp			(s_axi_bresp	),
+		.s_axil_bvalid			(s_axi_bvalid	),
+		.s_axil_bready			(s_axi_bready	),
 
 		// Read Address Channel.
-		.araddr			(s_axi_araddr 	),
-		.arprot			(s_axi_arprot 	),
-		.arvalid		(s_axi_arvalid	),
-		.arready		(s_axi_arready	),
+		.s_axil_araddr			(s_axi_araddr 	),
+		.s_axil_arprot			(s_axi_arprot 	),
+		.s_axil_arvalid			(s_axi_arvalid	),
+		.s_axil_arready			(s_axi_arready	),
 
 		// Read Data Channel.
-		.rdata			(s_axi_rdata	),
-		.rresp			(s_axi_rresp	),
-		.rvalid			(s_axi_rvalid	),
-		.rready			(s_axi_rready	),
+		.s_axil_rdata			(mosi_output	),
+		.s_axil_rresp			(s_axi_rresp	),
+		.s_axil_rvalid			(s_axi_rvalid	),
+		.s_axil_rready			(s_axi_rready	),
+
+		// OUTPUT AXI
+		// Write Address Channel.
+		.m_axil_awaddr			(m_axi_awaddr 	),
+		.m_axil_awprot			(m_axi_awprot 	),
+		.m_axil_awvalid			(m_axi_awvalid	),
+		.m_axil_awready			(m_axi_awready	),
+
+		// Write Data Channel.
+		.m_axil_wdata			(m_axi_wdata	),
+		.m_axil_wstrb			(m_axi_wstrb	),
+		.m_axil_wvalid			(m_axi_wvalid   ),
+		.m_axil_wready			(m_axi_wready	),
+
+		// Write Response Channel.
+		.m_axil_bresp			(m_axi_bresp	),
+		.m_axil_bvalid			(m_axi_bvalid	),
+		.m_axil_bready			(m_axi_bready	),
+
+		// Read Address Channel.
+		.m_axil_araddr			(m_axi_araddr 	),
+		.m_axil_arprot			(m_axi_arprot 	),
+		.m_axil_arvalid		    (m_axi_arvalid	),
+		.m_axil_arready		    (m_axi_arready	),
+
+		// Read Data Channel.
+		.m_axil_rdata			(m_axi_rdata	),
+		.m_axil_rresp			(m_axi_rresp	),
+		.m_axil_rvalid			(m_axi_rvalid	),
+		.m_axil_rready			(m_axi_rready	),
 
 		// Registers.
 		.START_VAL_REG	(START_VAL_REG	),
@@ -177,8 +224,10 @@ no_mem_sweep
 		.clk		(s0_axis_aclk),
 		.start		(START_VAL_REG),
 		.step		(STEP_SIZE_REG),
-		.mosi		(OUTPUT_REG)
+		.mosi		(mosi_output)
 		)
+
+
 
 
 endmodule
