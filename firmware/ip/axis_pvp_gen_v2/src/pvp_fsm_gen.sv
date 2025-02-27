@@ -16,8 +16,8 @@ module pvp_fsm_gen (
 /* Parameters */
 /**************/
 
-parameter SIZE = 256;
-parameter DWELL_TIME = 10; // will be set
+parameter SIZE = 16;
+parameter DWELL_TIME = 100; // will be set
 
 /*********/
 /* Ports */

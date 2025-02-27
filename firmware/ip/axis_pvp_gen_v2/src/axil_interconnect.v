@@ -1,7 +1,24 @@
 /*
 
-Based on code Copyright (c) 2018 Alex Forencich
+Copyright (c) 2018 Alex Forencich
 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 */
 
@@ -14,47 +31,36 @@ Based on code Copyright (c) 2018 Alex Forencich
 /*
  * AXI4 lite interconnect
  */
-module axil_slv #
+module axil_interconnect #
 (
     // Number of AXI inputs (slave interfaces)
-    parameter S_COUNT = 1,
-
+    parameter S_COUNT = 4,
     // Number of AXI outputs (master interfaces)
-    parameter M_COUNT = 1,
-
+    parameter M_COUNT = 4,
     // Width of data bus in bits
     parameter DATA_WIDTH = 32,
-
     // Width of address bus in bits
-    parameter ADDR_WIDTH = 6,
-
+    parameter ADDR_WIDTH = 32,
     // Width of wstrb (width of data bus in words)
     parameter STRB_WIDTH = (DATA_WIDTH/8),
-
     // Number of regions per master interface
     parameter M_REGIONS = 1,
-
     // Master interface base addresses
     // M_COUNT concatenated fields of M_REGIONS concatenated fields of ADDR_WIDTH bits
     // set to zero for default addressing based on M_ADDR_WIDTH
     parameter M_BASE_ADDR = 0,
-
     // Master interface address widths
     // M_COUNT concatenated fields of M_REGIONS concatenated fields of 32 bits
     parameter M_ADDR_WIDTH = {M_COUNT{{M_REGIONS{32'd24}}}},
-
     // Read connections between interfaces
     // M_COUNT concatenated fields of S_COUNT bits
     parameter M_CONNECT_READ = {M_COUNT{{S_COUNT{1'b1}}}},
-
     // Write connections between interfaces
     // M_COUNT concatenated fields of S_COUNT bits
     parameter M_CONNECT_WRITE = {M_COUNT{{S_COUNT{1'b1}}}},
-
     // Secure master (fail operations based on awprot/arprot)
     // M_COUNT bits
     parameter M_SECURE = {M_COUNT{1'b0}}
-
 )
 (
     input  wire                           clk,
@@ -63,69 +69,48 @@ module axil_slv #
     /*
      * AXI lite slave interfaces
      */
-    input  wire [31:0]  s_axil_awaddr,
-    input  wire [2:0]           s_axil_awprot,
-    input  wire              s_axil_awvalid,
-    output wire             s_axil_awready,
-    input  wire [31:0]  s_axil_wdata,
-    input  wire [3:0]  s_axil_wstrb,
-    input  wire             s_axil_wvalid,
-    output wire           s_axil_wready,
-    output wire [1:0]           s_axil_bresp,
-    output wire           s_axil_bvalid,
-    input  wire             s_axil_bready,
-    input  wire [31:0]  s_axil_araddr,
-    input  wire [2:0]      s_axil_arprot,
-    input  wire         s_axil_arvalid,
-    output wire        s_axil_arready,
-    output wire [31:0]  s_axil_rdata,
-    output wire [1:0]           s_axil_rresp,
-    output wire              s_axil_rvalid,
-    input  wire            s_axil_rready,
-
-    
-    // input  wire [S_COUNT*ADDR_WIDTH-1:0]  s_axil_awaddr,
-    // input  wire [S_COUNT*3-1:0]           s_axil_awprot,
-    // input  wire [S_COUNT-1:0]             s_axil_awvalid,
-    // output wire [S_COUNT-1:0]             s_axil_awready,
-    // input  wire [S_COUNT*DATA_WIDTH-1:0]  s_axil_wdata,
-    // input  wire [S_COUNT*STRB_WIDTH-1:0]  s_axil_wstrb,
-    // input  wire [S_COUNT-1:0]             s_axil_wvalid,
-    // output wire [S_COUNT-1:0]             s_axil_wready,
-    // output wire [S_COUNT*2-1:0]           s_axil_bresp,
-    // output wire [S_COUNT-1:0]             s_axil_bvalid,
-    // input  wire [S_COUNT-1:0]             s_axil_bready,
-    // input  wire [S_COUNT*ADDR_WIDTH-1:0]  s_axil_araddr,
-    // input  wire [S_COUNT*3-1:0]           s_axil_arprot,
-    // input  wire [S_COUNT-1:0]             s_axil_arvalid,
-    // output wire [S_COUNT-1:0]             s_axil_arready,
-    // output wire [S_COUNT*DATA_WIDTH-1:0]  s_axil_rdata,
-    // output wire [S_COUNT*2-1:0]           s_axil_rresp,
-    // output wire [S_COUNT-1:0]             s_axil_rvalid,
-    // input  wire [S_COUNT-1:0]             s_axil_rready,
+    input  wire [S_COUNT*ADDR_WIDTH-1:0]  s_axil_awaddr,
+    input  wire [S_COUNT*3-1:0]           s_axil_awprot,
+    input  wire [S_COUNT-1:0]             s_axil_awvalid,
+    output wire [S_COUNT-1:0]             s_axil_awready,
+    input  wire [S_COUNT*DATA_WIDTH-1:0]  s_axil_wdata,
+    input  wire [S_COUNT*STRB_WIDTH-1:0]  s_axil_wstrb,
+    input  wire [S_COUNT-1:0]             s_axil_wvalid,
+    output wire [S_COUNT-1:0]             s_axil_wready,
+    output wire [S_COUNT*2-1:0]           s_axil_bresp,
+    output wire [S_COUNT-1:0]             s_axil_bvalid,
+    input  wire [S_COUNT-1:0]             s_axil_bready,
+    input  wire [S_COUNT*ADDR_WIDTH-1:0]  s_axil_araddr,
+    input  wire [S_COUNT*3-1:0]           s_axil_arprot,
+    input  wire [S_COUNT-1:0]             s_axil_arvalid,
+    output wire [S_COUNT-1:0]             s_axil_arready,
+    output wire [S_COUNT*DATA_WIDTH-1:0]  s_axil_rdata,
+    output wire [S_COUNT*2-1:0]           s_axil_rresp,
+    output wire [S_COUNT-1:0]             s_axil_rvalid,
+    input  wire [S_COUNT-1:0]             s_axil_rready,
 
     /*
      * AXI lite master interfaces
      */
-    output wire [31:0]  m_axil_awaddr,
-    output wire [2:0]           m_axil_awprot,
-    output wire            m_axil_awvalid,
-    input  wire           m_axil_awready,
-    output wire [31:0]  m_axil_wdata,
-    output wire [3:0]  m_axil_wstrb,
-    output wire            m_axil_wvalid,
-    input  wire            m_axil_wready,
-    input  wire [1:0]           m_axil_bresp,
-    input  wire            m_axil_bvalid,
-    output wire             m_axil_bready,
-    output wire [31:0]  m_axil_araddr,
-    output wire [2:0]           m_axil_arprot,
-    output wire             m_axil_arvalid,
-    input  wire             m_axil_arready,
-    input  wire [31:0]  m_axil_rdata,
-    input  wire [1:0]           m_axil_rresp,
-    input  wire            m_axil_rvalid,
-    output wire          m_axil_rready
+    output wire [M_COUNT*ADDR_WIDTH-1:0]  m_axil_awaddr,
+    output wire [M_COUNT*3-1:0]           m_axil_awprot,
+    output wire [M_COUNT-1:0]             m_axil_awvalid,
+    input  wire [M_COUNT-1:0]             m_axil_awready,
+    output wire [M_COUNT*DATA_WIDTH-1:0]  m_axil_wdata,
+    output wire [M_COUNT*STRB_WIDTH-1:0]  m_axil_wstrb,
+    output wire [M_COUNT-1:0]             m_axil_wvalid,
+    input  wire [M_COUNT-1:0]             m_axil_wready,
+    input  wire [M_COUNT*2-1:0]           m_axil_bresp,
+    input  wire [M_COUNT-1:0]             m_axil_bvalid,
+    output wire [M_COUNT-1:0]             m_axil_bready,
+    output wire [M_COUNT*ADDR_WIDTH-1:0]  m_axil_araddr,
+    output wire [M_COUNT*3-1:0]           m_axil_arprot,
+    output wire [M_COUNT-1:0]             m_axil_arvalid,
+    input  wire [M_COUNT-1:0]             m_axil_arready,
+    input  wire [M_COUNT*DATA_WIDTH-1:0]  m_axil_rdata,
+    input  wire [M_COUNT*2-1:0]           m_axil_rresp,
+    input  wire [M_COUNT-1:0]             m_axil_rvalid,
+    output wire [M_COUNT-1:0]             m_axil_rready
 );
 
 parameter CL_S_COUNT = $clog2(S_COUNT);
@@ -282,46 +267,46 @@ assign m_axil_rready = m_axil_rready_reg;
 // slave side mux
 wire [(CL_S_COUNT > 0 ? CL_S_COUNT-1 : 0):0] s_select;
 
-wire [31:0] current_s_axil_awaddr  = s_axil_awaddr[s_select*ADDR_WIDTH +: ADDR_WIDTH];
+wire [ADDR_WIDTH-1:0] current_s_axil_awaddr  = s_axil_awaddr[s_select*ADDR_WIDTH +: ADDR_WIDTH];
 wire [2:0]            current_s_axil_awprot  = s_axil_awprot[s_select*3 +: 3];
-wire                  current_s_axil_awvalid = s_axil_awvalid;
-wire                  current_s_axil_awready = s_axil_awready;
+wire                  current_s_axil_awvalid = s_axil_awvalid[s_select];
+wire                  current_s_axil_awready = s_axil_awready[s_select];
 wire [DATA_WIDTH-1:0] current_s_axil_wdata   = s_axil_wdata[s_select*DATA_WIDTH +: DATA_WIDTH];
 wire [STRB_WIDTH-1:0] current_s_axil_wstrb   = s_axil_wstrb[s_select*STRB_WIDTH +: STRB_WIDTH];
-wire                  current_s_axil_wvalid  = s_axil_wvalid;
-wire                  current_s_axil_wready  = s_axil_wready;
+wire                  current_s_axil_wvalid  = s_axil_wvalid[s_select];
+wire                  current_s_axil_wready  = s_axil_wready[s_select];
 wire [1:0]            current_s_axil_bresp   = s_axil_bresp[s_select*2 +: 2];
-wire                  current_s_axil_bvalid  = s_axil_bvalid;
-wire                  current_s_axil_bready  = s_axil_bready;
+wire                  current_s_axil_bvalid  = s_axil_bvalid[s_select];
+wire                  current_s_axil_bready  = s_axil_bready[s_select];
 wire [ADDR_WIDTH-1:0] current_s_axil_araddr  = s_axil_araddr[s_select*ADDR_WIDTH +: ADDR_WIDTH];
-wire [2:0]              current_s_axil_arprot  = s_axil_arprot;
-wire                  current_s_axil_arvalid = s_axil_arvalid;
-wire                  current_s_axil_arready = s_axil_arready;
+wire [2:0]            current_s_axil_arprot  = s_axil_arprot[s_select*3 +: 3];
+wire                  current_s_axil_arvalid = s_axil_arvalid[s_select];
+wire                  current_s_axil_arready = s_axil_arready[s_select];
 wire [DATA_WIDTH-1:0] current_s_axil_rdata   = s_axil_rdata[s_select*DATA_WIDTH +: DATA_WIDTH];
 wire [1:0]            current_s_axil_rresp   = s_axil_rresp[s_select*2 +: 2];
-wire                  current_s_axil_rvalid  = s_axil_rvalid;
-wire                  current_s_axil_rready  = s_axil_rready;
+wire                  current_s_axil_rvalid  = s_axil_rvalid[s_select];
+wire                  current_s_axil_rready  = s_axil_rready[s_select];
 
 // master side mux
-wire [31:0] current_m_axil_awaddr  = m_axil_awaddr[m_select_reg*ADDR_WIDTH +: ADDR_WIDTH];
+wire [ADDR_WIDTH-1:0] current_m_axil_awaddr  = m_axil_awaddr[m_select_reg*ADDR_WIDTH +: ADDR_WIDTH];
 wire [2:0]            current_m_axil_awprot  = m_axil_awprot[m_select_reg*3 +: 3];
-wire                  current_m_axil_awvalid = m_axil_awvalid;
-wire                  current_m_axil_awready = m_axil_awready;
+wire                  current_m_axil_awvalid = m_axil_awvalid[m_select_reg];
+wire                  current_m_axil_awready = m_axil_awready[m_select_reg];
 wire [DATA_WIDTH-1:0] current_m_axil_wdata   = m_axil_wdata[m_select_reg*DATA_WIDTH +: DATA_WIDTH];
 wire [STRB_WIDTH-1:0] current_m_axil_wstrb   = m_axil_wstrb[m_select_reg*STRB_WIDTH +: STRB_WIDTH];
-wire                  current_m_axil_wvalid  = m_axil_wvalid;
-wire                  current_m_axil_wready  = m_axil_wready;
+wire                  current_m_axil_wvalid  = m_axil_wvalid[m_select_reg];
+wire                  current_m_axil_wready  = m_axil_wready[m_select_reg];
 wire [1:0]            current_m_axil_bresp   = m_axil_bresp[m_select_reg*2 +: 2];
-wire                  current_m_axil_bvalid  = m_axil_bvalid;
-wire                  current_m_axil_bready  = m_axil_bready;
+wire                  current_m_axil_bvalid  = m_axil_bvalid[m_select_reg];
+wire                  current_m_axil_bready  = m_axil_bready[m_select_reg];
 wire [ADDR_WIDTH-1:0] current_m_axil_araddr  = m_axil_araddr[m_select_reg*ADDR_WIDTH +: ADDR_WIDTH];
 wire [2:0]            current_m_axil_arprot  = m_axil_arprot[m_select_reg*3 +: 3];
-wire                  current_m_axil_arvalid = m_axil_arvalid;
-wire                  current_m_axil_arready = m_axil_arready;
+wire                  current_m_axil_arvalid = m_axil_arvalid[m_select_reg];
+wire                  current_m_axil_arready = m_axil_arready[m_select_reg];
 wire [DATA_WIDTH-1:0] current_m_axil_rdata   = m_axil_rdata[m_select_reg*DATA_WIDTH +: DATA_WIDTH];
 wire [1:0]            current_m_axil_rresp   = m_axil_rresp[m_select_reg*2 +: 2];
-wire                  current_m_axil_rvalid  = m_axil_rvalid;
-wire                  current_m_axil_rready  = m_axil_rready;
+wire                  current_m_axil_rvalid  = m_axil_rvalid[m_select_reg];
+wire                  current_m_axil_rready  = m_axil_rready[m_select_reg];
 
 // arbiter instance
 wire [S_COUNT*2-1:0] request;
@@ -355,16 +340,16 @@ genvar n;
 // request generation
 generate
 for (n = 0; n < S_COUNT; n = n + 1) begin
-    assign request[2*n]   = s_axil_awvalid;
-    assign request[2*n+1] = s_axil_arvalid;
+    assign request[2*n]   = s_axil_awvalid[n];
+    assign request[2*n+1] = s_axil_arvalid[n];
 end
 endgenerate
 
 // acknowledge generation
 generate
 for (n = 0; n < S_COUNT; n = n + 1) begin
-    assign acknowledge[2*n]   = grant[2*n]   && s_axil_bvalid && s_axil_bready;
-    assign acknowledge[2*n+1] = grant[2*n+1] && s_axil_rvalid && s_axil_rready;
+    assign acknowledge[2*n]   = grant[2*n]   && s_axil_bvalid[n] && s_axil_bready[n];
+    assign acknowledge[2*n+1] = grant[2*n+1] && s_axil_rvalid[n] && s_axil_rready[n];
 end
 endgenerate
 
@@ -576,4 +561,4 @@ end
 
 endmodule
 
-// `resetall
+`resetall

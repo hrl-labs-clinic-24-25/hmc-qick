@@ -59,20 +59,16 @@ module axis_pvp_gen_v2
 		m_axi_rready	,
 
 		// Start Sending
-		trigger,  // trigger to the dds
-		mux1,
-		mux2,
-		mux3,
-		mux4
+		trigger
 	);
 
 /**************/
 /* Parameters */
 /**************/
-mux1 = 5'b00001;
-mux2 = 5'b00010;
-mux3 = 5'b00100;
-mux4 = 5'b10000;
+parameter N		= 12;
+
+// Number of parallel dds blocks.
+parameter [31:0] N_DDS = 16;
 
 /*********/
 /* Ports */
@@ -133,16 +129,15 @@ input	[1:0]			m_axi_rresp;
 input					m_axi_rvalid;
 output					m_axi_rready;
 
-output trigger;
-output [4:0] mux1;
-output [4:0] mux2;
-output [4:0] mux3;
-output [4:0] mux4;
+input trigger;
 
 /********************/
 /* Internal signals */
 /********************/
 // Registers.
+wire	[19:0]			START_VAL_REG;
+wire	[19:0]			STEP_SIZE_REG;
+
 wire    [31:0] 			mosi_output;
 
 /**********************/
