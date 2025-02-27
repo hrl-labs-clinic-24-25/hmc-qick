@@ -1,0 +1,132 @@
+//Format of waveform interface:
+
+// mem_i
+// |---------|-----|---------|---------|--------|--------|
+// | 97      | 96  | 95:72   | 71:48   |  47:24	| 23:0   |
+// |---------|-----|---------|---------|--------|--------|
+// | trigger | mux | dac_4   |  dac_3  | dac_2  | dac_1  |
+// |---------|-----|---------|---------|--------|--------|
+
+// trigger  : start running the (LOADING/SENDING will happen)
+
+// mux   	: if mux = 1, the last three bits are the values for each select mux (i.e. 6:0 for bits 23:0)
+	//      : if mux = 0, 24 bits dedicated to the SPI output to be stored
+
+// mux -- 1 if this is loading the mux values for the DACs
+
+// trigger and mux cannot be turned on at the same time; either the user is saving the mux inputs, or they are storing DAC data (i.e. XOR)
+// the trigger will also be output via trigger_o in order to know when the system is being LOADed.
+
+module ctrl (
+	// Reset and clock.
+	rstn			,
+	clk				,
+
+	// Memory/AXI interface.
+	mem_i		,
+
+	// save
+	// dac control.
+	dac_1_o		,
+	dac_2_o		,
+	dac_3_o		,
+	dac_4_o		,
+
+	// Output mux selection (i.e. whether or not this is a dac output)
+	mux_1_o		,
+	mux_2_o		,
+	mux_3_o		,
+	mux_4_o		,
+	
+	// Output enable.
+	sendorload_o,      // output that we just got triggered (for LOAD or SEND)
+	mux_en_o			// the loop is currently out of LOAD or SEND
+);
+
+// Ports.
+input					rstn;
+input					clk;
+input	[97:0]			mem_i;    // 97 bits for the data
+
+output	[23:0]			dac_1_o;
+output	[23:0]			dac_2_o;
+output	[23:0]			dac_3_o;
+output	[23:0]			dac_4_o;
+
+output  [6:0]           mux_1_o;
+output  [6:0]           mux_2_o;
+output  [6:0]           mux_3_o;
+output  [6:0]           mux_4_o;
+
+output 					sendorload_o;
+output					mux_en_o;
+
+// wires combinational only
+// Muxes.
+reg [4:0]  mux_1_o, n_mux_1;
+reg [4:0]  mux_2_o, n_mux_2;
+reg [4:0]  mux_3_o, n_mux_3;
+reg [4:0]  mux_4_o, n_mux_4;
+
+// DAC
+reg [23:0] dac_1_o, dac_1;
+reg [23:0] dac_2_o, dac_2;
+reg [23:0] dac_3_o, dac_3;
+reg [23:0] dac_4_o, dac_4;
+
+// enabling loading
+reg sendorload;
+reg mux_en;
+
+
+// Registers.
+always @(posedge clk) begin
+	if (~rstn) begin
+
+		// DAC registers.
+		dac_1_o <= 0;
+		dac_2_o <= 0;
+		dac_3_o <= 0;
+		dac_4_o <= 0;
+
+		// Muxes.
+		mux_1_o <= 0;
+		mux_2_o <= 0;
+		mux_3_o <= 0;
+		mux_4_o <= 0;
+
+		mux_en  		 <= 0;
+		sendorload       <= 0;
+	end
+	else begin
+
+		mux_en <= mem_i[96];
+		sendorload <= mem_i[97]; // whether or not we're triggering the system for Load/Send
+		
+		dac_1_o <= dac_1;
+		dac_2_o <= dac_2;
+		dac_3_o <= dac_3;
+		dac_4_o <= dac_4;
+
+		mux_1_o <= n_mux_1;
+		mux_2_o <= n_mux_2;
+		mux_3_o <= n_mux_3;
+		mux_4_o <= n_mux_4;
+	end
+end 
+
+assign n_mux_1 = (mem_i[96] & ~mem_i[97]) ? mem_i[6:0] : 0;
+assign n_mux_2 = (mem_i[96] & ~mem_i[97]) ? mem_i[30:24] : 0;
+assign n_mux_3 = (mem_i[96] & ~mem_i[97]) ? mem_i[56:48] : 0;
+assign n_mux_4 = (mem_i[96] & ~mem_i[97]) ? mem_i[78:72]: 0;
+
+assign dac_1 = (~mem_i[96] & mem_i[97]) ? mem_i[23:0] : 0;
+assign dac_2 = (~mem_i[96] & mem_i[97]) ? mem_i[47:24] : 0;
+assign dac_3 = (~mem_i[96] & mem_i[97]) ? mem_i[71:48] : 0;
+assign dac_4 = (~mem_i[96] & mem_i[97]) ? mem_i[95:72] : 0;
+
+assign sendorload_o = sendorload;
+assign mux_en_o = mux_en;
+
+endmodule
+
