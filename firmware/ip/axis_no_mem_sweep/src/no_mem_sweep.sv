@@ -7,6 +7,10 @@
   @author: Ellie Sundheim
 	   esundheim@g.hmc.edu
   @version: 2/12/2025
+
+  @author: Cameron Hernandez
+        cahernandez@g.hmc.edu
+  @version: 2/26/2025
   
 */
 
@@ -14,7 +18,7 @@
 module no_mem_sweep #(parameter DEPTH = 256)
                     (input logic [19:0] start,
                     input logic [19:0] step,
-                    input logic clk, rstn,
+                    input logic clk, rstn, enable,
                     output logic [31:0] mosi
                     );
 
@@ -22,33 +26,36 @@ parameter [3:0] start_bits = 4'b0001;
 logic [7:0] counter;
 logic [19:0] curr_val, next_val;
 
-always @(posedge clk)
+always @(posedge clk) begin
     if (~rstn) begin
         curr_val <= start;
         counter <= 0;
     end
-    else if (counter < DEPTH) begin
-        curr_val <= next_val;
-        counter <= counter + 1;
-    end
-    else begin
-        curr_val <= curr_val;
-        counter <= counter; //freeze counter so that it doesn't overflow and restart the sweep
-    end
+    else if (enable) begin
+        if (counter < DEPTH) begin
+            curr_val <= next_val;
+            counter <= counter + 1;
+        end
+        else begin
+            curr_val <= curr_val;
+            counter <= counter; //freeze counter so that it doesn't overflow and restart the sweep
+        end
+    end 
+end
 
-assign next_val = curr_val + counter*step;
+assign next_val = curr_val + step;
 assign mosi = {8'b0, start_bits, curr_val};
 
 endmodule
 
 
 module no_mem_sweep_tb();
-    logic rstn, clk;
+    logic rstn, clk, enable;
     logic [19:0] start, step;
     logic [31:0] mosi;
 
     // test generation of 16 evenly spaced steps
-    no_mem_sweep #(16) dut ( .rstn(rstn), .clk(clk), .start(start), .step(step), .mosi(mosi));
+    no_mem_sweep #(16) dut ( .rstn(rstn), .clk(clk), .start(start), .step(step), .enable(enable), .mosi(mosi));
 
     // generate testbench clock
     always begin 
@@ -57,9 +64,36 @@ module no_mem_sweep_tb();
 
     // initialize
     initial begin
-        start = 20'b01010_10010_10101_01010;
-        step = 20'b00000_00000_00000_10000;
-	    rstn = 0; #12; rstn = 1; 
+        //start = 20'b01010_10010_10101_01010;
+        //step = 20'b00000_00000_00000_10000;
+        start = 30;
+        step = 2;
+	    rstn = 0; 
+        enable = 0;
+        #12; 
+        
+        rstn = 1; 
+
+        //Test 1: enable is low, so mosi should remain unchanged
+        #10;
+        $display("Test 1, enalbe is off, mosi value is = %d", mosi);
+
+        //Test 2: enable is now high, so mosi should change
+        enable = 1;
+        #10;
+        $display("Test 2, enable is on, mosi value is = %d", mosi);
+
+        //Test 3: enable is low, mosi should remain unchanged
+        enable = 0;
+        #10
+        $display("Test 3, enalbe is off, mosi value is = %d", mosi);
+
+        //Test 4: enable is now high, so mosi should change
+        enable = 1;
+        #10;
+        $display("Test 4, enable is on, mosi value is = %d", mosi);
+
+
 	end
 
     // apply test vectors on rising edge of clk 
