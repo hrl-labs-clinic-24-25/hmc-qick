@@ -1,0 +1,49 @@
+Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi4_lite_interface_v1_0.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi4_lite_interface_v1_0.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity axi4_lite_interface_v1_0
+-- Compiling architecture arch_imp of axi4_lite_interface_v1_0
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axis_pvp_gen_v2_tb.sv {1 {vlog -work work -vopt -sv -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axis_pvp_gen_v2_tb.sv
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module axis_pvp_gen_v2_tb
+
+Top level modules:
+	axis_pvp_gen_v2_tb
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_spi_simple.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_spi_simple.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity axi_spi_simple
+-- Compiling architecture arch_imp of axi_spi_simple
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/spi_peripheral.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/spi_peripheral.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity spi_peripheral
+-- Compiling architecture arch_imp of spi_peripheral
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axis_pvp_gen_v2.sv {1 {vlog -work work -vopt -sv -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axis_pvp_gen_v2.sv
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module axis_pvp_gen_v2
+
+Top level modules:
+	axis_pvp_gen_v2
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_lite_master.sv {1 {vlog -work work -vopt -sv -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_lite_master.sv
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module axi_lite_master
+
+Top level modules:
+	axi_lite_master
+
+} {} {}}

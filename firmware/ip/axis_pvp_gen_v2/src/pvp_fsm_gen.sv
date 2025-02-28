@@ -8,7 +8,9 @@ module pvp_fsm_gen (
 		clk,
 
     	// parameter inputs.
-		
+		mosi_o,
+        which_dac_o,
+
 		
 	);
 
@@ -25,17 +27,8 @@ parameter DWELL_TIME = 100; // will be set
 input						rstn;
 input						clk;
 
-input 	[97:0]			    data_i;
-input					    tvalid_i;
-
-output						iter_rd_en_o;
-output						iter_wr_en_o;
-input						iter_empty_i;
-input	            	    iter_full_i;
-
-
-output	[31:0]         	    iter_din_o;
-output	[4:0]         	    c_mux_o;
+output 	[19:0]			    mosi_o;
+output	[1:0]			    which_dac_o;
 
 
 /********************/
