@@ -514,7 +514,7 @@ begin
 	-- Output Registers.
 	START_VAL_REG 	<= slv_reg0(19 downto 0);
 	STEP_SIZE_REG	<= slv_reg1(19 downto 0);
-	OUTPUT_REG		<= slv_reg2(19 downto 0);
+	OUTPUT_REG		<= slv_reg2(23 downto 0);
 
 end rtl;
 

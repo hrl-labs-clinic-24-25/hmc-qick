@@ -108,11 +108,9 @@ output					s1_axis_tready;
 
 input					m_axis_tready;
 output					m_axis_tvalid;
-output	[N_DDS*16-1:0]	m_axis_tdata;
+output	[23:0]			m_axis_tdata;
 
-input					m1_axis_tready;
-output					m1_axis_tvalid;
-output	[23:0]			m1_axis_tdata;
+
 
 /********************/
 /* Internal signals */
@@ -132,7 +130,7 @@ axi_slv axi_slv_i
 	(
 		.aclk			(s_axi_aclk	 	),
 		.aresetn		(s_axi_aresetn	),
-
+ 
 		// Write Address Channel.
 		.awaddr			(s_axi_awaddr 	),
 		.awprot			(s_axi_awprot 	),
@@ -164,21 +162,20 @@ axi_slv axi_slv_i
 
 		// Registers.
 		.START_VAL_REG	(START_VAL_REG	),
-		.STEP_SIZE_REG	(STEP_SIZE_REG	),
-		.OUTPUT_REG		(OUTPUT_REG)
+		.STEP_SIZE_REG	(STEP_SIZE_REG	)
 	);
 
 no_mem_sweep 
 	#(
-		.N	(16)
+		.DEPTH	(16)
 	)
 	no_mem_sweep_i 
 		(.rstn		(s_axi_aresetn),
-		.clk		(s0_axis_aclk),
+		.clk		(s_axi_aclk),
 		.start		(START_VAL_REG),
 		.step		(STEP_SIZE_REG),
-		.mosi		(OUTPUT_REG))
-		)
+		.mosi		(m_axis_tdata)
+		);
 
 
 
