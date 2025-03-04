@@ -17,8 +17,8 @@
 
 module no_mem_sweep #(parameter numSteps = 256)
                     (input logic [19:0] start,
-                    input loxgic clk, rstn, enable, mode,
-                    output logic [31:0] mosi
+                    input logic clk, rstn, enable, mode,
+                    output logic [23:0] mosi
                     );
 
     parameter [3:0] start_bits = 4'b0001;
@@ -63,7 +63,7 @@ module no_mem_sweep #(parameter numSteps = 256)
     end
 
 assign next_val = direction ? (start + step*counter) : (start + (DEPTH-1)*step - step*counter);
-assign mosi = {8'b0, start_bits, curr_val};
+assign mosi = {start_bits, curr_val};
 assign top = (curr_val == (start + (DEPTH-1)*step)); // indicate 1 before top (works with FSM)
 assign base = (curr_val == start);
 

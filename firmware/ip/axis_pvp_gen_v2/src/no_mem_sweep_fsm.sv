@@ -24,8 +24,8 @@ module no_mem_sweep_fsm #(parameter DEPTH = 256)
                     input logic [19:0] step,
                     input logic clk, enable,
                     input logic rstn,
-                    output top, base,
-                    output logic [31:0] mosi
+                    output logic top, base,
+                    output logic [23:0] mosi
                     );
 
 parameter [3:0] start_bits = 4'b0001;
@@ -50,7 +50,7 @@ always @(posedge clk) begin
 end
 
 assign next_val = start + step*counter;
-assign mosi = {8'b0, start_bits, curr_val};
+assign mosi = {start_bits, curr_val};
 assign top = (curr_val == (start + (DEPTH-1)*step)); // indicate 1 before top (works with FSM)
 assign base = (curr_val == start);
 
