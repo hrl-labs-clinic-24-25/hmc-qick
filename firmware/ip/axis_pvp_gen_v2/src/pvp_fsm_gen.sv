@@ -214,7 +214,8 @@ no_mem_sweep
         .step       (STEP_SIZE),
         .base       (base_0),
         .top        (top_0),
-		.mosi		(mosi_0)
+		.mosi		(mosi_0),
+		.mode       (0)
 		);
 
 no_mem_sweep 
@@ -229,7 +230,8 @@ no_mem_sweep
         .step       (STEP_SIZE),
         .base       (base_1),
         .top        (top_1),
-		.mosi		(mosi_1)
+		.mosi		(mosi_1),
+		.mode       (0)
 		);
 
 no_mem_sweep 
@@ -244,7 +246,8 @@ no_mem_sweep
         .step       (STEP_SIZE),
         .base       (base_2),
         .top        (top_2),
-		.mosi		(mosi_2)
+		.mosi		(mosi_2),
+		.mode       (0)
 		);
 
 no_mem_sweep 
@@ -259,7 +262,8 @@ no_mem_sweep
         .step       (STEP_SIZE),
         .base       (base_3),
         .top        (top_3),
-		.mosi		(mosi_3)
+		.mosi		(mosi_3),
+		.mode       (0)
 		);
         
 
