@@ -15,36 +15,56 @@
 */
 
 
-module no_mem_sweep #(parameter DEPTH = 256)
+module no_mem_sweep #(parameter numSteps = 256)
                     (input logic [19:0] start,
                     input logic [19:0] step,
-                    input logic clk, rstn, enable,
+                    input logic clk, rstn, enable, mode,
                     output logic [31:0] mosi
                     );
 
-parameter [3:0] start_bits = 4'b0001;
-logic [7:0] counter;
-logic [19:0] curr_val, next_val;
+    parameter [3:0] start_bits = 4'b0001;
+    logic [7:0] counter;
+    logic [19:0] curr_val, next_val;
+    logic direction;
 
-always @(posedge clk) begin
-    if (~rstn) begin
-        curr_val <= start;
-        counter <= 0;
+    always @(posedge clk) begin
+        if (~rstn) begin
+            curr_val <= start;
+            counter <= 0;
+            direction <= 1; 
+        end
+        else if (enable) begin
+            if (mode) begin // "Top-Bottom" increment mode
+                if (counter == 0) 
+                    direction <= 1;  
+                else if (counter == numSteps - 1) 
+                    direction <= 0;
+    
+                if (direction == 1 && counter < numSteps - 1) begin
+                    curr_val <= next_val;
+                    counter <= counter + 1;
+                end 
+                else if (direction == 0 && counter > 0) begin
+                    curr_val <= next_val;
+                    counter <= counter - 1;
+                end
+            end
+            else begin // Default mode (increment only)
+                direction <= 1;
+                if (counter < numSteps - 1) begin
+                    curr_val <= next_val;
+                    counter <= counter + 1;
+                end
+                else begin
+                    curr_val <= curr_val;
+                    counter <= counter; //freeze counter so that it doesn't overflow and restart the sweep
+                end
+            end
+        end
     end
-    else if (enable) begin
-        if (counter < DEPTH) begin
-            curr_val <= next_val;
-            counter <= counter + 1;
-        end
-        else begin
-            curr_val <= curr_val;
-            counter <= counter; //freeze counter so that it doesn't overflow and restart the sweep
-        end
-    end 
-end
 
-assign next_val = curr_val + step;
-assign mosi = {8'b0, start_bits, curr_val};
+    assign next_val = direction ? (curr_val + step) : (curr_val - step); //muxing if direction == 1 add 1 else subtract 1
+    assign mosi = {8'b0, start_bits, curr_val};
 
 endmodule
 
@@ -53,9 +73,10 @@ module no_mem_sweep_tb();
     logic rstn, clk, enable;
     logic [19:0] start, step;
     logic [31:0] mosi;
+    logic mode;
 
     // test generation of 16 evenly spaced steps
-    no_mem_sweep #(16) dut ( .rstn(rstn), .clk(clk), .start(start), .step(step), .enable(enable), .mosi(mosi));
+    no_mem_sweep #(16) dut ( .rstn(rstn), .clk(clk), .start(start), .step(step), .enable(enable), .mode(mode), .mosi(mosi));
 
     // generate testbench clock
     always begin 
@@ -70,6 +91,7 @@ module no_mem_sweep_tb();
         step = 2;
 	    rstn = 0; 
         enable = 0;
+        mode = 1; //toggle between "Top-Bottom" or "Default" increment
         #12; 
         
         rstn = 1; 
@@ -83,6 +105,8 @@ module no_mem_sweep_tb();
         #10;
         $display("Test 2, enable is on, mosi value is = %d", mosi);
 
+        #5120; // Counter will hit the max (256) during this amount of delay time
+
         //Test 3: enable is low, mosi should remain unchanged
         enable = 0;
         #10
@@ -93,8 +117,14 @@ module no_mem_sweep_tb();
         #10;
         $display("Test 4, enable is on, mosi value is = %d", mosi);
 
-
+        $finish;
 	end
+
+    // Prints time, counter, current value, direciton, and mosi values every clock cycle
+    initial begin
+        $monitor("Time = %0t: counter = %d, curr_val = %d, direction = %d, mosi = %d",
+                 $time, dut.counter, dut.curr_val, dut.direction, mosi);
+    end
 
     // apply test vectors on rising edge of clk 
     always @(posedge clk) 
