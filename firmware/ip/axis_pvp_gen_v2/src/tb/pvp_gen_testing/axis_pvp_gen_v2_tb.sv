@@ -1,6 +1,11 @@
 // Modelsim-ASE requires a timescale directive
 // `timescale 1 ps / 1 ps
 
+
+// `resetall
+// `timescale 1ns / 1ps
+// `default_nettype none
+
 /**
 
 Based on the test bench in the corresponding video https://www.youtube.com/watch?v=qqI9QIkGFIQ 
@@ -93,6 +98,8 @@ module axis_pvp_gen_v2_tb ();
     logic  M_AXI_RREADY;
     logic  S_AXI_RREADY;
 
+    logic [1:0] mux;
+
     always_ff @(posedge clk) begin
         if (~rstn) begin
             init_transaction <= 0;
@@ -134,6 +141,8 @@ module axis_pvp_gen_v2_tb ();
 		.s_axi_rvalid	(S_AXI_RVALID),
 		.s_axi_rready	(S_AXI_RREADY),
 
+        .trigger_pvp    (init_transaction),
+
 		// AXIS Master for output.
 		.m_axi_awaddr	(M_AXI_AWADDR),
 		.m_axi_awprot	(M_AXI_AWPROT),
@@ -160,7 +169,8 @@ module axis_pvp_gen_v2_tb ();
 		.m_axi_rready	(M_AXI_RREADY),
 
 		// Start Sending
-		.trigger        (init_transaction)
+		.trigger        (trigger),
+        .mux            (mux)
     );
 
     axi_lite_master
