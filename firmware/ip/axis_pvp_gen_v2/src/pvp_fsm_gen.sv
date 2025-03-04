@@ -1,282 +1,266 @@
 /**
 	A module that runs a pvp plot generator using a Finite State Machine
+	Zoe Worrall, zworrall@g.hmc.edu, March 3, 2025
 */
 
-module pvp_fsm_gen (
+module pvp_fsm_gen  #(parameter DWELL_CYCLES = 1000, parameter START_VAL_0 = 20'd3, parameter STEP_SIZE = 1, parameter NUM_CYCLES = 20'd10)
+    (
 		// Reset and clock.
-		rstn,
-		clk,
+		input rstn,
+		input clk,
+
+        input trigger,
 
     	// parameter inputs.
-		mosi_o,
-        which_dac_o,
-
-		
+		output [31:0] mosi_o,
+        output [1:0]  which_dac_o,
+        output        readout_o
 	);
 
 /**************/
 /* Parameters */
 /**************/
 
-parameter SIZE = 16;
-parameter DWELL_TIME = 100; // will be set
+// parameter SIZE = 16;
+// parameter DWELL_TIME = 100; // will be set
 
 /*********/
 /* Ports */
 /*********/
-input						rstn;
-input						clk;
+// input						rstn;
+logic 						rstn_0, rstn_1, rstn_2, rstn_3;
+// input						clk;
 
-output 	[19:0]			    mosi_o;
-output	[1:0]			    which_dac_o;
+// input                       trigger;
+
+// output 	[31:0]			    mosi_o;
+// output	[1:0]			    which_dac_o;
+// output                      readout_o;
 
 
 /********************/
 /* Internal signals */
 /********************/
 
-reg  iter_rd_en;
-reg  iter_empty;
+logic [31:0] mosi_0;
+logic [31:0] mosi_1;
+logic [31:0] mosi_2;
+logic [31:0] mosi_3;
+logic [31:0] past_mosi;
 
-reg [23:0] dac_1;
-reg [23:0] dac_2;
-reg [23:0] dac_3;
-reg [23:0] dac_4;
+logic top_0;
+logic top_1;
+logic top_2;
+logic top_3;
 
-reg muxes_enabled;
-reg sendorload_trigger;
-reg iter_full;
+logic base_0;
+logic base_1;
+logic base_2;
+logic base_3;
 
-reg	[31:0]         	    iter_din_1_o;
-reg	[31:0]         	    iter_din_2_o;
-reg	[31:0]         	    iter_din_3_o;
-reg	[31:0]         	    iter_din_4_o;
+logic dac0_en;
+logic dac1_en;
+logic dac2_en;
+logic dac3_en;
 
-reg	[4:0]         	    c_mux_1_o;
-reg	[4:0]         	    c_mux_2_o;
-reg	[4:0]          	    c_mux_3_o;
-reg	[4:0]         	    c_mux_4_o;
+logic sendorload_trigger;
+
+logic [3:0] curr_state, next_state;
+logic [15:0] dwell_counter;   // cycle for DWELL_CYCLES
+
+
+logic [19:0] D0_START;
+assign D0_START = 20'b0000_0000_0000_0000_0000;
+
+logic [19:0] D1_START;
+assign D1_START = 20'b0000_0000_0000_0000_0100;
+
+logic [19:0] D2_START;
+assign D2_START = 20'b0000_0000_0000_0000_1000;
+
+logic [19:0] D3_START;
+assign D3_START = 20'b0000_0000_0000_0000_1100;
 
 /***************/
 /* FSM Machine */
 /***************/
 
 // FSM States:
-		// send three bits of eight to the SPI (LOAD) -- does it trigger automatically(?)
-				// enable SPI fifo. Width can be 16 or 256
-				// FIFO size of the SPI is 8
-				// AXI QSPI communicates either using AXI4 or AXI4-Lite.
-				// may need to output to the AXI SPI's specific inputs - 
-
-				// how loading works with AXI SPI:
-					// collection of 16 bits
-					// SPICR.SPE = 0
-					// SSR is: 0xff when off, 0 when on(?)
-					// Set SPI_SSR to ch_en, where ch_en = 0 (at least in Abbie's code for the DACs)  -> slave select
-					// SPI_DTR: sent to the SPI block; send once every clock cycle, 8 bits
-					// SPICR.SPE = 1 after 
-					// SPI_SSR reset to its initial value (normally 0xff)
-
 		// wait -- waits for DWELL_CYCLES amount of time
-		// 
+// wait   -- before triggered and running the full cycle this is where the FSM rests
+// s_send -- send part of the send state
+// s_wait -- the machine is waiting to be set
+// s_stall -- for when there are multiple dacs, to make sure that the SPI is set before continuing to run readout samples
+parameter WAIT = 4'b0000, S_SEND_0 = 4'b0001, S_SEND_1 = 4'b0010, S_SEND_2 = 4'b0100, S_SEND_3 = 4'b1000, S_WAIT = 4'b1110, S_STALL = 4'b1101;
 
+assign curr_state = next_state;
+assign dac0_en = ((dwell_counter == 0) & (curr_state == S_SEND_0)) | (curr_state == WAIT);
+assign dac1_en = ((dwell_counter == 0) & (curr_state == S_SEND_1)) | (curr_state == WAIT);
+assign dac2_en = ((dwell_counter == 0) & (curr_state == S_SEND_2)) | (curr_state == WAIT);
+assign dac3_en = ((dwell_counter == 0) & (curr_state == S_SEND_3)) | (curr_state == WAIT);
 
-	// DAC:   1     2     3     4
-// LOADING: 0001, 0010, 0011, 0100  --- saving into bram
-// SENDING: 0101, 0110, 0111, 1000  --- sending from iterator
-parameter WAIT_LOAD = 4'b0000, WAIT_SEND = 4'b1111, LOAD = 4'b0001, LOAD_MUX = 4'b0010, SEND = 4'b0101;
-parameter TIMES_THRU = 256;
+assign mosi_o      = ((curr_state==S_STALL) | (dwell_counter==0)) ? past_mosi : ((curr_state==S_SEND_0) & dwell_counter>0) ? mosi_0 : (curr_state==S_SEND_1) ? mosi_1 : (curr_state==S_SEND_2) ? mosi_2 : (curr_state==S_SEND_3) ? mosi_3 : 0;
+assign which_dac_o = (curr_state==S_SEND_0) ? 2'b00 : (curr_state==S_SEND_1) ? 2'b01 : (curr_state==S_SEND_2) ? 2'b10 : (curr_state==S_SEND_3) ? 2'b11 : 2'b00; // this is hard to debug if we're always seeing first DAC and none of second (lol)
 
-module hw_proj1_wrapper
-   (
-   // OTHER PINS
-   // ...
-    cs_n,
-    miso,
-    mosi,
-    sck);
-	
-   // etc
-   // ...
-  output [0:0]cs_n;
-  input miso;
-  output mosi;
-  output sck;
-  
-  
-  // etc
-  // ...
-  wire [0:0]cs_n;
-  wire miso;
-  wire mosi;
-  wire sck;
- 
-  hw_proj1 hw_proj1_i
-       (.DDR_addr(DDR_addr),
-        .DDR_ba(DDR_ba),
-        .DDR_cas_n(DDR_cas_n),
-        .DDR_ck_n(DDR_ck_n),
-        .DDR_ck_p(DDR_ck_p),
-        .DDR_cke(DDR_cke),
-        .DDR_cs_n(DDR_cs_n),
-        .DDR_dm(DDR_dm),
-        .DDR_dq(DDR_dq),
-        .DDR_dqs_n(DDR_dqs_n),
-        .DDR_dqs_p(DDR_dqs_p),
-        .DDR_odt(DDR_odt),
-        .DDR_ras_n(DDR_ras_n),
-        .DDR_reset_n(DDR_reset_n),
-        .DDR_we_n(DDR_we_n),
-        .FIXED_IO_ddr_vrn(FIXED_IO_ddr_vrn),
-        .FIXED_IO_ddr_vrp(FIXED_IO_ddr_vrp),
-        .FIXED_IO_mio(FIXED_IO_mio),
-        .FIXED_IO_ps_clk(FIXED_IO_ps_clk),
-        .FIXED_IO_ps_porb(FIXED_IO_ps_porb),
-        .FIXED_IO_ps_srstb(FIXED_IO_ps_srstb),
-        .cs_n(cs_n),
-        .miso(miso),
-        .mosi(mosi),
-        .sck(sck));
-endmodule
-
-reg[3:0] curr_state, next_state;
-
-// mux_x -- the value for mux_x
-reg[4:0] mux_1, n_mux_1;
-reg[4:0] mux_2, n_mux_2;
-reg[4:0] mux_3, n_mux_3;
-reg[4:0] mux_4, n_mux_4;
-
-reg[16:0] counter;
-reg[7:0]  iter_count;
+assign readout_o = (dwell_counter > DWELL_CYCLES/10); // CHANGE TO CYCLES_TILL_READOUT -- only possible in one of the readout states (dwell_counter is 0 in other states)
 
 // FINITE STATE MACHINE
 // Registers.
 always @(posedge clk) begin
+	rstn_3 <= 1;
+	rstn_2 <= 1;
+	rstn_1 <= 1;
+	rstn_0 <= 1;
 
 	if (~rstn) begin
 		// State register.
-		next_state 	<= WAIT_LOAD;
+		next_state 	<= WAIT;
+		past_mosi <= 0;
 
-		n_mux_1 <= 5'b00000;
-		n_mux_2 <= 5'b00000;
-		n_mux_3 <= 5'b00000;
-		n_mux_4 <= 5'b00000;
-
-
-		iter_rd_en <= 0;
-
-
-        counter <= 0;
-        iter_count <= 0;
+        dwell_counter <= 0;
 	end 
 	else begin
 
-		// muxes are only set during the WAIT_LOAD stage of the system; 
-			// when it is first triggered, the muxes are set
-		if (muxes_enabled) begin
-			n_mux_1 <= mux_1;
-			n_mux_2 <= mux_2;
-			n_mux_3 <= mux_3;
-			n_mux_4 <= mux_4;
-		end else begin
-			n_mux_1 <= c_mux_1_o;
-			n_mux_2 <= c_mux_2_o;
-			n_mux_3 <= c_mux_3_o;
-			n_mux_4 <= c_mux_4_o;
-		end
-		
 		// State register.
 		case(curr_state)
-			WAIT_LOAD: begin
-
-                iter_count <= 0;
-                counter <= 0;
+			WAIT: begin
+                dwell_counter <= 0;
+				rstn_3 <= 0;
+				rstn_2 <= 0;
+				rstn_1 <= 0;
+				rstn_0 <= 0;
+				past_mosi <= 0;
                 
-				if (muxes_enabled)  next_state <= LOAD_MUX;
-                else         	    next_state <= WAIT_LOAD;
+				if (trigger)  next_state <= S_STALL;
+                else          next_state <= WAIT;
 
             end
-			LOAD_MUX: begin
-                iter_count <= 0;
-                counter <= 0;
+            S_STALL: begin
+				
+				rstn_3 <= 1;
+				rstn_2 <= 1;
+				rstn_1 <= 1;
+				rstn_0 <= 1;
 
-				next_state <= LOAD;
+				next_state <= S_SEND_0;
+				past_mosi <= mosi_o;
+
+				dwell_counter <= 0;
+
+				// if      (top_3 & top_2 & top_1 & top_0) begin next_state <= WAIT; dwell_counter <= 0; rstn_0 <= 0; rstn_1 <= 0; rstn_2 <= 0; rstn_3 <= 0; end
+                // else if (top_2) 					    begin 				      dwell_counter <= 0; rstn_0 <= 0; rstn_1 <= 0; rstn_2 <= 0; rstn_3 <= 1; end
+                // else if (top_1) 					    begin 				      dwell_counter <= 0; rstn_0 <= 0; rstn_1 <= 0; rstn_2 <= 1; rstn_3 <= 1; end
+                // else if (top_0) 					    begin 				      dwell_counter <= 0; rstn_0 <= 0; rstn_1 <= 1; rstn_2 <= 1; rstn_3 <= 1; end  // reset only 0
+
+            end
+			S_SEND_0: begin
+
+				next_state <= S_SEND_0;
+				past_mosi <= mosi_o;
+
+				// cycle until dwell counter has been spent. If we're not at the top of the stack, return to stall
+				if ((dwell_counter == DWELL_CYCLES) & !top_0)      begin dwell_counter <= 0;  next_state <= S_STALL; end // inside DAC 1 loop
+				else if ((dwell_counter == DWELL_CYCLES) & top_0)  begin dwell_counter <= 0; next_state <= S_SEND_1; rstn_0 <= 0; end  // if we've' gone full through list, go to next DAC
+				else 											  begin dwell_counter <= dwell_counter + 1; end  // we are waiting for full time
+
 			end
-            LOAD: begin
+            S_SEND_1: begin
 
-                iter_count <= 0;
-                counter <= 0;
+				next_state <= S_SEND_1;
+				past_mosi <= mosi_o;
+
+				// cycle until dwell counter has been spent. If we're not at the top of the stack, return to stall
+				if ((dwell_counter == DWELL_CYCLES) & !top_1)      begin dwell_counter <= 0;  next_state <= S_STALL; end // inside DAC 1 loop
+				else if ((dwell_counter == DWELL_CYCLES) & top_1)  begin dwell_counter <= 0; next_state <= S_SEND_2; rstn_1 <= 0; end  // if we've' gone full through list, go to next DAC
+				else 											  begin dwell_counter <= dwell_counter + 1; end  // we are waiting for full time
+
+            end
+            S_SEND_2: begin
+
+				next_state <= S_SEND_2;
+				past_mosi <= mosi_o;
+
+				// cycle until dwell counter has been spent. If we're not at the top of the stack, return to stall
+				if ((dwell_counter == DWELL_CYCLES) & !top_2)      begin dwell_counter <= 0;  next_state <= S_STALL; end // inside DAC 1 loop
+				else if ((dwell_counter == DWELL_CYCLES) & top_2)  begin dwell_counter <= 0; next_state <= S_SEND_3; rstn_2 <= 0; end  // if we've' gone full through list, go to next DAC
+				else 											  begin dwell_counter <= dwell_counter + 1; end  // we are waiting for full time
+
+            end
+            S_SEND_3: begin
                 
-                if (iter_full) next_state <= WAIT_SEND;
-                else           next_state <= LOAD;
+				next_state <= S_SEND_3;
+				past_mosi <= mosi_o;
 
-            end
-            WAIT_SEND: begin
-
-                iter_count <= 0;
-                counter <= 0;
-
-                if (sendorload_trigger) begin  next_state <= SEND; end
-                else         begin  next_state <= WAIT_SEND; end
-
-            end
-            SEND: begin
-                if (iter_count < TIMES_THRU) 
-				begin // if we haven't gone through at 256 columns yet
-
-                    // continue time in loop
-                    next_state <= SEND;
-
-                    // if the counter's gone through the "DWELL TIME", move on to the next iterator loop and enable write enable again for the next DAC
-                    if (counter == DWELL_TIME) 
-					begin   
-						// restart counter and continue sending
-                        // increment counter for the loop
-                        iter_count <= iter_count + 1;
-                        counter <= 0;
-                    end else 
-					begin
-                        counter <= counter + 1;
-                        iter_count <= iter_count;
-                    end
-				end else begin 
-				iter_count <= iter_count + 1;
-                        	counter <= 0;
-				next_state <= WAIT_SEND;
-			end
+				// cycle until dwell counter has been spent. If we're not at the top of the stack, return to stall
+				if ((dwell_counter == DWELL_CYCLES) & top_3)          begin dwell_counter <= 0;  next_state <= WAIT; rstn_3 <= 0; end // inside DAC 1 loop
+				else if ((dwell_counter == DWELL_CYCLES) & !top_3)    begin dwell_counter <= 0;  next_state <= S_STALL; end 
+				else 									 begin dwell_counter <= dwell_counter + 1; end  // we are waiting for full time
 
 			end
-			default: begin iter_count <= 0; counter <= 0; next_state <= WAIT_LOAD; end
+			default: begin dwell_counter <= 0; next_state <= WAIT; end
 		endcase
 	end
 end
 
+no_mem_sweep 
+	#(
+		.DEPTH	(NUM_CYCLES)
+	)
+	no_mem_sweep_0 (
+        .rstn		(rstn_0),
+		.clk		(clk),
+        .enable     (dac0_en),
+		.start		(D0_START),
+        .step       (STEP_SIZE),
+        .base       (base_0),
+        .top        (top_0),
+		.mosi		(mosi_0)
+		);
 
-assign iter_wr_en_o = (curr_state == SEND) && (counter == 0);
+no_mem_sweep 
+	#(
+		.DEPTH	(NUM_CYCLES)
+	)
+	no_mem_sweep_1 (
+        .rstn		(rstn_1),
+		.clk		(clk),
+        .enable     (dac1_en),
+		.start		(D1_START),
+        .step       (STEP_SIZE),
+        .base       (base_1),
+        .top        (top_1),
+		.mosi		(mosi_1)
+		);
 
-// unsure if the timing will work for this; it may take multiple cycles to actually "load" something into memory
-assign iter_rd_en_o = (curr_state == LOAD & ~muxes_enabled); // wait until after we have loaded the muxes with the values that we want
-assign iter_empty = iter_empty_i;
-assign iter_full  = iter_full_i;
+no_mem_sweep 
+	#(
+		.DEPTH	(NUM_CYCLES)
+	)
+	no_mem_sweep_2 (
+        .rstn		(rstn_2),
+		.clk		(clk),
+        .enable     (dac2_en),
+		.start		(D2_START),
+        .step       (STEP_SIZE),
+        .base       (base_2),
+        .top        (top_2),
+		.mosi		(mosi_2)
+		);
 
-assign iter_din_1_o = (curr_state == LOAD & sendorload_trigger) ? {8'b0, dac_1} : 32'b0;
-assign iter_din_2_o = (curr_state == LOAD & sendorload_trigger) ? {8'b0, dac_2} : 32'b0;
-assign iter_din_3_o = (curr_state == LOAD & sendorload_trigger) ? {8'b0, dac_3} : 32'b0;
-assign iter_din_4_o = (curr_state == LOAD & sendorload_trigger) ? {8'b0, dac_4} : 32'b0;
-
-
-assign curr_state = next_state;
-
-assign c_mux_1_o = n_mux_1;
-assign c_mux_2_o = n_mux_2;
-assign c_mux_3_o = n_mux_3;
-assign c_mux_4_o = n_mux_4;
-
-
-// SINCE WE'RE NOT DOING MULTIPLE DAC'S YET; THIS WILL BE CHANGED WHEN WE HAVE AN INNER FOR LOOP (FOR TWO DACS)
-assign c_mux_o = c_mux_1_o;
-assign iter_din_o = iter_din_1_o;
-
+no_mem_sweep 
+	#(
+		.DEPTH	(NUM_CYCLES)
+	)
+	no_mem_sweep_3 (
+        .rstn		(rstn_3),
+		.clk		(clk),
+        .enable     (dac3_en),
+		.start		(D3_START),
+        .step       (STEP_SIZE),
+        .base       (base_3),
+        .top        (top_3),
+		.mosi		(mosi_3)
+		);
+        
 
 endmodule

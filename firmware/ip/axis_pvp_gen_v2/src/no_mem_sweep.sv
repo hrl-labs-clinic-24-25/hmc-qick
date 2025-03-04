@@ -18,7 +18,9 @@
 module no_mem_sweep #(parameter DEPTH = 256)
                     (input logic [19:0] start,
                     input logic [19:0] step,
-                    input logic clk, rstn, enable,
+                    input logic clk, enable,
+                    input logic rstn,
+                    output top, base,
                     output logic [31:0] mosi
                     );
 
@@ -43,8 +45,10 @@ always @(posedge clk) begin
     end 
 end
 
-assign next_val = curr_val + step;
+assign next_val = start + step*counter;
 assign mosi = {8'b0, start_bits, curr_val};
+assign top = (curr_val == (start + (DEPTH-1)*step)); // indicate 1 before top (works with FSM)
+assign base = (curr_val == start);
 
 endmodule
 

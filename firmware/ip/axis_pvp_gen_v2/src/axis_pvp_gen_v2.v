@@ -152,7 +152,7 @@ wire    [31:0] 			mosi_output;
 axil_slv 
 	#(
     .S_COUNT 				(32),
-	.M_COUNT 			(32),
+	.M_COUNT 				(32),
     .DATA_WIDTH				(32),
     .ADDR_WIDTH    			(32),
     .STRB_WIDTH			    (4),

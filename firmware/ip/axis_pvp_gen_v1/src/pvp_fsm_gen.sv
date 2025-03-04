@@ -1,5 +1,9 @@
 /**
 	A module that runs a pvp plot generator using a Finite State Machine
+
+	Zoe Worrall, zworrall@g.hmc.edu
+
+	January 27, 2025
 */
 
 module pvp_fsm_gen (
