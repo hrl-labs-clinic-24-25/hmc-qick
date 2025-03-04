@@ -14,6 +14,9 @@ module pvp_fsm_gen  #(parameter DWELL_CYCLES = 1000,
 
         input trigger,
 
+		// Inputs from PYNQ registers
+		input logic [19:0] start_0_i, start_1_i, start_2_i, start_3_i;
+
     	// parameter inputs.
 		output [31:0] mosi_o,
         output [1:0]  which_dac_o,
@@ -72,17 +75,17 @@ logic [3:0] curr_state, next_state;
 logic [15:0] dwell_counter;   // cycle for DWELL_CYCLES
 
 
-logic [19:0] D0_START;
-assign D0_START = 20'b0000_0000_0000_0000_0000;
+//logic [19:0] D0_START;
+//assign D0_START = 20'b0000_0000_0000_0000_0000;
 
-logic [19:0] D1_START;
-assign D1_START = 20'b0000_0000_0000_0000_0100;
+//logic [19:0] D1_START;
+//assign D1_START = 20'b0000_0000_0000_0000_0100;
 
-logic [19:0] D2_START;
-assign D2_START = 20'b0000_0000_0000_0000_1000;
+//logic [19:0] D2_START;
+//assign D2_START = 20'b0000_0000_0000_0000_1000;
 
-logic [19:0] D3_START;
-assign D3_START = 20'b0000_0000_0000_0000_1100;
+//logic [19:0] D3_START;
+//assign D3_START = 20'b0000_0000_0000_0000_1100;
 
 /***************/
 /* FSM Machine */
@@ -213,7 +216,7 @@ no_mem_sweep_fsm
         .rstn		(rstn_0),
 		.clk		(clk),
         .enable     (dac0_en),
-		.start		(D0_START),
+		.start		(start_0_i),
         .step       (STEP_SIZE),
         .base       (base_0),
         .top        (top_0),
@@ -228,7 +231,7 @@ no_mem_sweep_fsm
         .rstn		(rstn_1),
 		.clk		(clk),
         .enable     (dac1_en),
-		.start		(D1_START),
+		.start		(start_1_i),
         .step       (STEP_SIZE),
         .base       (base_1),
         .top        (top_1),
@@ -243,7 +246,7 @@ no_mem_sweep_fsm
         .rstn		(rstn_2),
 		.clk		(clk),
         .enable     (dac2_en),
-		.start		(D2_START),
+		.start		(start_2_i),
         .step       (STEP_SIZE),
         .base       (base_2),
         .top        (top_2),
@@ -258,7 +261,7 @@ no_mem_sweep_fsm
         .rstn		(rstn_3),
 		.clk		(clk),
         .enable     (dac3_en),
-		.start		(D3_START),
+		.start		(start_3_i),
         .step       (STEP_SIZE),
         .base       (base_3),
         .top        (top_3),

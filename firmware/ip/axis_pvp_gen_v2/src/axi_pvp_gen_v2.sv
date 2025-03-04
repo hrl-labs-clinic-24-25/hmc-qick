@@ -37,8 +37,9 @@ module axi_pvp_gen_v2
 		output wire	[31:0]			s_axi_rdata,
 		output wire	[1:0]			s_axi_rresp,
 		output	 wire				s_axi_rvalid,
-		input wire				s_axi_rready,
+		input wire					s_axi_rready,
 
+		// Non AXI inputs
 		input  wire					trigger_pvp,
 
 		// M AXIS
@@ -67,8 +68,9 @@ module axi_pvp_gen_v2
 		input	 wire				m_axi_rvalid,
 		output wire					m_axi_rready,
 
-		output  wire trigger,
-		output wire [1:0]  mux
+		// Non AXI-LITE outputs
+		output  wire 				trigger,
+		output wire [1:0]  			mux
 	);
 
 /*********/
@@ -138,8 +140,15 @@ module axi_pvp_gen_v2
 /* Internal signals */
 /********************/
 // Registers.
-wire    [31:0] 			mosi_output;
-wire    [1:0]           which_dac_o;
+//wire    [31:0] 			mosi_output;
+//wire    [1:0]           which_dac_o;
+
+logic [19:0] START_VAL_0_REG;
+logic [19:0] START_VAL_1_REG
+logic [19:0] START_VAL_2_REG
+logic [19:0] START_VAL_3_REG
+logic [19:0] STEP_SIZE_REG;
+
 
 
 /**************/
@@ -249,8 +258,12 @@ pvp_fsm_gen
 		.clk		(s_axi_aclk),
 		.trigger    (trigger_pvp),
 		.mosi_o		(mosi_output),
-        .which_dac_o,
-		.readout_o	(trigger)
+        .which_dac_o (select),
+		.readout_o	(trigger),
+		.start_0_i (START_VAL_0_REG),
+		.start_1_i (START_VAL_1_REG),
+		.start_2_i (START_VAL_2_REG),
+		.start_3_i (START_VAL_3_REG)
 		);
 
 
