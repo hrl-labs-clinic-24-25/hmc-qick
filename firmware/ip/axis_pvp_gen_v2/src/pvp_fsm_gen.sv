@@ -3,10 +3,11 @@
 	Zoe Worrall, zworrall@g.hmc.edu, March 3, 2025
 */
 
+
 module pvp_fsm_gen  #(parameter [15:0] DWELL_CYCLES = 16'd100,
 					parameter [19:0] STEP_SIZE = 20'h00001, 
 					parameter [7:0] NUM_CYCLES = 8'd10,
-					parameter [1:0] NUM_DACS = 2'd3)
+					parameter [1:0] NUM_DACS = 2'd4)
     (
 		// Reset and clock.
 		input rstn,
