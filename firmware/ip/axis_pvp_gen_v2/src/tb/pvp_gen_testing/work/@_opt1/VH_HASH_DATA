@@ -1,0 +1,199 @@
+[N
+14
+13
+15 SAXI_DATA_WIDTH
+9
+10 ADDR_WIDTH
+4
+10 GPIO_WIDTH
+7
+24 axi4_lite_interface_v1_0
+11
+33 SUBORDINATE_SYNCHRONOUS_READ_PORT
+12
+14 axi_spi_simple
+1
+84 Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/work
+8
+19 DATA_BUS_IS_64_BITS
+6
+13 ACTIVE_LOW_SS
+5
+8 USE_GPIO
+14
+15 SAXI_ADDR_WIDTH
+3
+8 arch_imp
+10
+17 USE_WRITE_STROBES
+2
+14 spi_peripheral
+]
+[G
+1
+7
+3
+1
+9
+1
+0
+2
+0
+0 0
+0
+0
+]
+[G
+1
+7
+3
+1
+10
+0
+0
+1
+0
+0 0
+0
+0
+]
+[G
+1
+12
+3
+1
+14
+0
+0
+2
+0
+0 0
+0
+0
+]
+[G
+1
+2
+3
+1
+5
+0
+0
+0
+0
+0 0
+0
+0
+]
+[G
+1
+2
+3
+1
+4
+1
+0
+32
+0
+0 0
+0
+0
+]
+[G
+1
+2
+3
+1
+6
+0
+0
+1
+0
+0 0
+0
+0
+]
+[G
+1
+7
+3
+1
+11
+1
+0
+1
+0
+0 0
+0
+0
+]
+[G
+1
+12
+3
+1
+13
+1
+0
+32
+0
+0 0
+0
+0
+]
+[G
+1
+12
+3
+1
+5
+0
+0
+0
+0
+0 0
+0
+0
+]
+[G
+1
+12
+3
+1
+4
+1
+0
+32
+0
+0 0
+0
+0
+]
+[G
+1
+12
+3
+1
+6
+0
+0
+1
+0
+0 0
+0
+0
+]
+[G
+1
+7
+3
+1
+8
+1
+0
+0
+0
+0 0
+0
+0
+]

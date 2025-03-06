@@ -1,0 +1,1 @@
+C:/lscc/radiant/2024.1/questasim/win64/VisualizerRls/bin/viscom.exe -nolock -quiet -jmem_size 393216 work.pvp_fsm_gen_tb -quiet -auto_acc_if_foreign -work work +acc -allow_unnamed -o _opt -id 1-001c4226aff8-67c6c0e7-16a-1b08 +__design_bin_path+Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing +__betafsm

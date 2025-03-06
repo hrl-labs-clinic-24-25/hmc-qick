@@ -12,65 +12,65 @@
 module axi_pvp_gen_v2
 	( 
 		// AXI Slave I/F for configuration.
-		input wire				s_axi_aclk,
-		input wire					s_axi_aresetn,
+		input logic				s_axi_aclk,
+		input logic					s_axi_aresetn,
 
-		input wire	[31:0]			s_axi_awaddr,
-		input wire	[2:0]			s_axi_awprot,
-		input wire					s_axi_awvalid,
-		output wire					s_axi_awready,
+		input logic	[31:0]			s_axi_awaddr,
+		input logic	[2:0]			s_axi_awprot,
+		input logic					s_axi_awvalid,
+		output logic					s_axi_awready,
 
-		input wire	[31:0]			s_axi_wdata,
-		input wire	[3:0]			s_axi_wstrb,
-		input wire					s_axi_wvalid,
-		output wire					s_axi_wready,
+		input logic	[31:0]			s_axi_wdata,
+		input logic	[3:0]			s_axi_wstrb,
+		input logic					s_axi_wvalid,
+		output logic					s_axi_wready,
 
-		output wire	[1:0]			s_axi_bresp,
-		output wire					s_axi_bvalid,
-		input	 wire				s_axi_bready,
+		output logic	[1:0]			s_axi_bresp,
+		output logic					s_axi_bvalid,
+		input	 logic				s_axi_bready,
 
-		input wire	[31:0]			s_axi_araddr,
-		input wire	[2:0]			s_axi_arprot,
-		input wire					s_axi_arvalid,
-		output wire					s_axi_arready,
+		input logic	[31:0]			s_axi_araddr,
+		input logic	[2:0]			s_axi_arprot,
+		input logic					s_axi_arvalid,
+		output logic					s_axi_arready,
 
-		output wire	[31:0]			s_axi_rdata,
-		output wire	[1:0]			s_axi_rresp,
-		output	 wire				s_axi_rvalid,
-		input wire					s_axi_rready,
+		output logic	[31:0]			s_axi_rdata,
+		output logic	[1:0]			s_axi_rresp,
+		output	 logic				s_axi_rvalid,
+		input logic					s_axi_rready,
 
 		// Non AXI inputs
-		input  wire					trigger_pvp,
+		input  logic					trigger_pvp,
 
 		// M AXIS
 
-		output wire	[31:0]			m_axi_awaddr,
-		output wire	[2:0]			m_axi_awprot,
-		output wire					m_axi_awvalid,
-		input wire					m_axi_awready,
+		output logic	[31:0]			m_axi_awaddr,
+		output logic	[2:0]			m_axi_awprot,
+		output logic					m_axi_awvalid,
+		input logic					m_axi_awready,
 
-		output wire	[31:0]			m_axi_wdata,
-		output wire	[3:0]			m_axi_wstrb,
-		output wire					m_axi_wvalid,
-		input	 wire				m_axi_wready,
+		output logic	[31:0]			m_axi_wdata,
+		output logic	[3:0]			m_axi_wstrb,
+		output logic					m_axi_wvalid,
+		input	 logic				m_axi_wready,
 
-		input wire	[1:0]			m_axi_bresp,
-		input wire					m_axi_bvalid,
-		output wire					m_axi_bready,
+		input logic	[1:0]			m_axi_bresp,
+		input logic					m_axi_bvalid,
+		output logic					m_axi_bready,
 
-		output	 wire [31:0]			m_axi_araddr,
-		output	 wire [2:0]			m_axi_arprot,
-		output	 wire				m_axi_arvalid,
-		input	 wire				m_axi_arready,
+		output	 logic [31:0]			m_axi_araddr,
+		output	 logic [2:0]			m_axi_arprot,
+		output	 logic				m_axi_arvalid,
+		input	 logic				m_axi_arready,
 
-		input wire	[31:0]			m_axi_rdata,
-		input wire	[1:0]			m_axi_rresp,
-		input	 wire				m_axi_rvalid,
-		output wire					m_axi_rready,
+		input logic	[31:0]			m_axi_rdata,
+		input logic	[1:0]			m_axi_rresp,
+		input	 logic				m_axi_rvalid,
+		output logic					m_axi_rready,
 
 		// Non AXI-LITE outputs
-		output  wire 				trigger,
-		output wire [1:0]  			mux
+		output  logic 				trigger,
+		output logic [1:0]  			SELECT
 	);
 
 /*********/
@@ -140,14 +140,18 @@ module axi_pvp_gen_v2
 /* Internal signals */
 /********************/
 // Registers.
-//wire    [31:0] 			mosi_output;
-//wire    [1:0]           which_dac_o;
+logic [31:0] mosi_output;
+logic [1:0]  select;
 
-logic [19:0] START_VAL_0_REG;
-logic [19:0] START_VAL_1_REG
-logic [19:0] START_VAL_2_REG
-logic [19:0] START_VAL_3_REG
-logic [19:0] STEP_SIZE_REG;
+logic [19:0] START_VAL_0_REG = 20'h000f0;
+logic [19:0] START_VAL_1_REG = 20'h00f00;
+logic [19:0] START_VAL_2_REG = 20'h0f000;
+logic [19:0] START_VAL_3_REG = 20'hf0000;
+
+localparam [19:0] STEP_SIZE_REG = 20'b0000_0000_0000_0000_0001;
+localparam [1:0]  NUM_DACS_REG = 2'd2;
+localparam [7:0]  NUM_CYCLES_REG = 8'd4;
+localparam [15:0] DWELL_CYCLES_REG = 100;
 
 
 
@@ -155,12 +159,12 @@ logic [19:0] STEP_SIZE_REG;
 /* Parameters */
 /**************/
 
-wire [4:0] mux1 = 5'b00001;
-wire [4:0] mux2 = 5'b00010;
-wire [4:0] mux3 = 5'b00100;
-wire [4:0] mux4 = 5'b10000;
+logic [4:0] mux1 = 5'b00001;
+logic [4:0] mux2 = 5'b00010;
+logic [4:0] mux3 = 5'b00100;
+logic [4:0] mux4 = 5'b10000;
 
-assign mux = (which_dac_o == 2'b00) ? mux1 : (which_dac_o == 2'b01) ? mux2 : (which_dac_o == 2'b10) ? mux3 : mux4;
+assign SELECT = (select == 2'b00) ? mux1 : (select == 2'b01) ? mux2 : (select == 2'b10) ? mux3 : mux4;
 
 /**********************/
 /* Begin Architecture */
@@ -248,10 +252,10 @@ axil_slv
 
 pvp_fsm_gen 
 	#(
-		.DWELL_CYCLES	(1000),
-		.START_VAL_0    (20'd3),
-		.STEP_SIZE      (20'b0000_0000_0000_0000_0001),
-		.NUM_CYCLES     (20'd10)
+		.DWELL_CYCLES	(DWELL_CYCLES_REG),
+		.STEP_SIZE      (STEP_SIZE_REG),
+		.NUM_CYCLES     (NUM_CYCLES_REG),
+		.NUM_DACS 		(NUM_DACS_REG)
 	)
 	fsm_i 
 		(.rstn		(s_axi_aresetn),

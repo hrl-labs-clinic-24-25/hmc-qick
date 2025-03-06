@@ -36,44 +36,44 @@ module axis_pvp_gen_v2_tb ();
     localparam AXI_DATA_WIDTH = 32;
 
 
-    wire [31 : 0]                S_AXI_AWADDR;
-    wire [2 : 0]                S_AXI_AWPROT;
-    wire                        S_AXI_AWVALID;
-    wire                        S_AXI_AWREADY;
+    logic [31 : 0]                S_AXI_AWADDR;
+    logic [2 : 0]                S_AXI_AWPROT;
+    logic                        S_AXI_AWVALID;
+    logic                        S_AXI_AWREADY;
 
-    wire [AXI_ADDR_WIDTH/8-1 : 0] S_AXI_WSTRB;
-    wire                          S_AXI_WVALID;
-    wire                          S_AXI_WREADY;
+    logic [AXI_ADDR_WIDTH/8-1 : 0] S_AXI_WSTRB;
+    logic                          S_AXI_WVALID;
+    logic                          S_AXI_WREADY;
 
-    wire [1 : 0]                S_AXI_BRESP;
-    wire                        S_AXI_BVALID;
-    wire                        S_AXI_BREADY;
+    logic [1 : 0]                S_AXI_BRESP;
+    logic                        S_AXI_BVALID;
+    logic                        S_AXI_BREADY;
 
-    wire [31 : 0]  S_AXI_ARADDR;
-    wire [2 : 0]                 S_AXI_ARPROT;
-    wire                         S_AXI_ARVALID;
-    wire                         S_AXI_ARREADY;
+    logic [31 : 0]  S_AXI_ARADDR;
+    logic [2 : 0]                 S_AXI_ARPROT;
+    logic                         S_AXI_ARVALID;
+    logic                         S_AXI_ARREADY;
 
 
 
-    wire [31 : 0]                M_AXI_AWADDR;
-    wire [2 : 0]                M_AXI_AWPROT;
-    wire                        M_AXI_AWVALID;
-    wire                        M_AXI_AWREADY;
+    logic [31 : 0]                M_AXI_AWADDR;
+    logic [2 : 0]                M_AXI_AWPROT;
+    logic                        M_AXI_AWVALID;
+    logic                        M_AXI_AWREADY;
 
-    wire [AXI_DATA_WIDTH-1 : 0]   M_AXI_WADDR;
-    wire [AXI_ADDR_WIDTH/8-1 : 0] M_AXI_WSTRB;
-    wire                          M_AXI_WVALID;
-    wire                          M_AXI_WREADY;
+    logic [AXI_DATA_WIDTH-1 : 0]   M_AXI_WADDR;
+    logic [AXI_ADDR_WIDTH/8-1 : 0] M_AXI_WSTRB;
+    logic                          M_AXI_WVALID;
+    logic                          M_AXI_WREADY;
 
-    wire [1 : 0]                M_AXI_BRESP;
-    wire                        M_AXI_BVALID;
-    wire                        M_AXI_BREADY;
+    logic [1 : 0]                M_AXI_BRESP;
+    logic                        M_AXI_BVALID;
+    logic                        M_AXI_BREADY;
 
-    wire [31 : 0]  M_AXI_ARADDR;
-    wire [2 : 0]                 M_AXI_ARPROT;
-    wire                         M_AXI_ARVALID;
-    wire                         M_AXI_ARREADY;
+    logic [31 : 0]  M_AXI_ARADDR;
+    logic [2 : 0]                 M_AXI_ARPROT;
+    logic                         M_AXI_ARVALID;
+    logic                         M_AXI_ARREADY;
 
 
 
@@ -112,7 +112,7 @@ module axis_pvp_gen_v2_tb ();
         if (init_counter == 10) begin init_transaction <= 1; end
     end
     
-    axis_pvp_gen_v2 apg_i
+    axi_pvp_gen_v2 apg_i
     (
         .s_axi_aclk		(clk),
 		.s_axi_aresetn	(rstn),

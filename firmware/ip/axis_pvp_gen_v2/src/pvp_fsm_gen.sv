@@ -3,10 +3,10 @@
 	Zoe Worrall, zworrall@g.hmc.edu, March 3, 2025
 */
 
-module pvp_fsm_gen  #(parameter DWELL_CYCLES = 1000,
- 					parameter START_VAL_0 = 20'd3, 
-					parameter STEP_SIZE = 1, 
-					parameter NUM_CYCLES = 20'd10)
+module pvp_fsm_gen  #(parameter [15:0] DWELL_CYCLES = 16'd100,
+					parameter [19:0] STEP_SIZE = 20'h00001, 
+					parameter [7:0] NUM_CYCLES = 8'd10,
+					parameter [1:0] NUM_DACS = 2'd3)
     (
 		// Reset and clock.
 		input rstn,
@@ -15,7 +15,10 @@ module pvp_fsm_gen  #(parameter DWELL_CYCLES = 1000,
         input trigger,
 
 		// Inputs from PYNQ registers
-		input logic [19:0] start_0_i, start_1_i, start_2_i, start_3_i;
+		input logic [19:0] start_0_i,
+		input logic [19:0] start_1_i,
+		input logic [19:0] start_2_i,
+		input logic [19:0] start_3_i,
 
     	// parameter inputs.
 		output [31:0] mosi_o,
