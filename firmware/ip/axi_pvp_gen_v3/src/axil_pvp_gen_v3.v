@@ -9,7 +9,7 @@
 // s0_axis_aclk	: clock for s0_axis_*
 // aclk			: clock for s1_axis_* and m_axis_*
 //
-module axi_pvp_gen_v3
+module axil_pvp_gen_v3
 	( 
 		// AXI Slave I/F for configuration.
 		s_axi_aclk,
@@ -66,7 +66,7 @@ module axi_pvp_gen_v3
 
 		// Non AXI-LITE 
 		TRIGGER_AWG_REG, // trigger for AWG
-		SELECT_REG,
+		select,
 
 		trigger_spi // trigger for SPI
 	);
@@ -129,9 +129,9 @@ module axi_pvp_gen_v3
 	output 				m_axi_rready;
 
 	// Non AXI-LITE outputs
-	output 			TRIGGER_AWG_REG; // trigger for AWG
-	output [4:0]  	SELECT_REG;
-	output 			trigger_spi;	// trigger for SPI
+	output 			TRIGGER_AWG_REG; // trigger for AWG ** test that output registers don't cause net contention in Vivado (March 7)
+	output [4:0]  	select;
+	output 			trigger_spi;	 // trigger for SPI
 
 
 
@@ -147,29 +147,34 @@ module axi_pvp_gen_v3
 	wire TRIGGER_PVP_REG;
 
 	// starting value for the DACs
-	wire [19:0] START_VAL_0_REG;
-	wire [19:0] START_VAL_1_REG;
-	wire [19:0] START_VAL_2_REG;
-	wire [19:0] START_VAL_3_REG;
+	wire [19:0] X_AXIS_START_VAL_REG;
+	wire [19:0] Y_AXIS_START_VAL_REG;
+	wire [19:0] Z_AXIS_START_VAL_REG;
+	wire [19:0] W_AXIS_START_VAL_REG;
 
 	// Adjust these to change PvP Plot
 	wire [19:0] STEP_SIZE_REG;
-	wire [1:0]  NUM_DACS_REG;
-	wire [7:0]  NUM_CYCLES_REG;
+	wire [2:0]  NUM_DACS_REG;
+	wire [9:0]  PVP_WIDTH_REG;
+
 	wire [15:0] DWELL_CYCLES_REG;
+	wire [15:0] CYCLES_TILL_READOUT_REG;
 
 	// Address for Demux to DACs
-	wire [4:0] W_REG_W;
-	wire [4:0] W_REG_X;
-	wire [4:0] W_REG_Y;
-	wire [4:0] W_REG_Z;
+	wire [5:0] X_AXIS_DEMUX_REG;
+	wire [5:0] Y_AXIS_DEMUX_REG;
+	wire [5:0] Z_AXIS_DEMUX_REG;
+	wire [5:0] W_AXIS_DEMUX_REG;
+	wire 	   done;			 // trigger for SPI
+
+
 
 	// /**************/
 	// /* Parameters */
 	// /**************/
 
 	// // Set the starting values for the DACs based on the current select line
-	// assign SELECT = (select == 2'b00) ? START_VAL_0_REG : (select == 2'b01) ? START_VAL_1_REG : (select == 2'b10) ? START_VAL_2_REG : START_VAL_3_REG;
+	// assign select = (select == 2'b00) ? X_AXIS_START_VAL_REG : (select == 2'b01) ? Y_AXIS_START_VAL_REG : (select == 2'b10) ? Z_AXIS_START_VAL_REG : W_AXIS_START_VAL_REG;
 
 	/**********************/
 	/* Begin Architecture */
@@ -260,25 +265,30 @@ module axi_pvp_gen_v3
 			(
 				.rstn				(s_axi_aresetn),
 				.clk				(s_axi_aclk),
+
 				.TRIGGER_PVP_REG   	(TRIGGER_PVP_REG),
 				.mosi_o				(mosi_output),
-				.which_dac_o		(SELECT_REG),
+				.select				(select), 
 				.TRIGGER_AWG_REG	(TRIGGER_AWG_REG),
 				.trigger_spi_o 		(trigger_spi),
-				.START_VAL_0_REG 	(START_VAL_0_REG),
-				.START_VAL_1_REG 	(START_VAL_1_REG),
-				.START_VAL_2_REG 	(START_VAL_2_REG),
-				.START_VAL_3_REG 	(START_VAL_3_REG),
+				.done 				(done),
 
+				.X_AXIS_START_VAL_REG 	(X_AXIS_START_VAL_REG),
+				.Y_AXIS_START_VAL_REG 	(Y_AXIS_START_VAL_REG),
+				.Z_AXIS_START_VAL_REG 	(Z_AXIS_START_VAL_REG),
+				.W_AXIS_START_VAL_REG 	(W_AXIS_START_VAL_REG),
 
-				.DWELL_CYCLES_REG	(DWELL_CYCLES_REG),
+				.DWELL_CYCLES_REG		 (DWELL_CYCLES_REG),
+				.CYCLES_TILL_READOUT_REG (CYCLES_TILL_READOUT_REG),
+
 				.STEP_SIZE_REG      (STEP_SIZE_REG),
-				.NUM_CYCLES_REG     (NUM_CYCLES_REG),
+				.PVP_WIDTH_REG      (PVP_WIDTH_REG),
 				.NUM_DACS_REG 		(NUM_DACS_REG),
-				.W_REG_W			(W_REG_W),
-				.W_REG_X			(W_REG_X),
-				.W_REG_Y			(W_REG_Y),
-				.W_REG_Z			(W_REG_Z)
+
+				.X_AXIS_DEMUX_REG			(X_AXIS_DEMUX_REG),
+				.Y_AXIS_DEMUX_REG			(Y_AXIS_DEMUX_REG),
+				.Z_AXIS_DEMUX_REG			(Z_AXIS_DEMUX_REG),
+				.W_AXIS_DEMUX_REG			(W_AXIS_DEMUX_REG)
 			);
 
 
