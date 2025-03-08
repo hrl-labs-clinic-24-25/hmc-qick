@@ -73,3 +73,14 @@ Temporary Items
 !/README.md
 
 firmware/ip/axis_sandbox
+firmware/ip/axis_pvp_gen_v2/src/tb/pvp_fsm_testing/pvp_fsm_gen_tb.sv.bak
+firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_lite_pvp_test2.cr.mti
+firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_lite_pvp_test2.mpf
+firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/pvp_fsm_testbench.cr.mti
+firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/pvp_fsm_testbench.mpf
+firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/testbench_v3_pvp_fsm.cr.mti
+firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/testbench_v3_pvp_fsm.mpf
+firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/transcript
+firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/vsim.wlf
+firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/work/@_opt/_data/exempta0y7zr
+firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/work/@_opt/_data/exemptacb7v9
