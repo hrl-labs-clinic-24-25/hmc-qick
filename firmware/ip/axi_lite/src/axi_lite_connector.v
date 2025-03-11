@@ -9,7 +9,7 @@
 // s0_axis_aclk	: clock for s0_axis_*
 // aclk			: clock for s1_axis_* and m_axis_*
 //
-module axil_pvp_gen_v3
+module axi_lite_connector
 	( 
 		// AXI Slave I/F for configuration.
 		s_axi_aclk,
@@ -62,13 +62,7 @@ module axil_pvp_gen_v3
 		m_axi_rdata,
 		m_axi_rresp,
 		m_axi_rvalid,
-		m_axi_rready,
-
-		// Non AXI-LITE 
-		TRIGGER_AWG_REG, // trigger for AWG
-		select,
-
-		trigger_spi // trigger for SPI
+		m_axi_rready
 	);
 
 	/*********/
@@ -133,48 +127,6 @@ module axil_pvp_gen_v3
 	output [4:0]  	select;
 	output 			trigger_spi;	 // trigger for SPI
 
-
-
-	/********************/
-	/* Internal signals */
-	/********************/
-	// Registers.
-
-	// connected from FSM to axil_slv
-	wire [31:0] mosi_output;
-
-	// Non AXI inputs
-	wire TRIGGER_PVP_REG;
-
-	// starting value for the DACs
-	wire [19:0] X_AXIS_START_VAL_REG;
-	wire [19:0] Y_AXIS_START_VAL_REG;
-	wire [19:0] Z_AXIS_START_VAL_REG;
-	wire [19:0] W_AXIS_START_VAL_REG;
-
-	// Adjust these to change PvP Plot
-	wire [19:0] STEP_SIZE_REG;
-	wire [2:0]  NUM_DACS_REG;
-	wire [9:0]  PVP_WIDTH_REG;
-
-	wire [15:0] DWELL_CYCLES_REG;
-	wire [15:0] CYCLES_TILL_READOUT_REG;
-
-	// Address for Demux to DACs
-	wire [5:0] X_AXIS_DEMUX_REG;
-	wire [5:0] Y_AXIS_DEMUX_REG;
-	wire [5:0] Z_AXIS_DEMUX_REG;
-	wire [5:0] W_AXIS_DEMUX_REG;
-	wire 	   done;			 // trigger for SPI
-
-
-
-	// /**************/
-	// /* Parameters */
-	// /**************/
-
-	// // Set the starting values for the DACs based on the current select line
-	// assign select = (select == 2'b00) ? X_AXIS_START_VAL_REG : (select == 2'b01) ? Y_AXIS_START_VAL_REG : (select == 2'b10) ? Z_AXIS_START_VAL_REG : W_AXIS_START_VAL_REG;
 
 	/**********************/
 	/* Begin Architecture */
@@ -259,37 +211,6 @@ module axil_pvp_gen_v3
 			.m_axil_rvalid			(m_axi_rvalid	),
 			.m_axil_rready			(m_axi_rready	)
 		);
-
-	pvp_fsm_gen
-		fsm_i 
-			(
-				.rstn				(s_axi_aresetn),
-				.clk				(s_axi_aclk),
-
-				.TRIGGER_PVP_REG   	(TRIGGER_PVP_REG),
-				.mosi_o				(mosi_output),
-				.select				(select), 
-				.readout_o	(TRIGGER_AWG_REG),
-				.trigger_spi_o 		(trigger_spi),
-				.done 				(done),
-
-				.X_AXIS_START_VAL_REG 	(X_AXIS_START_VAL_REG),
-				.Y_AXIS_START_VAL_REG 	(Y_AXIS_START_VAL_REG),
-				.Z_AXIS_START_VAL_REG 	(Z_AXIS_START_VAL_REG),
-				.W_AXIS_START_VAL_REG 	(W_AXIS_START_VAL_REG),
-
-				.DWELL_CYCLES_REG		 (DWELL_CYCLES_REG),
-				.CYCLES_TILL_READOUT_REG (CYCLES_TILL_READOUT_REG),
-
-				.STEP_SIZE_REG      (STEP_SIZE_REG),
-				.PVP_WIDTH_REG      (PVP_WIDTH_REG),
-				.NUM_DACS_REG 		(NUM_DACS_REG),
-
-				.X_AXIS_DEMUX_REG			(X_AXIS_DEMUX_REG),
-				.Y_AXIS_DEMUX_REG			(Y_AXIS_DEMUX_REG),
-				.Z_AXIS_DEMUX_REG			(Z_AXIS_DEMUX_REG),
-				.W_AXIS_DEMUX_REG			(W_AXIS_DEMUX_REG)
-			);
 
 
 endmodule

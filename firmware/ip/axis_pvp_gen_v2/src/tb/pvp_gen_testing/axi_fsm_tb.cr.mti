@@ -1,0 +1,71 @@
+Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/axil_pvp_gen_v3.v {1 {vlog -work work -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/axil_pvp_gen_v3.v
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module axil_pvp_gen_v3
+
+Top level modules:
+	axil_pvp_gen_v3
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/pvp_fsm_gen.sv {1 {vlog -work work -vopt -sv -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/pvp_fsm_gen.sv
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module pvp_fsm_gen
+
+Top level modules:
+	pvp_fsm_gen
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/priority_encoder.v {1 {vlog -work work -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/priority_encoder.v
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module priority_encoder
+
+Top level modules:
+	priority_encoder
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/axil_interconnect.v {1 {vlog -work work -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/axil_interconnect.v
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module axil_interconnect
+
+Top level modules:
+	axil_interconnect
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/arbiter.v {1 {vlog -work work -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/arbiter.v
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module arbiter
+
+Top level modules:
+	arbiter
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axi_spi_simple.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axi_spi_simple.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity axi_spi_simple
+-- Compiling architecture arch_imp of axi_spi_simple
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/axil_slv.v {1 {vlog -work work -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/axil_slv.v
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module axil_slv
+
+Top level modules:
+	axil_slv
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/no_mem_sweep.sv {2 {vlog -work work -vopt -sv -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/no_mem_sweep.sv
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module no_mem_sweep_fsm
+** Warning: Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/no_mem_sweep.sv(67): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
+-- Compiling module no_mem_sweep_tb
+
+Top level modules:
+	no_mem_sweep_fsm
+	no_mem_sweep_tb
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axi4_lite_interface_v1_0.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axi4_lite_interface_v1_0.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity axi4_lite_interface_v1_0
+-- Compiling architecture arch_imp of axi4_lite_interface_v1_0
+
+} {} {}}

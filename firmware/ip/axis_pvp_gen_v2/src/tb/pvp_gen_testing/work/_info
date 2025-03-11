@@ -215,6 +215,7 @@ Z8 o-quiet -auto_acc_if_foreign -work work +acc
 Z9 tCvgOpt 0
 n@_opt
 Z10 OL;O;2024.2;79
+R4
 T_opt1
 !s110 1741227525
 V3bb>FDm^WSk<KA8mS84MH2
@@ -232,7 +233,7 @@ R10
 R4
 varbiter
 2Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/arbiter.v
-Z11 !s110 1741391434
+Z11 !s110 1741393801
 !i10b 1
 !s100 0EDbb5>hdY>IN?ffmHMdg3
 I8=>O58aVK[<Ncf7VdXD7:1
@@ -240,39 +241,39 @@ R4
 Z12 w1741240105
 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/arbiter.v
 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/arbiter.v
-!i122 813
+!i122 868
 L0 34 124
 Z13 VDg1SIo80bB@j0V0VzS_@n1
 Z14 OL;L;2024.2;79
 r1
 !s85 0
 31
-Z15 !s108 1741391434.000000
+Z15 !s108 1741393801.000000
 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/arbiter.v|
 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/arbiter.v|
 !i113 0
 Z16 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
 R9
 Eaxi4_lite_interface_v1_0
-Z17 w1740648440
+Z17 w1741383053
 Z18 DPx4 ieee 11 numeric_std 0 22 aU^R8eGcicLcUFIaBQSL>3
 Z19 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
 Z20 DPx4 ieee 14 std_logic_1164 0 22 cVAk:aDinOX8^VGI1ekP<3
-!i122 621
+!i122 875
 R4
-Z21 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi4_lite_interface_v1_0.vhd
-Z22 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi4_lite_interface_v1_0.vhd
+Z21 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axi4_lite_interface_v1_0.vhd
+Z22 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axi4_lite_interface_v1_0.vhd
 l0
 Z23 L27 1
 V`]DV:1aUdN:O:9]moC=GZ1
 !s100 I`:cnKT]P=Eje8c;_?Q_=2
 Z24 OL;C;2024.2;79
 32
-Z25 !s110 1741227378
+Z25 !s110 1741393802
 !i10b 1
-Z26 !s108 1741227377.000000
-Z27 !s90 -reportprogress|300|-work|work|-2002|-explicit|-vopt|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi4_lite_interface_v1_0.vhd|
-Z28 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi4_lite_interface_v1_0.vhd|
+Z26 !s108 1741393802.000000
+Z27 !s90 -reportprogress|300|-work|work|-2002|-explicit|-vopt|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axi4_lite_interface_v1_0.vhd|
+Z28 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axi4_lite_interface_v1_0.vhd|
 !i113 0
 Z29 o-work work -2002 -explicit
 Z30 tExplicit 1 CvgOpt 0
@@ -281,7 +282,7 @@ R18
 R19
 R20
 DEx4 work 24 axi4_lite_interface_v1_0 0 22 `]DV:1aUdN:O:9]moC=GZ1
-!i122 621
+!i122 875
 l100
 L73 209
 V6:?ha^BnmV_DY8D:cn:BC0
@@ -299,7 +300,7 @@ R30
 vaxi_lite_master
 2Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_lite_master.sv
 Z31 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
-Z32 !s110 1741227377
+!s110 1741227377
 !i10b 1
 !s100 hAJoUh33Sk`dRgZ_X?DWJ1
 Ie_?<Qkm0k8MAC2L1Tchd;1
@@ -315,11 +316,11 @@ R14
 r1
 !s85 0
 31
-R26
+!s108 1741227377.000000
 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_lite_master.sv|
 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_lite_master.sv|
 !i113 0
-Z33 o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z32 o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
 R9
 vaxi_pvp_gen_v2
 2Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/axi_pvp_gen_v2.sv
@@ -344,7 +345,7 @@ r1
 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/axi_pvp_gen_v2.sv|
 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/axi_pvp_gen_v2.sv|
 !i113 0
-R33
+R32
 R9
 vaxi_pvp_gen_v3
 2Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/axi_pvp_gen_v3.v
@@ -384,34 +385,34 @@ VLBlk?^d>zgjG3`KUVl1HR3
 !s100 15KOSmTbg@Ol[<`Y4f4^d2
 R24
 32
-Z34 !s110 1741227379
+Z33 !s110 1741227379
 !i10b 1
-Z35 !s108 1741227378.000000
+Z34 !s108 1741227378.000000
 !s90 -reportprogress|300|-work|work|-2002|-explicit|-vopt|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/axi_slv.vhd|
 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/axi_slv.vhd|
 !i113 0
 R29
 R30
 Eaxi_spi_simple
-Z36 w1740649334
+R17
 R18
 R19
 R20
-!i122 620
+!i122 874
 R4
-Z37 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_spi_simple.vhd
-Z38 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_spi_simple.vhd
+Z35 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axi_spi_simple.vhd
+Z36 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axi_spi_simple.vhd
 l0
 R23
 VH_T_6VCi5a0;?:3KoX]G01
 !s100 >M4=S3I?5Qi>[^N^MO]?>1
 R24
 32
-R32
+R25
 !i10b 1
 R26
-Z39 !s90 -reportprogress|300|-work|work|-2002|-explicit|-vopt|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_spi_simple.vhd|
-Z40 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_spi_simple.vhd|
+Z37 !s90 -reportprogress|300|-work|work|-2002|-explicit|-vopt|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axi_spi_simple.vhd|
+Z38 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axi_spi_simple.vhd|
 !i113 0
 R29
 R30
@@ -420,18 +421,18 @@ R18
 R19
 R20
 DEx4 work 14 axi_spi_simple 0 22 H_T_6VCi5a0;?:3KoX]G01
-!i122 620
+!i122 874
 l151
 L66 154
 VEVKRVofS6Wi@@Xo@:D]b62
 !s100 a7HUoK6`kGnVTOdeCkD_Y3
 R24
 32
-R32
+R25
 !i10b 1
 R26
-R39
-R40
+R37
+R38
 !i113 0
 R29
 R30
@@ -445,7 +446,7 @@ R4
 R12
 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/axil_interconnect.v
 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/axil_interconnect.v
-!i122 814
+!i122 869
 L0 34 529
 R13
 R14
@@ -460,22 +461,22 @@ R16
 R9
 vaxil_pvp_gen_v3
 2Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/axil_pvp_gen_v3.v
-Z41 !s110 1741391435
+R11
 !i10b 1
-!s100 AH[oYEP8`n<;]^C5iTgfZ3
-If9:RGlMBzJPE7?ljWL[BC0
+!s100 TQ^ReZdCWlS6a;E0E=U2c2
+I=]^CcZoDVG:BESNAlDgjP1
 R4
-w1741390511
+w1741393624
 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/axil_pvp_gen_v3.v
 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/axil_pvp_gen_v3.v
-!i122 819
+!i122 867
 L0 12 284
 R13
 R14
 r1
 !s85 0
 31
-Z42 !s108 1741391435.000000
+!s108 1741393800.000000
 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/axil_pvp_gen_v3.v|
 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/axil_pvp_gen_v3.v|
 !i113 0
@@ -491,7 +492,7 @@ R4
 R12
 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/axil_slv.v
 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/axil_slv.v
-!i122 815
+!i122 870
 L0 17 561
 R13
 R14
@@ -527,37 +528,62 @@ r1
 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axis_pvp_gen_v2.sv|
 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axis_pvp_gen_v2.sv|
 !i113 0
-R33
+R32
 R9
 vaxis_pvp_gen_v2_tb
-2Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axis_pvp_gen_v2_tb.sv
+Z39 2Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axis_pvp_gen_v3_tb.sv
 R31
-R25
+!s110 1741393321
 !i10b 1
-!s100 PWcEa`m`CIP<LooCW8OXk0
-I4=7Va5U:AFfnI[XM=9mX23
+!s100 WLI:A4BE^`3kn[@oU^>1U3
+I4o_kj^AbX2m:F9J6EKo>e3
 S1
 R4
-w1741225025
-8Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axis_pvp_gen_v2_tb.sv
-FZ:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axis_pvp_gen_v2_tb.sv
-!i122 623
-L0 16 235
+w1741393313
+Z40 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axis_pvp_gen_v3_tb.sv
+Z41 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axis_pvp_gen_v3_tb.sv
+!i122 836
+Z42 L0 16 236
 R13
 R14
 r1
 !s85 0
 31
-R35
-!s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axis_pvp_gen_v2_tb.sv|
-!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axis_pvp_gen_v2_tb.sv|
+!s108 1741393321.000000
+!s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axis_pvp_gen_v3_tb.sv|
+Z43 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axis_pvp_gen_v3_tb.sv|
 !i113 0
-R33
+R32
+R9
+vaxis_pvp_gen_v3_tb
+R39
+R31
+R25
+!i10b 1
+!s100 l=[kAQCoD^H?JMoA?@zg12
+IEaR99gIVO27hAOW=PDL]:1
+S1
+R4
+w1741393795
+R40
+R41
+!i122 876
+R42
+R13
+R14
+r1
+!s85 0
+31
+R26
+Z44 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_axi_fsm/axis_pvp_gen_v3_tb.sv|
+R43
+!i113 0
+R32
 R9
 vctrl
 2Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/ctrl.sv
 R31
-R34
+R33
 !i10b 1
 !s100 P4>YRoDnNZD8fZj``dGGd3
 IzYJ3PH^SOlIImIC3_Q^H21
@@ -577,7 +603,7 @@ r1
 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/ctrl.sv|
 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/ctrl.sv|
 !i113 0
-R33
+R32
 R9
 vno_mem_sweep
 2Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/no_mem_sweep.sv
@@ -602,61 +628,61 @@ r1
 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/no_mem_sweep.sv|
 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/no_mem_sweep.sv|
 !i113 0
-R33
+R32
 R9
 vno_mem_sweep_fsm
-Z43 2Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/no_mem_sweep.sv
+Z45 2Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/no_mem_sweep.sv
 R31
-R41
+R25
 !i10b 1
 !s100 B2L0TkJM;cAIB@B5bCf_A3
 IFUoI:jz@E>b1`icHjZ@WH3
 S1
 R4
-Z44 w1741253613
-Z45 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/no_mem_sweep.sv
-Z46 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/no_mem_sweep.sv
-!i122 818
+Z46 w1741253613
+Z47 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/no_mem_sweep.sv
+Z48 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/no_mem_sweep.sv
+!i122 872
 L0 22 50
 R13
 R14
 r1
 !s85 0
 31
-R42
-Z47 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/no_mem_sweep.sv|
-Z48 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/no_mem_sweep.sv|
+R15
+Z49 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/no_mem_sweep.sv|
+Z50 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/no_mem_sweep.sv|
 !i113 0
-R33
+R32
 R9
 vno_mem_sweep_tb
-R43
+R45
 R31
-R41
+R25
 !i10b 1
 !s100 ?E9X_hgIi=UOXjn=:FcT]3
 I^73I2XCi`@:i@RgcUYiBh1
 S1
 R4
-R44
-R45
 R46
-!i122 818
+R47
+R48
+!i122 872
 L0 74 60
 R13
 R14
 r1
 !s85 0
 31
-R42
-R47
-R48
+R15
+R49
+R50
 !i113 0
-R33
+R32
 R9
 vpriority_encoder
 2Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/priority_encoder.v
-R41
+R11
 !i10b 1
 !s100 g_;QeW:];eXB2?4<E@k<K2
 I@I<32NZA?S]mZmzL^UO8N1
@@ -664,7 +690,7 @@ R4
 R12
 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/priority_encoder.v
 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/interconnect/priority_encoder.v
-!i122 816
+!i122 871
 L0 34 57
 R13
 R14
@@ -680,7 +706,7 @@ R9
 vpvp_fsm_gen
 2Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/pvp_fsm_gen.sv
 R31
-R41
+R25
 !i10b 1
 !s100 FZGVF^k8?i?3V<eSL^X[_2
 IlZ?S8ZWOcJ=[:[X9ei2]U3
@@ -689,23 +715,23 @@ R4
 w1741391273
 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/pvp_fsm_gen.sv
 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/pvp_fsm_gen.sv
-!i122 817
+!i122 873
 L0 6 363
 R13
 R14
 r1
 !s85 0
 31
-R42
+R26
 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/pvp_fsm_gen.sv|
 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/src/fsm/pvp_fsm_gen.sv|
 !i113 0
-R33
+R32
 R9
 vpvp_fsm_gen_tb
 2Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_fsm/pvp_fsm_gen_tb.sv
 R31
-R11
+!s110 1741391434
 !i10b 1
 !s100 gXd3baR;D9z^dg;`[jm7o0
 Il66_7bS3kQFF;_fP=;f<a1
@@ -721,32 +747,32 @@ R14
 r1
 !s85 0
 31
-R15
+!s108 1741391434.000000
 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_fsm/pvp_fsm_gen_tb.sv|
 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_pvp_gen_v3/tb/testbench_fsm/pvp_fsm_gen_tb.sv|
 !i113 0
-R33
+R32
 R9
 Espi_peripheral
-R17
+Z51 w1740648440
 R18
 R19
 R20
 !i122 624
 R4
-Z49 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/spi_peripheral.vhd
-Z50 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/spi_peripheral.vhd
+Z52 8Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/spi_peripheral.vhd
+Z53 FZ:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/spi_peripheral.vhd
 l0
 R23
 V1]D;g96M;AFTjVhNAzSbT2
 !s100 77Ih]a^>>lHQ[5F09SzIG1
 R24
 32
-R25
+Z54 !s110 1741227378
 !i10b 1
-R35
-Z51 !s90 -reportprogress|300|-work|work|-2002|-explicit|-vopt|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/spi_peripheral.vhd|
-Z52 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/spi_peripheral.vhd|
+R34
+Z55 !s90 -reportprogress|300|-work|work|-2002|-explicit|-vopt|-stats=none|Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/spi_peripheral.vhd|
+Z56 !s107 Z:/Documents/GitHub/hmc-qick/firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/spi_peripheral.vhd|
 !i113 0
 R29
 R30
@@ -762,11 +788,11 @@ V>]OkzaW3XU5Ua1<[<D>8T1
 !s100 Ojdg?U>]^^ffGd[2BoEZH1
 R24
 32
-R25
+R54
 !i10b 1
-R35
-R51
-R52
+R34
+R55
+R56
 !i113 0
 R29
 R30
