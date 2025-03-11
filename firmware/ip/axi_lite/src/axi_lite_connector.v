@@ -41,7 +41,6 @@ module axi_lite_connector
 
 		// M AXIS
 		m_axi_awaddr,
-		m_axi_awprot,
 		m_axi_awvalid,
 		m_axi_awready,
 
@@ -55,7 +54,6 @@ module axi_lite_connector
 		m_axi_bready,
 
 		m_axi_araddr,
-		m_axi_arprot,
 		m_axi_arvalid,
 		m_axi_arready,
 
@@ -88,7 +86,6 @@ module axi_lite_connector
 	input 			    s_axi_bready;
 
 	input [6:0]  		s_axi_araddr;
-	input [2:0]			s_axi_arprot;
 	input 				s_axi_arvalid;
 	output 				s_axi_arready;
 
@@ -98,7 +95,7 @@ module axi_lite_connector
 	input 				s_axi_rready;
 
 	// M AXIS
-	output [31:0]		m_axi_awaddr;
+	output [6:0]		m_axi_awaddr;
 	output [2:0]		m_axi_awprot;
 	output 				m_axi_awvalid;
 	input 				m_axi_awready;
@@ -112,8 +109,7 @@ module axi_lite_connector
 	input 				m_axi_bvalid;
 	output 				m_axi_bready;
 
-	output [31:0]		m_axi_araddr;
-	output [2:0]		m_axi_arprot;
+	output [6:0]		m_axi_araddr;
 	output 				m_axi_arvalid;
 	input 				m_axi_arready;
 
