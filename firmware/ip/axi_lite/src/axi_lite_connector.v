@@ -73,7 +73,7 @@ module axi_lite_connector
 	input 				s_axi_aclk;
 	input 				s_axi_aresetn;
 
-	input [31:0] 		s_axi_awaddr;
+	input [6:0] 		s_axi_awaddr;
 	input [2:0]			s_axi_awprot;
 	input 				s_axi_awvalid;
 	output 				s_axi_awready;
@@ -87,7 +87,7 @@ module axi_lite_connector
 	output 				s_axi_bvalid;
 	input 			    s_axi_bready;
 
-	input [31:0]		s_axi_araddr;
+	input [6:0]  		s_axi_araddr;
 	input [2:0]			s_axi_arprot;
 	input 				s_axi_arvalid;
 	output 				s_axi_arready;
