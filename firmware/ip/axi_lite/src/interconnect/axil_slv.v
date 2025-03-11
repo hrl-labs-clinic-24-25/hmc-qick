@@ -63,7 +63,7 @@ module axil_slv #
     /*
      * AXI lite slave interfaces
      */
-    input  wire [31:0]  s_axil_awaddr,
+    input  wire [6:0]  s_axil_awaddr,
     input  wire [2:0]           s_axil_awprot,
     input  wire              s_axil_awvalid,
     output wire             s_axil_awready,
@@ -74,7 +74,7 @@ module axil_slv #
     output wire [1:0]           s_axil_bresp,
     output wire           s_axil_bvalid,
     input  wire             s_axil_bready,
-    input  wire [31:0]  s_axil_araddr,
+    input  wire [6:0]  s_axil_araddr,
     input  wire [2:0]      s_axil_arprot,
     input  wire         s_axil_arvalid,
     output wire        s_axil_arready,
@@ -107,7 +107,7 @@ module axil_slv #
     /*
      * AXI lite master interfaces
      */
-    output wire [31:0]  m_axil_awaddr,
+    output wire [6:0]  m_axil_awaddr,
     output wire [2:0]           m_axil_awprot,
     output wire            m_axil_awvalid,
     input  wire           m_axil_awready,
@@ -118,7 +118,7 @@ module axil_slv #
     input  wire [1:0]           m_axil_bresp,
     input  wire            m_axil_bvalid,
     output wire             m_axil_bready,
-    output wire [31:0]  m_axil_araddr,
+    output wire [6:0]  m_axil_araddr,
     output wire [2:0]           m_axil_arprot,
     output wire             m_axil_arvalid,
     input  wire             m_axil_arready,
