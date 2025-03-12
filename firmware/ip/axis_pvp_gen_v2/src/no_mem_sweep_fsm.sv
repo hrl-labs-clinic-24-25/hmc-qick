@@ -25,7 +25,7 @@ module no_mem_sweep_fsm #(parameter DEPTH = 256)
                     input logic clk, enable,
                     input logic rstn,
                     output logic top, base,
-                    output logic [31:0] mosi
+                    output logic [23:0] mosi
                     );
 
 parameter [3:0] start_bits = 4'b0001;
@@ -50,7 +50,7 @@ always @(posedge clk) begin
 end
 
 assign next_val = start + step*counter;
-assign mosi = {{{2'h00}}, start_bits, curr_val};
+assign mosi = {start_bits, curr_val};
 assign top = (curr_val == (start + (DEPTH-1)*step)); // indicate 1 before top (works with FSM)
 assign base = (curr_val == start);
 
@@ -60,7 +60,7 @@ endmodule
 module no_mem_sweep_tb();
     logic rstn, clk, enable;
     logic [19:0] start, step;
-    logic [31:0] mosi;
+    logic [23:0] mosi;
 
     // test generation of 16 evenly spaced steps
     no_mem_sweep #(16) dut ( .rstn(rstn), .clk(clk), .start(start), .step(step), .enable(enable), .mosi(mosi));

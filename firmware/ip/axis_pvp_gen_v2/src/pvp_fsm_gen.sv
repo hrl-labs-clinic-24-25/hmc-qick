@@ -1,19 +1,21 @@
 /**
 	A module that runs a pvp plot generator using a Finite State Machine
 	Zoe Worrall, zworrall@g.hmc.edu, March 3, 2025
+
+	Rev 1: changing input/output vs parameters
+	Ellie Sundheim, 3/5/25
 */
 
-
-module pvp_fsm_gen  #(parameter [15:0] DWELL_CYCLES = 16'd100,
-					parameter [19:0] STEP_SIZE = 20'h00001, 
-					parameter [7:0] NUM_CYCLES = 8'd10,
-					parameter [1:0] NUM_DACS = 2'd4)
+module pvp_fsm_gen  
+	#(
+		NUM_CYCLES = 256,
+		DWELL_CYCLES = 10
+	)
     (
 		// Reset and clock.
-		input rstn,
-		input clk,
+		input logic rstn, clk,
 
-        input trigger,
+        input logic trigger,
 
 		// Inputs from PYNQ registers
 		input logic [19:0] start_0_i,
@@ -21,31 +23,18 @@ module pvp_fsm_gen  #(parameter [15:0] DWELL_CYCLES = 16'd100,
 		input logic [19:0] start_2_i,
 		input logic [19:0] start_3_i,
 
-    	// parameter inputs.
-		output [31:0] mosi_o,
-        output [1:0]  which_dac_o,
-        output        readout_o
+		// these 2 will be set in python but locked during pvp generations so they don't change in the middle of a plot
+		input logic [19:0] 	STEP_SIZE,
+		input logic [3:0] 	ACTIVE_DACS,
+
+    	// outputs to other blocks
+		output logic [31:0] mosi_o,
+        output logic [1:0]  which_dac_o,
+		output logic 		readout_0;
 	);
 
-/**************/
-/* Parameters */
-/**************/
 
-// parameter SIZE = 16;
-// parameter DWELL_TIME = 100; // will be set
-
-/*********/
-/* Ports */
-/*********/
-// input						rstn;
-logic 						rstn_0, rstn_1, rstn_2, rstn_3;
-// input						clk;
-
-// input                       trigger;
-
-// output 	[31:0]			    mosi_o;
-// output	[1:0]			    which_dac_o;
-// output                      readout_o;
+logic 	rstn_0, rstn_1, rstn_2, rstn_3;
 
 
 /********************/

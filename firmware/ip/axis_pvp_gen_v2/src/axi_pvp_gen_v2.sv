@@ -12,65 +12,64 @@
 module axi_pvp_gen_v2
 	( 
 		// AXI Slave I/F for configuration.
-		input logic				s_axi_aclk,
+		input logic					s_axi_aclk,
 		input logic					s_axi_aresetn,
 
 		input logic	[31:0]			s_axi_awaddr,
 		input logic	[2:0]			s_axi_awprot,
 		input logic					s_axi_awvalid,
-		output logic					s_axi_awready,
+		output logic				s_axi_awready,
 
 		input logic	[31:0]			s_axi_wdata,
 		input logic	[3:0]			s_axi_wstrb,
 		input logic					s_axi_wvalid,
-		output logic					s_axi_wready,
+		output logic				s_axi_wready,
 
-		output logic	[1:0]			s_axi_bresp,
-		output logic					s_axi_bvalid,
+		output logic	[1:0]		s_axi_bresp,
+		output logic				s_axi_bvalid,
 		input	 logic				s_axi_bready,
 
 		input logic	[31:0]			s_axi_araddr,
 		input logic	[2:0]			s_axi_arprot,
 		input logic					s_axi_arvalid,
-		output logic					s_axi_arready,
+		output logic				s_axi_arready,
 
-		output logic	[31:0]			s_axi_rdata,
-		output logic	[1:0]			s_axi_rresp,
-		output	 logic				s_axi_rvalid,
+		output logic	[31:0]		s_axi_rdata,
+		output logic	[1:0]		s_axi_rresp,
+		output logic				s_axi_rvalid,
 		input logic					s_axi_rready,
 
 		// Non AXI inputs
-		input  logic					trigger_pvp,
+		input  logic					trigger_tproc,
 
 		// M AXIS
 
 		output logic	[31:0]			m_axi_awaddr,
 		output logic	[2:0]			m_axi_awprot,
 		output logic					m_axi_awvalid,
-		input logic					m_axi_awready,
+		input logic						m_axi_awready,
 
 		output logic	[31:0]			m_axi_wdata,
 		output logic	[3:0]			m_axi_wstrb,
 		output logic					m_axi_wvalid,
-		input	 logic				m_axi_wready,
+		input	 logic					m_axi_wready,
 
 		input logic	[1:0]			m_axi_bresp,
 		input logic					m_axi_bvalid,
-		output logic					m_axi_bready,
+		output logic				m_axi_bready,
 
-		output	 logic [31:0]			m_axi_araddr,
-		output	 logic [2:0]			m_axi_arprot,
+		output	 logic [31:0]		m_axi_araddr,
+		output	 logic [2:0]		m_axi_arprot,
 		output	 logic				m_axi_arvalid,
 		input	 logic				m_axi_arready,
 
 		input logic	[31:0]			m_axi_rdata,
 		input logic	[1:0]			m_axi_rresp,
 		input	 logic				m_axi_rvalid,
-		output logic					m_axi_rready,
+		output logic				m_axi_rready,
 
 		// Non AXI-LITE outputs
-		output  logic 				trigger,
-		output logic [1:0]  			SELECT
+		output logic [4:0]  		select
 	);
 
 /*********/
@@ -141,23 +140,29 @@ module axi_pvp_gen_v2
 /********************/
 // Registers.
 logic [31:0] mosi_output;
-logic [1:0]  select;
+logic [1:0]  mux;
 
-logic [19:0] START_VAL_0_REG = 20'h000f0;
-logic [19:0] START_VAL_1_REG = 20'h00f00;
-logic [19:0] START_VAL_2_REG = 20'h0f000;
-logic [19:0] START_VAL_3_REG = 20'hf0000;
+logic [19:0] START_VAL_0_REG; 
+logic [19:0] START_VAL_1_REG; 
+logic [19:0] START_VAL_2_REG;
+logic [19:0] START_VAL_3_REG; 
 
-localparam [19:0] STEP_SIZE_REG = 20'b0000_0000_0000_0000_0001;
-localparam [1:0]  NUM_DACS_REG = 2'd2;
-localparam [7:0]  NUM_CYCLES_REG = 8'd4;
-localparam [15:0] DWELL_CYCLES_REG = 100;
+logic [19:0] STEP_SIZE_REG;
+logic [3:0]  ACTIVE_DACS_REG; 
 
+logic [5:0] DEMUX_0_REG;
+logic [5:0] DEMUX_1_REG;
+logic [5:0] DEMUX_2_REG;
+logic [5:0] DEMUX_3_REG;
 
+logic 		TRIGGER_PVP_REG;
+logic 		TRIGGER_AWG_REG;
 
 /**************/
 /* Parameters */
 /**************/
+parameter NUM_CYCLES = 256;
+parameter DWELL_CYCLES = 16;
 
 logic [4:0] mux1 = 5'b00001;
 logic [4:0] mux2 = 5'b00010;
@@ -250,24 +255,26 @@ axil_slv
 		.m_axil_rready			(m_axi_rready	)
 	);
 
-pvp_fsm_gen 
-	#(
-		.DWELL_CYCLES	(DWELL_CYCLES_REG),
-		.STEP_SIZE      (STEP_SIZE_REG),
-		.NUM_CYCLES     (NUM_CYCLES_REG),
-		.NUM_DACS 		(NUM_DACS_REG)
-	)
-	fsm_i 
-		(.rstn		(s_axi_aresetn),
-		.clk		(s_axi_aclk),
-		.trigger    (trigger_pvp),
-		.mosi_o		(mosi_output),
-        .which_dac_o (select),
-		.readout_o	(trigger),
-		.start_0_i (START_VAL_0_REG),
-		.start_1_i (START_VAL_1_REG),
-		.start_2_i (START_VAL_2_REG),
-		.start_3_i (START_VAL_3_REG)
+pvp_fsm_gen #(
+				.NUM_CYCLES (NUM_CYCLES),
+				.DWELL_CYCLES (DWELL_CYCLES)
+			)
+		fsm_i 
+		(.rstn			(s_axi_aresetn),
+		.clk			(s_axi_aclk),
+		.trigger    	(TRIGGER_PVP_REG),
+		
+		.start_0_i 		(START_VAL_0_REG),
+		.start_1_i 		(START_VAL_1_REG),
+		.start_2_i 		(START_VAL_2_REG),
+		.start_3_i 		(START_VAL_3_REG),
+
+		.STEP_SIZE 		(STEP_SIZE_REG),
+		.ACTIVE_DACS 	(NUM_DIMS_REG),
+
+		.mosi_o			(mosi_output),
+        .which_dac_o 	(select),
+		.readout_o		(TRIGGER_AWG_REG),
 		);
 
 

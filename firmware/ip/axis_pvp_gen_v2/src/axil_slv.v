@@ -108,8 +108,8 @@ module axil_slv #
      * AXI lite master interfaces
      */
     output wire [31:0]  m_axil_awaddr,
-    output wire [2:0]           m_axil_awprot,
-    output wire            m_axil_awvalid,
+    output wire [2:0]   m_axil_awprot,
+    output wire         m_axil_awvalid,
     input  wire           m_axil_awready,
     output wire [31:0]  m_axil_wdata,
     output wire [3:0]  m_axil_wstrb,
