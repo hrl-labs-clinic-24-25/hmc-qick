@@ -1,16 +1,15 @@
-// Modelsim-ASE requires a timescale directive
-// `timescale 1 ps / 1 ps
+/**
+* File: axis_pvp_gen_v3_tb.sv
+* Description:
+*     This is a test bench for the AXI PVP generator. It is used to confirm that the data interacts with the AXI blocks as anticipated.
+* Author: Zoe Worrall, zoe.worrall@me.com
+* Date: March 13, 2025
+*/
 
-
-// `resetall
-// `timescale 1ns / 1ps
-// `default_nettype none
 
 /**
 
 Based on the test bench in the corresponding video https://www.youtube.com/watch?v=qqI9QIkGFIQ 
-
-Confirming that data interacts with AXI blocks as anticipated
 
 */
 module axis_pvp_gen_v3_tb ();

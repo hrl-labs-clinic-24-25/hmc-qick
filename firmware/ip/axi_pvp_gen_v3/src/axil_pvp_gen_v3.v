@@ -1,8 +1,9 @@
-// Zoe Worrall, March 4, 2025
-
-// `resetall
-// `timescale 1ns / 1ps
-// `default_nettype none
+/**
+* Module: axil_pvp_gen_v3
+* Description: This module is the top level module for the PVP generator. It instantiates the FSM and the AXI Slave modules for the PVP generator.
+* Author: Zoe Worrall, zoe.worrall@me.com
+* Date: March 13, 2025
+*/
 
 // No Mem Sweep
 // s_axi_aclk	: clock for s_axi_*
