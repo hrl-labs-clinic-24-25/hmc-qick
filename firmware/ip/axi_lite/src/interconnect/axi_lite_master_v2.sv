@@ -14,14 +14,12 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module axi_lite_master
+module axi_lite_master_v2
   #(
-    parameter integer AXI_ADDR_WIDTH = 32,
+    parameter integer AXI_ADDR_WIDTH = 6,
     parameter integer AXI_DATA_WIDTH = 32
     )
    (
-    input                                init_transaction,
-
     input wire                           M_AXI_ACLK,
     input wire                           M_AXI_ARESETN,
 
@@ -67,6 +65,8 @@ module axi_lite_master
    // generally parameters should be at the top if they're designed to be changed by users outside the module.
    localparam HSIZE = 640;
    localparam VSIZE = 480;
+
+   logic init_transaction;
 
 
    // only include here signals that I drive (outputs). Inputs are not included (used later)
