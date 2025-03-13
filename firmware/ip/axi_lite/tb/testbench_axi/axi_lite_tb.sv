@@ -13,13 +13,17 @@ Based on the test bench in the corresponding video https://www.youtube.com/watch
 Confirming that data interacts with AXI blocks as anticipated
 
 */
-module axis_pvp_gen_v3_tb ();
+module axi_lite_tb ();
 
     logic clk = 0;
     logic rstn;
 
     localparam freq = 50.0e6;
     localparam clk_period = (1/freq)/1e-9;
+
+
+    logic miso;
+    logic mosi;
 
     always begin
         clk = #(clk_period/2) ~clk;
@@ -30,10 +34,16 @@ module axis_pvp_gen_v3_tb ();
             rstn = 0;
             #100
             rstn = 1;
+            #100;
+            rstn = 0;
+            #100
+            rstn = 1;
+
         end
 
     localparam AXI_ADDR_WIDTH = 32;
     localparam AXI_DATA_WIDTH = 32;
+
 
 
     logic [31 : 0]                S_AXI_AWADDR;
@@ -84,7 +94,6 @@ module axis_pvp_gen_v3_tb ();
     logic SS;
     logic SSN;
     logic SCLK;
-    logic MOSI_OUTPUT;
 
     logic [31:0] M_AXI_WDATA;
     logic [31:0] S_AXI_WDATA;
@@ -106,73 +115,14 @@ module axis_pvp_gen_v3_tb ();
             init_transaction <= 0;
             init_counter     <= 0;
         end else begin
+            // begin increasing the counter. The counter is 
             init_transaction <= 0;
             init_counter     <= init_counter+1;
         end
 
-        if (init_counter == 10) begin init_transaction <= 1; end
+        if (init_counter == 25) begin init_transaction <= 1; end
     end
     
-    axil_pvp_gen_v3 apg_i
-    (
-        .s_axi_aclk		(clk),
-		.s_axi_aresetn	(rstn),
-
-		.s_axi_awaddr	(S_AXI_AWADDR),
-		.s_axi_awprot	(S_AXI_AWPROT),
-		.s_axi_awvalid	(S_AXI_AWVALID),
-		.s_axi_awready	(S_AXI_AWREADY),
-
-		.s_axi_wdata	(S_AXI_WDATA),
-		.s_axi_wstrb	(S_AXI_WSTRB),
-		.s_axi_wvalid	(S_AXI_WVALID),
-		.s_axi_wready	(S_AXI_WREADY),
-
-		.s_axi_bresp	(S_AXI_BRESP),
-		.s_axi_bvalid	(S_AXI_BVALID),
-		.s_axi_bready	(S_AXI_BREADY),
-
-		.s_axi_araddr	(S_AXI_ARADDR),
-		.s_axi_arprot	(S_AXI_ARPROT),
-		.s_axi_arvalid	(S_AXI_ARVALID),
-		.s_axi_arready	(S_AXI_ARREADY),
-
-		.s_axi_rdata	(S_AXI_RDATA),
-		.s_axi_rresp	(S_AXI_RRESP),
-		.s_axi_rvalid	(S_AXI_RVALID),
-		.s_axi_rready	(S_AXI_RREADY),
-		// AXIS Master for output.
-		.m_axi_awaddr	(M_AXI_AWADDR),
-		.m_axi_awprot	(M_AXI_AWPROT),
-		.m_axi_awvalid	(M_AXI_AWVALID),
-		.m_axi_awready	(M_AXI_AWREADY),
-
-		.m_axi_wdata	(M_AXI_WDATA),
-		.m_axi_wstrb	(M_AXI_WSTRB),
-		.m_axi_wvalid	(M_AXI_WVALID),
-		.m_axi_wready	(M_AXI_WREADY),
-
-		.m_axi_bresp	(M_AXI_BRESP),
-		.m_axi_bvalid	(M_AXI_BVALID),
-		.m_axi_bready	(M_AXI_BREADY),
-
-		.m_axi_araddr	(M_AXI_ARADDR),
-		.m_axi_arprot	(M_AXI_ARPROT),
-		.m_axi_arvalid	(M_AXI_ARVALID),
-		.m_axi_arready	(M_AXI_ARREADY),
-
-		.m_axi_rdata	(M_AXI_RDATA),
-		.m_axi_rresp	(M_AXI_RRESP),
-		.m_axi_rvalid	(M_AXI_RVALID),
-		.m_axi_rready	(M_AXI_RREADY),
-
-
-		// Non AXI-LITE 
-		.TRIGGER_AWG_REG (init_transaction), // trigger for AWG
-		.select  (mux), // DAC demuxing set of 5 pins
-
-		.trigger_spi_o (trigger_spi_o) // trigger for SPI
-    );
 
     axi_lite_master
      #(
@@ -184,7 +134,7 @@ module axis_pvp_gen_v3_tb ();
       .init_transaction(init_transaction),
 
       .M_AXI_ACLK(clk),
-      .M_AXI_ARESETN(rstn),
+      .M_AXI_ARESETN(~rstn),
 
       // aw
       .M_AXI_AWADDR(S_AXI_AWADDR),
@@ -217,35 +167,118 @@ module axis_pvp_gen_v3_tb ();
 
       );
 
-    axi_spi_simple axi_spi_i
-    (
-        .saxi_aclk (clk),
-        .saxi_aresetn(rstn),
-        .saxi_awaddr(M_AXI_AWADDR),
-		.saxi_awprot	(M_AXI_AWPROT),
-		.saxi_awvalid	(M_AXI_AWVALID),
-		.saxi_awready	(M_AXI_AWREADY),
-		.saxi_wdata	(M_AXI_WDATA),
-		.saxi_wstrb	(M_AXI_WSTRB),
-		.saxi_wvalid	(M_AXI_WVALID),
-		.saxi_wready	(M_AXI_WREADY),
-		.saxi_bresp	(M_AXI_BRESP),
-		.saxi_bvalid	(M_AXI_BVALID),
-		.saxi_bready	(M_AXI_BREADY),
-		.saxi_araddr	(M_AXI_ARADDR),
-		.saxi_arprot	(M_AXI_ARPROT),
-		.saxi_arvalid	(M_AXI_ARVALID),
-		.saxi_arready	(M_AXI_ARREADY),
-		.saxi_rdata	(M_AXI_RDATA),
-		.saxi_rresp	(M_AXI_RRESP),
-		.saxi_rvalid	(M_AXI_RVALID),
-		.saxi_rready	(M_AXI_RREADY),
-        .gpo (GPO),
-        .ss (SS),
-        .ssn (SSN),
-        .sclk (SCLK),
-        .miso (1'b0),
-        .mosi (MOSI_OUTPUT)
-    );
+
+    // testing the axi lite slave to confirm that it run properly when
+        // configured with other AXI streams
+    axil_slv 
+		#(
+		.S_COUNT 				(32),
+		.M_COUNT 				(32),
+		.DATA_WIDTH				(32),
+		.ADDR_WIDTH    			(32),
+		.STRB_WIDTH			    (4),
+		.M_REGIONS				(1),
+		.M_BASE_ADDR  			(0),
+		.M_ADDR_WIDTH 			({32 { {1 {32'd24} } }  }),
+		.M_CONNECT_READ 		({32 { {32{1'b1}   } }  }),
+		.M_CONNECT_WRITE 		({32 { {32{1'b1}   } }  }),
+		.M_SECURE 				({32 	  {1'b0}        })
+		)
+		axil_slv_i
+		(
+			.clk			(s_axi_aclk	 	),
+			.rst		    (~s_axi_aresetn	),
+
+			// INPUT AXI
+			// Write Address Channel.
+			.s_axil_awaddr			(S_AXI_AWADDR 	),
+			.s_axil_awprot			(S_AXI_AWPROT 	),
+			.s_axil_awvalid		    (S_AXI_AWVALID	),
+			.s_axil_awready		    (S_AXI_AWREADY	),
+
+			// Write Data Channel.
+			.s_axil_wdata			(init_counter	),
+			.s_axil_wstrb			(S_AXI_WSTRB	),
+			.s_axil_wvalid			(S_AXI_WVALID   ),
+			.s_axil_wready			(S_AXI_WREADY	),
+
+			// Write Response Channel.
+			.s_axil_bresp			(S_AXI_BRESP	),
+			.s_axil_bvalid			(S_AXI_BVALID	),
+			.s_axil_bready			(S_AXI_BREADY	),
+
+			// Read Address Channel.
+			.s_axil_araddr			(S_AXI_ARADDR 	),
+			.s_axil_arprot			(S_AXI_ARPROT 	),
+			.s_axil_arvalid			(S_AXI_ARVALID	),
+			.s_axil_arready			(S_AXI_ARREADY	),
+
+			// Read Data Channel.
+			.s_axil_rdata			(S_AXI_RDATA	),
+			.s_axil_rresp			(S_AXI_RRESP	),
+			.s_axil_rvalid			(S_AXI_RVALID	),
+			.s_axil_rready			(S_AXI_RREADY	),
+
+			// OUTPUT AXI
+			// Write Address Channel.
+			.m_axil_awaddr			(M_AXI_AWADDR 	),
+			.m_axil_awprot			(M_AXI_AWPROT 	),
+			.m_axil_awvalid			(M_AXI_AWVALID	),
+			.m_axil_awready			(M_AXI_AWREADY	),
+
+			// Write Data Channel.
+			.m_axil_wdata			(M_AXI_WDATA	),
+			.m_axil_wstrb			(M_AXI_WSTRB	),
+			.m_axil_wvalid			(M_AXI_WVALID   ),
+			.m_axil_wready			(M_AXI_WREADY	),
+
+			// Write Response Channel.
+			.m_axil_bresp			(M_AXI_BRESP	),
+			.m_axil_bvalid			(M_AXI_BVALID	),
+			.m_axil_bready			(M_AXI_BREADY	),
+
+			// Read Address Channel.
+			.m_axil_araddr			(M_AXI_ARADDR 	),
+			.m_axil_arprot			(M_AXI_ARPROT 	),
+			.m_axil_arvalid		    (M_AXI_ARVALID	),
+			.m_axil_arready		    (M_AXI_ARREADY	),
+
+			// Read Data Channel.
+			.m_axil_rdata			(M_AXI_RDATA	),
+			.m_axil_rresp			(M_AXI_RRESP	),
+			.m_axil_rvalid			(M_AXI_RVALID	),
+			.m_axil_rready			(M_AXI_RREADY	)
+		);
+
+    // axi_spi_simple axi_spi_i
+    // (
+    //     .saxi_aclk (clk),
+    //     .saxi_aresetn(rstn),
+    //     .saxi_awaddr(M_AXI_AWADDR),
+	// 	.saxi_awprot	(M_AXI_AWPROT),
+	// 	.saxi_awvalid	(M_AXI_AWVALID),
+	// 	.saxi_awready	(M_AXI_AWVREADY),
+	// 	.saxi_wdata	(M_AXI_WDATA),
+	// 	.saxi_wstrb	(M_AXI_WSTRB),
+	// 	.saxi_wvalid	(M_AXI_WVALID),
+	// 	.saxi_wready	(M_AXI_WREADY),
+	// 	.saxi_bresp	(M_AXI_BRESP),
+	// 	.saxi_bvalid	(M_AXI_BVALID),
+	// 	.saxi_bready	(M_AXI_BREADY),
+	// 	.saxi_araddr	(M_AXI_ARADDR),
+	// 	.saxi_arprot	(M_AXI_ARPROT),
+	// 	.saxi_arvalid	(M_AXI_ARVALID),
+	// 	.saxi_arready	(M_AXI_ARREADY),
+	// 	.saxi_rdata	(M_AXI_RDATA),
+	// 	.saxi_rresp	(M_AXI_RRESP),
+	// 	.saxi_rvalid	(M_AXI_RVALID),
+	// 	.saxi_rready	(M_AXI_RREEADY),
+    //     .gpo (GPO),
+    //     .ss (SS),
+    //     .ssn (SSN),
+    //     .sclk (SCLK),
+    //     .miso (miso),
+    //     .mosi (MOSI_OUTPUT)
+    // );
 
 endmodule

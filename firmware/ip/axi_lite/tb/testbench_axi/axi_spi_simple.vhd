@@ -148,9 +148,10 @@ component axi4_lite_interface_v1_0 is
     signal clk: std_logic;
     signal resetn: std_logic;
     constant is_64b_data_bus: integer := (SAXI_DATA_WIDTH)/32-1; 
+
 begin
 
-U0: spi_peripheral
+SPI_U0: spi_peripheral
 generic map(
     USE_GPIO => USE_GPIO,
     GPIO_WIDTH => GPIO_WIDTH,
@@ -175,7 +176,7 @@ port map(
 );
 
 
-U1: axi4_lite_interface_v1_0 
+SPI_U1: axi4_lite_interface_v1_0 
 generic map(
         DATA_BUS_IS_64_BITS => is_64b_data_bus,
         ADDR_WIDTH	=> 2,--subordinate has 4 registers

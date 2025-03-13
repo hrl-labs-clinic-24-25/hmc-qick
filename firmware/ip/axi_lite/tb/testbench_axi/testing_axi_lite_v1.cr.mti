@@ -1,0 +1,61 @@
+Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/tb/testbench_axi/axi_lite_tb.sv {1 {vlog -work work -vopt -sv -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/tb/testbench_axi/axi_lite_tb.sv
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module axi_lite_tb
+
+Top level modules:
+	axi_lite_tb
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/src/interconnect/axil_slv.v {1 {vlog -work work -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/src/interconnect/axil_slv.v
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module axil_slv
+
+Top level modules:
+	axil_slv
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/src/axi_lite_master.sv {1 {vlog -work work -vopt -sv -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/src/axi_lite_master.sv
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module axi_lite_master
+
+Top level modules:
+	axi_lite_master
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/tb/testbench_axi/axi_spi_simple.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/tb/testbench_axi/axi_spi_simple.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity axi_spi_simple
+-- Compiling architecture arch_imp of axi_spi_simple
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/src/interconnect/priority_encoder.v {1 {vlog -work work -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/src/interconnect/priority_encoder.v
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module priority_encoder
+
+Top level modules:
+	priority_encoder
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/src/interconnect/axil_interconnect.v {1 {vlog -work work -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/src/interconnect/axil_interconnect.v
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module axil_interconnect
+
+Top level modules:
+	axil_interconnect
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/src/interconnect/arbiter.v {1 {vlog -work work -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/src/interconnect/arbiter.v
+Questa Lattice OEM Edition-64 vlog 2024.2 Compiler 2024.05 May 20 2024
+-- Compiling module arbiter
+
+Top level modules:
+	arbiter
+
+} {} {}} Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/src/axi4_lite_interface_v1_0.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none Z:/Documents/GitHub/hmc-qick/firmware/ip/axi_lite/src/axi4_lite_interface_v1_0.vhd
+Questa Lattice OEM Edition-64 vcom 2024.2 Compiler 2024.05 May 20 2024
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity axi4_lite_interface_v1_0
+-- Compiling architecture arch_imp of axi4_lite_interface_v1_0
+
+} {} {}}

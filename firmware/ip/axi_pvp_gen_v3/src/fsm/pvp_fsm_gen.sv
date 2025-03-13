@@ -18,7 +18,7 @@ module pvp_fsm_gen
 		Z_AXIS_START_VAL_REG,
 		W_AXIS_START_VAL_REG,
 
-		DWELL_CYCLES_REG,        // the number of clock cycles to wait before moving to next DAC
+		DWELL_CYCLES_REG,        // the number of clock cycles to wait before moving to next DAC. DWELL_CYCLES_REG > 50
 		CYCLES_TILL_READOUT_REG, // the number of clock cycles until AWG can be run
 
 		STEP_SIZE_REG,
@@ -78,10 +78,13 @@ module pvp_fsm_gen
 	output readout_o;
 	output trigger_spi_o;
 
+
 	/********************/
 	/* Internal signals */
 	/********************/
 
+	
+	logic on_off;
 
 	///////// DACs //////////
 	logic rstn_0, rstn_1, rstn_2, rstn_3;
@@ -107,11 +110,13 @@ module pvp_fsm_gen
 	logic 		 dac1_en;
 	logic 		 dac2_en;
 	logic 		 dac3_en;
+
 	/////////////////////////
 
 	// FSM signals
 	logic [3:0]  curr_state, next_state;
 	logic [15:0] dwell_counter;   // cycle for DWELL_CYCLES
+	logic [31:0] next_mosi;
 
 	/***************/
 	/* FSM Machine */
@@ -131,6 +136,9 @@ module pvp_fsm_gen
 		rstn_2 <= 1;
 		rstn_1 <= 1;
 		rstn_0 <= 1;
+		dwell_counter <= 0;
+		next_mosi <= ((curr_state==S_STALL) | (dwell_counter==0)) ? past_mosi   : ((curr_state==S_SEND_0) & dwell_counter>0) ? mosi_0 : (curr_state==S_SEND_1) ? mosi_1                : (curr_state==S_SEND_2) ? mosi_2 			   : (curr_state==S_SEND_3) ? mosi_3 				: 0;
+	
 
 		if (~rstn) begin
 			// State register.
@@ -141,6 +149,8 @@ module pvp_fsm_gen
 			dwell_counter <= 0;
 		end 
 		else begin
+			
+			on_off <= ((dwell_counter >= (DWELL_CYCLES_REG-10)) & (dwell_counter < (DWELL_CYCLES_REG-9))) ? 1 : 0;
 
 			// State register.
 			case(curr_state)
@@ -190,7 +200,8 @@ module pvp_fsm_gen
 					else if ((dwell_counter == DWELL_CYCLES_REG) & top_0)  // if we've' gone full through list, go to next DAC
 					begin 
 						dwell_counter <= 0; 
-						next_state <= S_SEND_1; 
+						if (NUM_DACS_REG < 2) next_state <= WAIT;
+						else next_state <= S_SEND_1;
 						rstn_0 <= 0; 
 					end 
 					else  // we are waiting for full time
@@ -215,7 +226,8 @@ module pvp_fsm_gen
 					else if ((dwell_counter == DWELL_CYCLES_REG) & top_1)  // if we've' gone full through list, go to next DAC
 					begin 
 						dwell_counter <= 0; 
-						next_state <= S_SEND_2; 
+						if (NUM_DACS_REG < 3) next_state <= WAIT;
+						else next_state <= S_SEND_2; 
 						rstn_1 <= 0; 
 					end  
 					else 	  // we are waiting for full time
@@ -240,7 +252,8 @@ module pvp_fsm_gen
 					else if ((dwell_counter == DWELL_CYCLES_REG) & top_2)   // if we've' gone full through list, go to next DAC
 					begin 
 						dwell_counter <= 0; 
-						next_state <= S_SEND_3; 
+						if (NUM_DACS_REG < 4) next_state <= WAIT;
+						else next_state <= S_SEND_3; 
 						rstn_2 <= 0; 
 					end 
 					else 		 // we are waiting for full time									  
@@ -293,16 +306,15 @@ module pvp_fsm_gen
 	assign dac3_en = ((dwell_counter == 0) & (curr_state == S_SEND_3)) | (curr_state == WAIT);
 
 	// assign the mosi and output for demuxing to DACs based on current state
-	assign mosi_o = ((curr_state==S_STALL) | (dwell_counter==0)) ? past_mosi   : ((curr_state==S_SEND_0) & dwell_counter>0) ? mosi_0 : (curr_state==S_SEND_1) ? mosi_1                : (curr_state==S_SEND_2) ? mosi_2 			   : (curr_state==S_SEND_3) ? mosi_3 				: 0;
+	assign mosi_o = next_mosi; //((curr_state==S_STALL) | (dwell_counter==0)) ? past_mosi   : ((curr_state==S_SEND_0) & dwell_counter>0) ? mosi_0 : (curr_state==S_SEND_1) ? mosi_1                : (curr_state==S_SEND_2) ? mosi_2 			   : (curr_state==S_SEND_3) ? mosi_3 				: 0;
 	assign select = ((curr_state==S_STALL) | (dwell_counter==0)) ? past_select :  (curr_state==S_SEND_0) ? X_AXIS_DEMUX_REG[4:0]     : (curr_state==S_SEND_1) ? Y_AXIS_DEMUX_REG[4:0] : (curr_state==S_SEND_2) ? Z_AXIS_DEMUX_REG[4:0] : (curr_state==S_SEND_3) ? W_AXIS_DEMUX_REG[4:0] : 5'b11111; // this is hard to debug if we're always seeing first DAC and none of second (lol)
+
+	assign trigger_spi_o = on_off;
 
 	// readout controls AWG readout
 	assign readout_o 	 = (dwell_counter > CYCLES_TILL_READOUT_REG); // CHANGE TO CYCLES_TILL_READOUT
 
-	// spi_readout controls when the SPI gets written to
-	assign trigger_spi_o = (dwell_counter > DWELL_CYCLES_REG/10 & dwell_counter < (DWELL_CYCLES_REG/10 + 1));
-
-	assign done = (top_3);	// if all the DACs are at the top, then we are done
+	assign done = (curr_state == WAIT);	// if all the DACs are at the top, then we are done
 
 	no_mem_sweep_fsm 
 		#(

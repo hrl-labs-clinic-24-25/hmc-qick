@@ -2,7 +2,7 @@
 <spirit:component xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <spirit:vendor>user.org</spirit:vendor>
   <spirit:library>user</spirit:library>
-  <spirit:name>axi_lite_connector</spirit:name>
+  <spirit:name>axi_lite_master</spirit:name>
   <spirit:version>1.0</spirit:version>
   <spirit:busInterfaces>
     <spirit:busInterface>
@@ -334,7 +334,7 @@
         <spirit:displayName>Synthesis</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:synthesis</spirit:envIdentifier>
         <spirit:language>Verilog</spirit:language>
-        <spirit:modelName>axi_lite_connector</spirit:modelName>
+        <spirit:modelName>axi_lite_master</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_anylanguagesynthesis_xilinx_com_ip_dds_compiler_6_0__ref_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -353,7 +353,7 @@
         <spirit:displayName>Simulation</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:simulation</spirit:envIdentifier>
         <spirit:language>Verilog</spirit:language>
-        <spirit:modelName>axi_lite_connector</spirit:modelName>
+        <spirit:modelName>axi_lite_master</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_anylanguagebehavioralsimulation_xilinx_com_ip_dds_compiler_6_0__ref_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -945,7 +945,7 @@
         <spirit:userFileType>CELL_NAME_signal_gen_top_i/signal_gen_i/GEN_dds[0].dds_i/dds_compiler_0</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/axi_lite_connector.v</spirit:name>
+        <spirit:name>src/axi_lite_master.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:userFileType>CHECKSUM_49c7e8e9</spirit:userFileType>
       </spirit:file>
@@ -983,7 +983,7 @@
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/axi_lite_connector.v</spirit:name>
+        <spirit:name>src/axi_lite_master.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
       </spirit:file>
     </spirit:fileSet>
@@ -1000,7 +1000,7 @@
     <spirit:fileSet>
       <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>xgui/axi_lite_connector_v1_0.tcl</spirit:name>
+        <spirit:name>xgui/axi_lite_master_v1_0.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
         <spirit:userFileType>CHECKSUM_d3309d54</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
@@ -1021,7 +1021,7 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>Component_Name</spirit:name>
-      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">axi_lite_connector_v1_0</spirit:value>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">axi_lite_master_v1_0</spirit:value>
     </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
@@ -1037,38 +1037,38 @@
       <xilinx:coreRevision>11</xilinx:coreRevision>
       <xilinx:coreCreationDateTime>2025-02-27T01:22:45Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@108ce282_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@6eccca9b_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@3eca7e_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@30f77a91_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@2018b5a3_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@6cabe64c_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@6157f2dc_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@17c97184_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@f0b7827_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@4e4935dd_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@3ee8bbd4_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@64ae1327_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@28fcbcac_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@3e479df6_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@70ac52ba_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@60a62ca_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@4c46d07a_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@5dc36852_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@65961a3c_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@78418fb8_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@612ce142_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@40626f22_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@6f194284_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@70b9cd75_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@48891b63_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@6a94a812_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@4d454eea_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ae125d_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@f119367_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@2396e40e_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@1f0e0152_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
-        <xilinx:tag xilinx:name="ui.data.coregen.dd@19411ca5_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_connector</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@108ce282_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6eccca9b_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3eca7e_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@30f77a91_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2018b5a3_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6cabe64c_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6157f2dc_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@17c97184_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@f0b7827_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4e4935dd_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3ee8bbd4_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@64ae1327_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@28fcbcac_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3e479df6_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@70ac52ba_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@60a62ca_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4c46d07a_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5dc36852_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@65961a3c_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@78418fb8_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@612ce142_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40626f22_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6f194284_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@70b9cd75_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@48891b63_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6a94a812_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4d454eea_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ae125d_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@f119367_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2396e40e_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1f0e0152_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@19411ca5_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axi_lite_master</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
