@@ -73,6 +73,7 @@ module axi_pvp_gen_v2
 
 		// Non AXI-LITE outputs
 		output logic [4:0]  		select_mux_o,
+		output logic 				ro,
 		output logic 				done
 	);
 
@@ -174,6 +175,8 @@ logic [4:0] mux3 = 5'b00100;
 logic [4:0] mux4 = 5'b10000;
 
 assign SELECT = (select_mux_o == 2'b00) ? mux1 : (select_mux_o == 2'b01) ? mux2 : (select_mux_o == 2'b10) ? mux3 : mux4;
+assign m_axi_wvalid = 1; //BIG CHANGE THIS IS TIED SO SPI MIGHT UNDERSTAND OUR MESSAGES
+
 
 /**********************/
 /* Begin Architecture */
@@ -282,10 +285,10 @@ pvp_fsm_gen // getting rid of parameters 3/11/25
 		.NUM_DIMS_REG 				(NUM_DIMS_REG),
 
 		//outputs
-		.mosi_o			(m_axi_wdata),
+		.mosi_o			(m_axi_wdata), //zoe approved
         .select_mux_o 	(select_mux_o),
-		.readout_o		(m_axi_wvalid), //this and trigger_spi are almost certianly wrong but not the focus atm
-		.trigger_spi_o  (m_axi_bready),
+		.readout_o		(ro), //this should be an output port directly off the blcok (not axi, Spi doesn/t want it)
+		.trigger_spi_o  (m_axi_wready),
 		.done 			(done)
 		);
 
