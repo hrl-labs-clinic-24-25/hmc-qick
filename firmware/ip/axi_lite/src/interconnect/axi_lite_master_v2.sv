@@ -24,7 +24,7 @@ module axi_lite_master_v2
     input wire                           M_AXI_ARESETN,
 
     // aw
-    output wire [31: 0]   M_AXI_AWADDR,
+    output wire [5: 0]   M_AXI_AWADDR,
     output wire [2 : 0]                  M_AXI_AWPROT,
     output wire                          M_AXI_AWVALID,
     input wire                           M_AXI_AWREADY,
@@ -41,7 +41,7 @@ module axi_lite_master_v2
     output wire                          M_AXI_BREADY,
 
     // ar
-    output wire [31: 0]   M_AXI_ARADDR,
+    output wire [5: 0]   M_AXI_ARADDR,
     output wire [2 : 0]                  M_AXI_ARPROT,
     output wire                          M_AXI_ARVALID,
     input wire                           M_AXI_ARREADY,

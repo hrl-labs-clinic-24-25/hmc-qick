@@ -40,36 +40,13 @@ module axi_pvp_gen_v3
 		s_axi_rvalid,
 		s_axi_rready,
 
-		// M AXIS
-		m_axi_awaddr,
-		m_axi_awprot,
-		m_axi_awvalid,
-		m_axi_awready,
-
-		m_axi_wdata,
-		m_axi_wstrb,
-		m_axi_wvalid,
-		m_axi_wready,
-
-		m_axi_bresp,
-		m_axi_bvalid,
-		m_axi_bready,
-
-		m_axi_araddr,
-		m_axi_arprot,
-		m_axi_arvalid,
-		m_axi_arready,
-
-		m_axi_rdata,
-		m_axi_rresp,
-		m_axi_rvalid,
-		m_axi_rready,
-
 		// Non AXI-LITE 
 		TRIGGER_AWG_REG, // trigger for AWG
 		select_mux,
-		test_fake,
-		done
+		done,
+		COPI,
+		SCK, // SPI Clock
+		CS // SPI Chip Select
 	);
 
 	/*********/
@@ -108,39 +85,14 @@ module axi_pvp_gen_v3
 	output 				s_axi_rvalid;
 	input 				s_axi_rready;
 
-
-	// M AXIS
-	output [5:0]		m_axi_awaddr;
-	output [2:0]		m_axi_awprot;
-	output 				m_axi_awvalid;
-	input 				m_axi_awready;
-
-	output [31:0]		m_axi_wdata;
-	output [3:0]		m_axi_wstrb;
-	output 				m_axi_wvalid;
-	input				m_axi_wready;
-
-	input  [1:0]		m_axi_bresp;
-	input 				m_axi_bvalid;
-	output 				m_axi_bready;
-
-
-
-	output [5:0]		m_axi_araddr;
-	output [2:0]		m_axi_arprot;
-	output 				m_axi_arvalid;
-	input 				m_axi_arready;
-
-	input  [31:0]		m_axi_rdata;
-	input  [1:0]		m_axi_rresp;
-	input 				m_axi_rvalid;
-	output 				m_axi_rready;
-
 	// Non AXI-LITE outputs
 	output 			TRIGGER_AWG_REG; // trigger for AWG ** test that output registers don't cause net contention in Vivado (March 7)
 	output [4:0]  	select_mux;
 	output 			done;
-	output testfake;
+
+	output 			COPI;
+	output 			SCK; // SPI Clock
+	output 			CS; // SPI Chip Select
 	//we do NOT put mosi here because it comes out via m_axi
 
 
@@ -148,7 +100,6 @@ module axi_pvp_gen_v3
 	/********************/
 	/* Internal signals */
 	/********************/
-	// Registers.
 
 	// connected from FSM to axil_slv
 	wire [31:0] mosi_output;
@@ -164,10 +115,9 @@ module axi_pvp_gen_v3
 
 	// Adjust these to change PvP Plot
 	wire [19:0] STEP_SIZE_REG;
-	wire [2:0]  NUM_DACS_REG;
+	wire [2:0]  NUM_DIMS_REG;
 	wire [9:0]  PVP_WIDTH_REG;
-
-	wire [15:0] DWELL_CYCLES_REG;
+	wire [15:0] DWELL_CYCLES_REG;         // at minimum, must be 50 * 4 cycles (200 cycles)
 	wire [15:0] CYCLES_TILL_READOUT_REG;
 
 	// Address for Demux to DACs
@@ -175,18 +125,14 @@ module axi_pvp_gen_v3
 	wire [5:0] DEMUX_1_REG;
 	wire [5:0] DEMUX_2_REG;
 	wire [5:0] DEMUX_3_REG;
-
 	wire 	   done;			 // trigger for SPI
-
 	wire trigger_spi_o;
-	wire [31:0] outsig;
-	
 
 
 	/**************/
 	/* Parameters */
 	/**************/
-
+	
 
 	/**********************/
 	/* Begin Architecture */
@@ -246,6 +192,7 @@ module axi_pvp_gen_v3
 		.DEMUX_3_REG 		(DEMUX_3_REG)
 	);
 
+
 	pvp_fsm_gen
 		fsm_i 
 			(
@@ -253,12 +200,7 @@ module axi_pvp_gen_v3
 				.clk				(s_axi_aclk),
 
 				.TRIGGER_PVP_REG   	(TRIGGER_PVP_REG),
-				.mosi_o				(mosi_output),
-				.select_mux			(select_mux), 
-				.TRIGGER_AWG_REG	(TRIGGER_AWG_REG),
-				.trigger_spi_o 		(trigger_spi_o),
-				.done 				(done),
-
+			
 				.START_VAL_0_REG 	(START_VAL_0_REG),
 				.START_VAL_1_REG 	(START_VAL_1_REG),
 				.START_VAL_2_REG 	(START_VAL_2_REG),
@@ -274,55 +216,28 @@ module axi_pvp_gen_v3
 				.DEMUX_0_REG		(DEMUX_0_REG),
 				.DEMUX_1_REG		(DEMUX_1_REG),
 				.DEMUX_2_REG		(DEMUX_2_REG),
-				.DEMUX_3_REG		(DEMUX_3_REG)
+				.DEMUX_3_REG		(DEMUX_3_REG),
+
+				.mosi_o				(mosi_output),
+				.select_mux			(select_mux), 
+				.readout_o			(TRIGGER_AWG_REG),
+				.trigger_spi_o 		(trigger_spi_o),
+				.done 				(done)
+
 				
 			);
 
-
-
-	axi_lite_master
-     #(
-       .AXI_ADDR_WIDTH(6),
-       .AXI_DATA_WIDTH(32)
-       )
-   axi_lite_master_i
+	spi spi_i
      (
-      .init_transaction 		(trigger_spi_o), // input
-	  .output_data				(mosi_output), // output
-
-      .M_AXI_ACLK		(s_axi_aclk), // input
-      .M_AXI_ARESETN	(s_axi_aresetn), // input
-
-      // aw
-      .M_AXI_AWADDR		(m_axi_awaddr),
-      .M_AXI_AWPROT		(m_axi_awprot),
-      .M_AXI_AWVALID	(m_axi_awvalid),
-      .M_AXI_AWREADY	(m_axi_awready), // input
-
-      // w
-      .M_AXI_WDATA		(m_axi_wdata),
-      .M_AXI_WSTRB		(m_axi_wstrb),
-      .M_AXI_WVALID		(m_axi_wvalid),
-      .M_AXI_WREADY		(s_axi_wready), // input
-
-      // b resp
-      .M_AXI_BRESP		(m_axi_bresp), // input
-      .M_AXI_BVALID		(m_axi_bvalid), // input
-      .M_AXI_BREADY		(m_axi_bready),
-
-      // ar
-      .M_AXI_ARADDR		(m_axi_araddr),
-      .M_AXI_ARPROT		(m_axi_arprot),
-      .M_AXI_ARVALID	(m_axi_arvalid),
-      .M_AXI_ARREADY	(m_axi_arready), // input
-
-      // r
-      .M_AXI_RDATA		(m_axi_rdata), // input
-      .M_AXI_RRESP		(m_axi_rresp), // input
-      .M_AXI_RVALID		(m_axi_rvalid), // input
-      .M_AXI_RREADY		(m_axi_rready)
-
-      );
+		.clk (s_axi_aclk),
+		.rstn (rstn),
+		.DATA_IN (mosi_output),
+		.TRIGGER (trigger_spi_o),
+		.sdo (COPI),
+		.sdi (1'b0),
+		.cs (CS),
+		.sck (SCK)
+	);
 
 
 endmodule

@@ -66,40 +66,12 @@ module axis_pvp_gen_v3_tb ();
     logic [1:0] S_AXI_RRESP;
     logic  S_AXI_RREADY;
 
-
-    logic [5 : 0]                M_AXI_AWADDR;
-    logic [2 : 0]                M_AXI_AWPROT;
-    logic                        M_AXI_AWVALID;
-    logic                        M_AXI_AWREADY;
-
-    logic [5 : 0]   M_AXI_WADDR;
-    logic [3 : 0] M_AXI_WSTRB;
-    logic                          M_AXI_WVALID;
-    logic                          M_AXI_WREADY;
-    logic [31 : 0] M_AXI_WDATA;
-
-    logic [1 : 0]                M_AXI_BRESP;
-    logic                        M_AXI_BVALID;
-    logic                        M_AXI_BREADY;
-
-    logic [31 :0] M_AXI_RDATA;
-    logic [1:0] M_AXI_RRESP;
-    logic  M_AXI_RREADY;
-
-    logic [5 : 0]                 M_AXI_ARADDR;
-    logic [2 : 0]                 M_AXI_ARPROT;
-    logic                         M_AXI_ARVALID;
-    logic                         M_AXI_ARREADY;
-
-
-
     logic         init_transaction;
+    logic [31:0]  outsig;
 
-    logic [31:0] GPO;
-    logic SS;
-    logic SSN;
-    logic SCLK;
-    logic MOSI_OUTPUT;
+    logic COPI;
+    logic CS;
+    logic SCK;
 
 
     logic [4:0] mux;
@@ -123,6 +95,7 @@ module axis_pvp_gen_v3_tb ();
    axi_lite_master_i
      (
       .init_transaction(init_transaction),
+      .output_data (outsig),
 
       .M_AXI_ACLK(clk),
       .M_AXI_ARESETN(rstn),
@@ -158,7 +131,7 @@ module axis_pvp_gen_v3_tb ();
 
       );
 
-    axil_pvp_gen_v3 apg_i
+    axi_pvp_gen_v3 pvp_gen_i
     (
         .s_axi_aclk		(clk),
 		.s_axi_aresetn	(rstn),
@@ -186,69 +159,15 @@ module axis_pvp_gen_v3_tb ();
 		.s_axi_rresp	(S_AXI_RRESP),
 		.s_axi_rvalid	(S_AXI_RVALID),
 		.s_axi_rready	(S_AXI_RREADY),
-		// AXIS Master for output.
-
-		.m_axi_awaddr	(M_AXI_AWADDR),
-		.m_axi_awprot	(M_AXI_AWPROT),
-		.m_axi_awvalid	(M_AXI_AWVALID),
-		.m_axi_awready	(M_AXI_AWREADY),
-
-		.m_axi_wdata	(M_AXI_WDATA),
-		.m_axi_wstrb	(M_AXI_WSTRB),
-		.m_axi_wvalid	(M_AXI_WVALID),
-		.m_axi_wready	(M_AXI_WREADY),
-
-		.m_axi_bresp	(M_AXI_BRESP),
-		.m_axi_bvalid	(M_AXI_BVALID),
-		.m_axi_bready	(M_AXI_BREADY),
-
-		.m_axi_araddr	(M_AXI_ARADDR),
-		.m_axi_arprot	(M_AXI_ARPROT),
-		.m_axi_arvalid	(M_AXI_ARVALID),
-		.m_axi_arready	(M_AXI_ARREADY),
-
-		.m_axi_rdata	(M_AXI_RDATA),
-		.m_axi_rresp	(M_AXI_RRESP),
-		.m_axi_rvalid	(M_AXI_RVALID),
-		.m_axi_rready	(M_AXI_RREADY),
 
 
 		// Non AXI-LITE 
 		.TRIGGER_AWG_REG (init_transaction), // trigger for AWG
-		.select  (mux), // DAC demuxing set of 5 pins
+		.select_mux  (mux), // DAC demuxing set of 5 pins
+        .COPI (COPI),
+		.SCK (SCK),
+		.CS (CS),
         .done (done)
-    );
-
-
-    axi_spi_simple #(.C_S00_AXI_ADDR_WIDTH (6), .C_S00_AXI_DATA_WIDTH (32)) axi_spi_i
-    (
-        .s00_axi_aclk    (clk),
-        .s00_axi_aresetn (rstn),
-        .s00_axi_awaddr(M_AXI_AWADDR),
-		.s00_axi_awprot	(M_AXI_AWPROT),
-		.s00_axi_awvalid	(M_AXI_AWVALID),
-		.s00_axi_awready	(M_AXI_AWREADY),
-		.s00_axi_wdata	(M_AXI_WDATA),
-		.s00_axi_wstrb	(M_AXI_WSTRB),
-		.s00_axi_wvalid	(M_AXI_WVALID),
-		.s00_axi_wready	(M_AXI_WREADY),
-		.s00_axi_bresp	(M_AXI_BRESP),
-		.s00_axi_bvalid	(M_AXI_BVALID),
-		.s00_axi_bready	(M_AXI_BREADY),
-		.s00_axi_araddr	(M_AXI_ARADDR),
-		.s00_axi_arprot	(M_AXI_ARPROT),
-		.s00_axi_arvalid	(M_AXI_ARVALID),
-		.s00_axi_arready	(M_AXI_ARREADY),
-		.s00_axi_rdata	(M_AXI_RDATA),
-		.s00_axi_rresp	(M_AXI_RRESP),
-		.s00_axi_rvalid	(M_AXI_RVALID),
-		.s00_axi_rready	(M_AXI_RREADY),
-        .gpo (GPO),
-        .ss (SS),
-        .ssn (SSN),
-        .sclk (SCLK),
-        .miso (1'b0),
-        .mosi (MOSI_OUTPUT)
     );
 
 endmodule

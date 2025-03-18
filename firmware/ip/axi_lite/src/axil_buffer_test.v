@@ -134,30 +134,6 @@ module axil_buffer_test
 
 	wire [31:0] outsig;
 
-
-
-
-	/********************/
-	/* Internal signals */
-	/********************/
-	// Registers.
-
-	// wire [31:0] write_data;
-
-	// reg [31:0] wd_next;
-
-	// always @(posedge s_axi_aclk) begin
-	// 	if (TRIGGER_PVP_REG) begin
-	// 		wd_next <=  mosi_output;
-	// 	end else begin
-	// 		wd_next <= 32'h00000000;
-	// 	end
-	// end
-
-
-	// assign write_data = wd_next;
-
-
 	// /**************/
 	// /* Parameters */
 	// /**************/
@@ -207,43 +183,38 @@ module axil_buffer_test
 		.QOUT_REG       (outsig)
 	);
 
-	axi_lite_master_v2
-     #(
-       .AXI_ADDR_WIDTH(6),
-       .AXI_DATA_WIDTH(32)
-       )
-   axi_lite_master_i
+    axi_lite_master_v2 axi_lite_master_i
      (
 	  .M_AXI_ACLK		(s_axi_aclk), // input
       .M_AXI_ARESETN	(s_axi_aresetn), // input
 
       // aw
-      .M_AXI_AWADDR		(m_axi_awaddr),
+      .M_AXI_AWADDR		(s_axi_awaddr),
       .M_AXI_AWPROT		(m_axi_awprot),
       .M_AXI_AWVALID	(m_axi_awvalid),
-      .M_AXI_AWREADY	(m_axi_awready), // input
+      .M_AXI_AWREADY	(s_axi_awready), // input
 
       // w
       .M_AXI_WDATA		(m_axi_wdata),
       .M_AXI_WSTRB		(m_axi_wstrb),
       .M_AXI_WVALID		(m_axi_wvalid),
-      .M_AXI_WREADY		(m_axi_wready), // input
+      .M_AXI_WREADY		(s_axi_wready), // input
 
       // b resp
-      .M_AXI_BRESP		(m_axi_bresp), // input
-      .M_AXI_BVALID		(m_axi_bvalid), // input
+      .M_AXI_BRESP		(s_axi_bresp), // input
+      .M_AXI_BVALID		(s_axi_bvalid), // input
       .M_AXI_BREADY		(m_axi_bready),
 
       // ar
       .M_AXI_ARADDR		(m_axi_araddr),
       .M_AXI_ARPROT		(m_axi_arprot),
       .M_AXI_ARVALID	(m_axi_arvalid),
-      .M_AXI_ARREADY	(m_axi_arready), // input
+      .M_AXI_ARREADY	(s_axi_arready), // input
 
       // r
-      .M_AXI_RDATA		(m_axi_rdata), // input
-      .M_AXI_RRESP		(m_axi_rresp), // input
-      .M_AXI_RVALID		(m_axi_rvalid), // input
+      .M_AXI_RDATA		(s_axi_rdata), // input
+      .M_AXI_RRESP		(s_axi_rresp), // input
+      .M_AXI_RVALID		(s_axi_rvalid), // input
       .M_AXI_RREADY		(m_axi_rready)
 
       );

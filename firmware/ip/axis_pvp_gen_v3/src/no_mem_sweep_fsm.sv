@@ -28,7 +28,8 @@ module no_mem_sweep_fsm
                         rstn,
                         top,
                         base,
-                        mosi
+                        mosi,
+                        DEPTH
                     );
 
 /**
@@ -39,8 +40,8 @@ input [19:0] step;
 input clk, enable, rstn;
 output top, base;
 output [31:0] mosi;
+input [9:0] DEPTH;
 
-parameter DEPTH = 256;
 parameter [3:0] start_bits = 4'b0001;
 
 logic [7:0]  counter;

@@ -91,6 +91,7 @@ module axil_buffer_tb ();
     logic         init_transaction;
 
     logic [31:0] GPO;
+    logic [31:0] output;
     logic SS;
     logic SSN;
     logic SCLK;
@@ -117,6 +118,7 @@ module axil_buffer_tb ();
    axi_lite_master_i
      (
       .init_transaction(init_transaction),
+      .output_data (output),
 
       .M_AXI_ACLK(clk),
       .M_AXI_ARESETN(rstn),
@@ -213,7 +215,7 @@ module axil_buffer_tb ();
         .s00_axi_aclk    (clk),
         .s00_axi_aresetn (rstn),
         .s00_axi_awaddr(M_AXI_AWADDR),
-		.s00_axi_awprot	(M_AXI_AWPROT),
+		.s00_axi_awprot	(3'b000), // non secure, unprivileged, data access
 		.s00_axi_awvalid	(M_AXI_AWVALID),
 		.s00_axi_awready	(M_AXI_AWREADY),
 		.s00_axi_wdata	(M_AXI_WDATA),

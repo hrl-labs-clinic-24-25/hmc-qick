@@ -1,0 +1,26 @@
+
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/START_VAL_0_REG 20'h000f0 0
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/START_VAL_1_REG 20'h00f00 0
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/START_VAL_2_REG 20'h0f000 0
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/START_VAL_3_REG 20'hf0000 0
+
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/STEP_SIZE_REG 20'h00001 0
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/NUM_DIMS_REG 3'h4 0
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/PVP_WIDTH_REG 10'd256 0
+
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/DWELL_CYCLES_REG 15'd200 0
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/CYCLES_TILL_READOUT_REG 30 0
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/START_VAL_0_REG 20'h000f0 0
+
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/DEMUX_0_REG 6'b010101 0
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/DEMUX_1_REG 6'b000101 0
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/DEMUX_2_REG 6'b011101 0
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/DEMUX_3_REG 6'b000111 0
+
+run 200
+
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/TRIGGER_PVP_REG 1'h0
+
+run 200
+
+force -freeze sim:/axis_pvp_gen_v3_tb/pvp_gen_i/TRIGGER_PVP_REG 1'h1
