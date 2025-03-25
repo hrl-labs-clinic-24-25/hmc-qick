@@ -15,7 +15,6 @@ module spi
         DATA_IN,
         TRIGGER,
         sdo,
-        sdi,
         cs,
         sck
      );
@@ -28,7 +27,6 @@ module spi
     input [31:0] DATA_IN;
     input TRIGGER;
     output sdo;
-    input sdi;
     output cs;
     output sck;
 
@@ -37,12 +35,7 @@ module spi
     */
     logic [7:0] counter; // 8 bit counter, 0 to 32
 
-    logic clk_i;
-    logic rstn_i;
-    logic [31:0] DATA_IN_i;
-    logic TRIGGER_i;
     logic sdo_o;
-    logic sdi_i;
     logic cs_o;
 
     // POSEDGE CLOCK TEST - Phase = 1, Polarity = 0 and 
@@ -54,11 +47,11 @@ module spi
         end 
         if (TRIGGER) begin // start the transmission
             sdo_o <= DATA_IN[31];
-            counter <= 0;
+            counter <= 30;
             cs_o <= 1;
-        end else if (cs & (counter < 31)) begin // increment the counter, output the data in the designated bit
-            sdo_o <= DATA_IN[30 - counter];
-            counter <= counter + 1'b1;
+        end else if (cs & (counter > 8'h00)) begin // increment the counter, output the data in the designated bit
+            sdo_o <= DATA_IN[counter];
+            counter <= counter - 1'b1;
             cs_o <= 1;
         end else begin
             sdo_o <= 0; //freeze counter so that it doesn't overflow and restart the sweep
@@ -82,14 +75,13 @@ module spi_tb();
     logic [31:0] track_out;
     logic trig;
     logic sdo;
-    logic sdi;
     logic cs; 
     logic sck;
 
     logic [31:0] transmitted;
 
     // test generation of 16 evenly spaced steps
-    spi dut ( clk, rstn, track_out, trig, sdo, sdi, cs, sck);
+    spi dut ( clk, rstn, track_out, trig, sdo, cs, sck);
 
     // generate testbench clock
     always begin 

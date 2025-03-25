@@ -56,10 +56,10 @@ entity axi_slv is
 		PVP_WIDTH_REG		: out std_logic_vector (9 downto 0);
 		NUM_DIMS_REG		: out std_logic_vector (2 downto 0);
 
-		DEMUX_0_REG			: out std_logic_vector (5 downto 0);
-		DEMUX_1_REG			: out std_logic_vector (5 downto 0);
-		DEMUX_2_REG			: out std_logic_vector (5 downto 0);
-		DEMUX_3_REG			: out std_logic_vector (5 downto 0)
+		DEMUX_0_REG			: out std_logic_vector (4 downto 0);
+		DEMUX_1_REG			: out std_logic_vector (4 downto 0);
+		DEMUX_2_REG			: out std_logic_vector (4 downto 0);
+		DEMUX_3_REG			: out std_logic_vector (4 downto 0)
 	);
 end axi_slv;
 
@@ -532,9 +532,9 @@ begin
 	PVP_WIDTH_REG				<= slv_reg8 (9 downto 0); 
 	NUM_DIMS_REG 				<= slv_reg9 (2 downto 0);
 
-	DEMUX_0_REG 				<= slv_reg10 (5 downto 0);
-	DEMUX_1_REG 				<= slv_reg11 (5 downto 0);
-	DEMUX_2_REG 				<= slv_reg12 (5 downto 0);
-	DEMUX_3_REG 				<= slv_reg13 (5 downto 0);
+	DEMUX_0_REG 				<= slv_reg10 (4 downto 0);
+	DEMUX_1_REG 				<= slv_reg11 (4 downto 0);
+	DEMUX_2_REG 				<= slv_reg12 (4 downto 0);
+	DEMUX_3_REG 				<= slv_reg13 (4 downto 0);
 
 end rtl;

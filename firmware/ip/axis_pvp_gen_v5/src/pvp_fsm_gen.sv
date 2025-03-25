@@ -71,10 +71,10 @@ module pvp_fsm_gen
 	input [9:0]  PVP_WIDTH_REG;
 	input [2:0]  NUM_DIMS_REG;
 
-	input [5:0]  DEMUX_0_REG;
-	input [5:0]  DEMUX_1_REG;
-	input [5:0]  DEMUX_2_REG;
-	input [5:0]  DEMUX_3_REG;
+	input [4:0]  DEMUX_0_REG;
+	input [4:0]  DEMUX_1_REG;
+	input [4:0]  DEMUX_2_REG;
+	input [4:0]  DEMUX_3_REG;
 
 	input TRIGGER_PVP_REG;
 
@@ -108,10 +108,10 @@ module pvp_fsm_gen
 	logic		 top_2;
 	logic 		 top_3;
 
-	logic 		 base_0;
-	logic		 base_1;
-	logic 		 base_2;
-	logic 		 base_3;
+	// logic 		 base_0;
+	// logic		 base_1;
+	// logic 		 base_2;
+	// logic 		 base_3;
 
 	logic 		 dac0_en;
 	logic 		 dac1_en;
@@ -311,7 +311,7 @@ module pvp_fsm_gen
 
 	// assign the mosi and output for demuxing to DACs based on current state
 	assign mosi_o = next_mosi; //((curr_state==S_STALL) | (dwell_counter==0)) ? past_mosi   : ((curr_state==S_SEND_0) & dwell_counter>0) ? mosi_0 : (curr_state==S_SEND_1) ? mosi_1                : (curr_state==S_SEND_2) ? mosi_2 			   : (curr_state==S_SEND_3) ? mosi_3 				: 0;
-	assign select_mux = ((curr_state==S_STALL) | (dwell_counter==0)) ? past_select_mux :  (curr_state==S_SEND_0) ? DEMUX_0_REG[4:0]     : (curr_state==S_SEND_1) ? DEMUX_1_REG[4:0] : (curr_state==S_SEND_2) ? DEMUX_2_REG[4:0] : (curr_state==S_SEND_3) ? DEMUX_3_REG[4:0] : 5'b11111; // this is hard to debug if we're always seeing first DAC and none of second (lol)
+	assign select_mux = ((curr_state==S_STALL) | (dwell_counter==0)) ? past_select_mux :  (curr_state==S_SEND_0) ? DEMUX_0_REG     : (curr_state==S_SEND_1) ? DEMUX_1_REG : (curr_state==S_SEND_2) ? DEMUX_2_REG : (curr_state==S_SEND_3) ? DEMUX_3_REG : 4'b1111; // this is hard to debug if we're always seeing first DAC and none of second (lol)
 
 	assign trigger_spi_o = on_off;
 
@@ -334,7 +334,7 @@ module pvp_fsm_gen
 			.enable     (dac0_en),
 			.start		(START_VAL_0_REG),
 			.step       (STEP_SIZE_REG),
-			.base       (base_0),
+			// .base       (base_0),
 			.top        (top_0),
 			.mosi		(mosi_0),
 			.DEPTH	    (PVP_WIDTH_REG)
@@ -348,7 +348,7 @@ module pvp_fsm_gen
 			.enable     (dac1_en),
 			.start		(START_VAL_1_REG),
 			.step       (STEP_SIZE_REG),
-			.base       (base_1),
+			// .base       (base_1),
 			.top        (top_1),
 			.mosi		(mosi_1),
 			.DEPTH	    (PVP_WIDTH_REG)
@@ -362,7 +362,7 @@ module pvp_fsm_gen
 			.enable     (dac2_en),
 			.start		(START_VAL_2_REG),
 			.step       (STEP_SIZE_REG),
-			.base       (base_2),
+			// .base       (base_2),
 			.top        (top_2),
 			.mosi		(mosi_2),
 			.DEPTH	    (PVP_WIDTH_REG)
@@ -376,7 +376,7 @@ module pvp_fsm_gen
 			.enable     (dac3_en),
 			.start		(START_VAL_3_REG),
 			.step       (STEP_SIZE_REG),
-			.base       (base_3),
+			// .base       (base_3),
 			.top        (top_3),
 			.mosi		(mosi_3),
 			.DEPTH	    (PVP_WIDTH_REG)

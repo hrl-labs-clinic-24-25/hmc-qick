@@ -53,7 +53,7 @@ module axi_pvp_gen_v5
 	/* Ports */
 	/*********/
 	parameter DATA_WIDTH	= 32;
-	parameter ADDR_WIDTH	= 6;
+	parameter ADDR_WIDTH	= 32;
 
 	// AXI Slave I/F for configuration.
 	input 				s_axi_aclk;
@@ -121,10 +121,10 @@ module axi_pvp_gen_v5
 	wire [15:0] CYCLES_TILL_READOUT_REG;
 
 	// Address for Demux to DACs
-	wire [5:0] DEMUX_0_REG;
-	wire [5:0] DEMUX_1_REG;
-	wire [5:0] DEMUX_2_REG;
-	wire [5:0] DEMUX_3_REG;
+	wire [4:0] DEMUX_0_REG;
+	wire [4:0] DEMUX_1_REG;
+	wire [4:0] DEMUX_2_REG;
+	wire [4:0] DEMUX_3_REG;
 	wire 	   done;			 // trigger for SPI
 	wire trigger_spi_o;
 
@@ -234,7 +234,6 @@ module axi_pvp_gen_v5
 		.DATA_IN (mosi_output),
 		.TRIGGER (trigger_spi_o),
 		.sdo (COPI),
-		.sdi (1'b0),
 		.cs (CS),
 		.sck (SCK)
 	);

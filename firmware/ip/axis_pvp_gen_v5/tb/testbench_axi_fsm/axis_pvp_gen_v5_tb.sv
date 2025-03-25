@@ -12,7 +12,7 @@
 Based on the test bench in the corresponding video https://www.youtube.com/watch?v=qqI9QIkGFIQ 
 
 */
-module axis_pvp_gen_v3_tb ();
+module axis_pvp_gen_v5_tb ();
 
     logic clk = 0;
     logic rstn;
@@ -39,11 +39,11 @@ module axis_pvp_gen_v3_tb ();
             rstn = 1;
         end
 
-    parameter AXI_ADDR_WIDTH = 6;
+    parameter AXI_ADDR_WIDTH = 32;
     parameter AXI_DATA_WIDTH = 32;
 
 
-    logic [5 : 0]                S_AXI_AWADDR;
+    logic [31: 0]                S_AXI_AWADDR;
     logic [2 : 0]                S_AXI_AWPROT;
     logic                        S_AXI_AWVALID;
     logic                        S_AXI_AWREADY;
@@ -57,7 +57,7 @@ module axis_pvp_gen_v3_tb ();
     logic                        S_AXI_BVALID;
     logic                        S_AXI_BREADY;
 
-    logic [5 : 0]  S_AXI_ARADDR;
+    logic [31: 0]  S_AXI_ARADDR;
     logic [2 : 0]                 S_AXI_ARPROT;
     logic                         S_AXI_ARVALID;
     logic                         S_AXI_ARREADY;
@@ -89,7 +89,7 @@ module axis_pvp_gen_v3_tb ();
     
     axi_lite_master
      #(
-       .AXI_ADDR_WIDTH(6),
+       .AXI_ADDR_WIDTH(32),
        .AXI_DATA_WIDTH(32)
        )
    axi_lite_master_i
@@ -131,7 +131,7 @@ module axis_pvp_gen_v3_tb ();
 
       );
 
-    axi_pvp_gen_v3 pvp_gen_i
+    axi_pvp_gen_v5 pvp_gen_i
     (
         .s_axi_aclk		(clk),
 		.s_axi_aresetn	(rstn),

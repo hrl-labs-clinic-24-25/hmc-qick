@@ -134,3 +134,4 @@ firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/testing_axi_lite_v1.cr.mti
 firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_lite_pvp_test2.mpf
 firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_lite_pvp_test2.cr.mti
 firmware/ip/axis_pvp_gen_v2/src/tb/pvp_gen_testing/axi_fsm_tb.cr.mti
+firmware/ip/axi_lite/tb/testbench_axi/work/@_opt2/_viscom/.env_list_file

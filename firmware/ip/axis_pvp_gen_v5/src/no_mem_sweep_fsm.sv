@@ -27,7 +27,7 @@ module no_mem_sweep_fsm
                         enable,
                         rstn,
                         top,
-                        base,
+                        // base,
                         mosi,
                         DEPTH
                     );
@@ -38,7 +38,7 @@ module no_mem_sweep_fsm
 input [19:0] start;
 input [19:0] step;
 input clk, enable, rstn;
-output top, base;
+output top; //, base;
 output [31:0] mosi;
 input [9:0] DEPTH;
 
@@ -65,7 +65,7 @@ always @(posedge clk) begin
 end
 
 assign next_val = start + step*counter;
-assign mosi = {{{2'h00}}, start_bits, curr_val};
+assign mosi = {{{8'h00}}, start_bits, curr_val};     // start_bits is 4, curr_val is 20 bits
 assign top = (curr_val == (start + (DEPTH-1)*step)); // indicate 1 before top (works with FSM)
 assign base = (curr_val == start);
 
