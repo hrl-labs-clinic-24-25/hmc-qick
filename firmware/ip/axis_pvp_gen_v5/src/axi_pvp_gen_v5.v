@@ -59,7 +59,7 @@ module axi_pvp_gen_v5
 	input 				s_axi_aclk;
 	input 				s_axi_aresetn;
 
-	input [31:0] 		s_axi_awaddr;
+	input [5:0] 		s_axi_awaddr;
 	input [2:0]			s_axi_awprot;
 	input 				s_axi_awvalid;
 	output 				s_axi_awready;
@@ -75,7 +75,7 @@ module axi_pvp_gen_v5
 
 
 
-	input [31:0]		    s_axi_araddr;
+	input [5:0]		    s_axi_araddr;
 	input [2:0]			s_axi_arprot;
 	input 				s_axi_arvalid;
 	output 				s_axi_arready;

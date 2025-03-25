@@ -522,15 +522,8 @@ begin
 
 
 	-- Register Map.
-	-- 0 : START_VAL_REG	: 20-bit. Start value (in volts, converted into DAC scale)
-	-- 1 : STEP_SIZE_REG	: 20-bit. Size of steps between values (in volts, converted to DAC scale)
-	-- 2 : OUTPUT_REG		: 24-bit. The current 24-bit message that can be sent to the DAC
 
 	-- Output Registers.
-	START_VAL_REG 	<= slv_reg0(19 downto 0);
-	STEP_SIZE_REG	<= slv_reg1(19 downto 0);
-	OUTPUT_REG		<= slv_reg2(23 downto 0);
-	
 	START_VAL_0_REG <= slv_reg0(19 downto 0);
 	START_VAL_1_REG <= slv_reg1(19 downto 0);
 	START_VAL_2_REG <= slv_reg2(19 downto 0);
@@ -548,7 +541,7 @@ begin
 	DEMUX_0_REG <= slv_reg10(4 downto 0);
 	DEMUX_1_REG <= slv_reg11(4 downto 0);
 	DEMUX_2_REG <= slv_reg12(4 downto 0);
-	DEMUX_3_REG <= slv_reg13(4 downto 0)
+	DEMUX_3_REG <= slv_reg13(4 downto 0);
 
 end rtl;
 

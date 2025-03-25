@@ -43,7 +43,7 @@ module axis_pvp_gen_v5_tb ();
     parameter AXI_DATA_WIDTH = 32;
 
 
-    logic [31: 0]                S_AXI_AWADDR;
+    logic [5 : 0]                S_AXI_AWADDR;
     logic [2 : 0]                S_AXI_AWPROT;
     logic                        S_AXI_AWVALID;
     logic                        S_AXI_AWREADY;
@@ -57,7 +57,7 @@ module axis_pvp_gen_v5_tb ();
     logic                        S_AXI_BVALID;
     logic                        S_AXI_BREADY;
 
-    logic [31: 0]  S_AXI_ARADDR;
+    logic [5 : 0]  S_AXI_ARADDR;
     logic [2 : 0]                 S_AXI_ARPROT;
     logic                         S_AXI_ARVALID;
     logic                         S_AXI_ARREADY;
@@ -89,7 +89,7 @@ module axis_pvp_gen_v5_tb ();
     
     axi_lite_master
      #(
-       .AXI_ADDR_WIDTH(32),
+       .AXI_ADDR_WIDTH(6),
        .AXI_DATA_WIDTH(32)
        )
    axi_lite_master_i
