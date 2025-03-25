@@ -6,7 +6,7 @@ entity axi_slv is
 	Generic 
 	(
 		DATA_WIDTH	: integer	:= 32;
-		ADDR_WIDTH	: integer	:= 32
+		ADDR_WIDTH	: integer	:= 6
 	);
 	Port 
 	(
@@ -43,23 +43,24 @@ entity axi_slv is
 		rready			: in std_logic;
 
 		-- Registers.
-		START_VAL_0_REG 	: out std_logic_vector (19 downto 0); -- pvp plot's initial voltage start value
+		START_VAL_0_REG 	: out std_logic_vector (19 downto 0);
 		START_VAL_1_REG 	: out std_logic_vector (19 downto 0);
 		START_VAL_2_REG 	: out std_logic_vector (19 downto 0);
 		START_VAL_3_REG 	: out std_logic_vector (19 downto 0);
 
-		TRIGGER_PVP_REG		: out std_logic;
+		TRIGGER_PVP_REG 	: out std_logic;
 
-		DWELL_CYCLES_REG	: out std_logic_vector (15 downto 0);
+		DWELL_CYCLES_REG 	: out std_logic_vector (15 downto 0);
 		CYCLES_TILL_READOUT_REG : out std_logic_vector (15 downto 0);
-		STEP_SIZE_REG 		: out std_logic_vector (19 downto 0); -- how much to increment no mem sweep every time
-		PVP_WIDTH_REG		: out std_logic_vector (9 downto 0);
-		NUM_DIMS_REG		: out std_logic_vector (2 downto 0);
 
-		DEMUX_0_REG			: out std_logic_vector (4 downto 0);
-		DEMUX_1_REG			: out std_logic_vector (4 downto 0);
-		DEMUX_2_REG			: out std_logic_vector (4 downto 0);
-		DEMUX_3_REG			: out std_logic_vector (4 downto 0)
+		STEP_SIZE_REG 	: out std_logic_vector (19 downto 0);
+		PVP_WIDTH_REG 	: out std_logic_vector (9 downto 0);
+		NUM_DIMS_REG 	: out std_logic_vector (2 downto 0);
+
+		DEMUX_0_REG 	: out std_logic_vector (4 downto 0);
+		DEMUX_1_REG 	: out std_logic_vector (4 downto 0);
+		DEMUX_2_REG 	: out std_logic_vector (4 downto 0);
+		DEMUX_3_REG 	: out std_logic_vector (4 downto 0)
 	);
 end axi_slv;
 
@@ -519,22 +520,35 @@ begin
 	  end if;
 	end process;
 
+
+	-- Register Map.
+	-- 0 : START_VAL_REG	: 20-bit. Start value (in volts, converted into DAC scale)
+	-- 1 : STEP_SIZE_REG	: 20-bit. Size of steps between values (in volts, converted to DAC scale)
+	-- 2 : OUTPUT_REG		: 24-bit. The current 24-bit message that can be sent to the DAC
+
 	-- Output Registers.
-	START_VAL_0_REG				<= slv_reg0 (19 downto 0);
-	START_VAL_1_REG				<= slv_reg1 (19 downto 0);
-	START_VAL_2_REG				<= slv_reg2 (19 downto 0);
-	START_VAL_3_REG				<= slv_reg3 (19 downto 0);
+	START_VAL_REG 	<= slv_reg0(19 downto 0);
+	STEP_SIZE_REG	<= slv_reg1(19 downto 0);
+	OUTPUT_REG		<= slv_reg2(23 downto 0);
+	
+	START_VAL_0_REG <= slv_reg0(19 downto 0);
+	START_VAL_1_REG <= slv_reg1(19 downto 0);
+	START_VAL_2_REG <= slv_reg2(19 downto 0);
+	START_VAL_3_REG <= slv_reg3(19 downto 0);
 
-	TRIGGER_PVP_REG				<= slv_reg4 (0);
-	DWELL_CYCLES_REG 			<= slv_reg5 (15 downto 0);
-	CYCLES_TILL_READOUT_REG 	<= slv_reg6 (15 downto 0);
-	STEP_SIZE_REG				<= slv_reg7 (19 downto 0);
-	PVP_WIDTH_REG				<= slv_reg8 (9 downto 0); 
-	NUM_DIMS_REG 				<= slv_reg9 (2 downto 0);
+	TRIGGER_PVP_REG <= slv_reg4(0);
 
-	DEMUX_0_REG 				<= slv_reg10 (4 downto 0);
-	DEMUX_1_REG 				<= slv_reg11 (4 downto 0);
-	DEMUX_2_REG 				<= slv_reg12 (4 downto 0);
-	DEMUX_3_REG 				<= slv_reg13 (4 downto 0);
+	DWELL_CYCLES_REG <= slv_reg5(15 downto 0);
+	CYCLES_TILL_READOUT_REG <= slv_reg6(15 downto 0);
+
+	STEP_SIZE_REG <= slv_reg7(19 downto 0);
+	PVP_WIDTH_REG <= slv_reg8(9 downto 0);
+	NUM_DIMS_REG <= slv_reg9(2 downto 0);
+
+	DEMUX_0_REG <= slv_reg10(4 downto 0);
+	DEMUX_1_REG <= slv_reg11(4 downto 0);
+	DEMUX_2_REG <= slv_reg12(4 downto 0);
+	DEMUX_3_REG <= slv_reg13(4 downto 0)
 
 end rtl;
+

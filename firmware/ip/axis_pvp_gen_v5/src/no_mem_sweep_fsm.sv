@@ -67,7 +67,7 @@ end
 assign next_val = start + step*counter;
 assign mosi = {{{8'h00}}, start_bits, curr_val};     // start_bits is 4, curr_val is 20 bits
 assign top = (curr_val == (start + (DEPTH-1)*step)); // indicate 1 before top (works with FSM)
-assign base = (curr_val == start);
+// assign base = (curr_val == start);
 
 endmodule
 

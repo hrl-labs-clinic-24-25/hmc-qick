@@ -53,7 +53,7 @@ module axi_pvp_gen_v5
 	/* Ports */
 	/*********/
 	parameter DATA_WIDTH	= 32;
-	parameter ADDR_WIDTH	= 32;
+	parameter ADDR_WIDTH	= 6;
 
 	// AXI Slave I/F for configuration.
 	input 				s_axi_aclk;
