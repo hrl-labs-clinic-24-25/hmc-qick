@@ -78,7 +78,7 @@ module pvp_fsm_gen
 
 	input TRIGGER_PVP_REG;
 
-	output [31:0] mosi_o;  // could potentially be reduced to 24
+	output [23:0] mosi_o;  // could potentially be reduced to 24
 	output [4:0]  select_mux;
 	output done;
 	output readout_o;
@@ -118,6 +118,9 @@ module pvp_fsm_gen
 	logic 		 dac2_en;
 	logic 		 dac3_en;
 
+
+	logic        past_done;
+
 	/////////////////////////
 
 	// FSM signals
@@ -141,6 +144,7 @@ module pvp_fsm_gen
 
 	// FINITE STATE MACHINE
 	always @(posedge clk) begin
+		past_done <= 0;
 		rstn_3 <= 1;
 		rstn_2 <= 1;
 		rstn_1 <= 1;
@@ -171,8 +175,11 @@ module pvp_fsm_gen
 					past_mosi	  <= 0;
 					past_select_mux	  <= 0;
 					
-					if (TRIGGER_PVP_REG)  next_state <= S_STALL;
-					else          		  next_state <= WAIT;
+					if (TRIGGER_PVP_REG & !done)   next_state <= S_STALL;
+					else          		  		   next_state <= WAIT;
+
+
+					past_done <= done;
 
 				end
 				S_STALL: begin
@@ -199,6 +206,8 @@ module pvp_fsm_gen
 					past_mosi   <= mosi_o;
 					past_select_mux <= select_mux;
 
+					past_done <= done;
+
 				end
 				S_SEND_0: begin
 
@@ -206,6 +215,8 @@ module pvp_fsm_gen
 					past_mosi <= mosi_o;
 					past_select_mux <= select_mux;
 					dwell_counter <= dwell_counter + 1; 
+
+					past_done <= done;
 
 					on_off <= (dwell_counter == (9)) ? 1 : 0;
 
@@ -218,6 +229,8 @@ module pvp_fsm_gen
 					begin 
 						if (NUM_DIMS_REG == 1) next_state <= WAIT;
 						else next_state <= S_SEND_1;
+
+						if (NUM_DIMS_REG == 1) past_done <= 1;
 						rstn_0 <= 0; 
 					end 
 
@@ -228,6 +241,8 @@ module pvp_fsm_gen
 					past_mosi <= mosi_o;
 					past_select_mux <= select_mux;
 					dwell_counter <= dwell_counter + 1; 
+
+					past_done <= done;
 
 					on_off <= (dwell_counter == ((LOADING_SPI-1) + 10)) ? 1 : 0;
 
@@ -241,6 +256,9 @@ module pvp_fsm_gen
 					begin 
 						if (NUM_DIMS_REG == 2) next_state <= WAIT;
 						else 				   next_state <= S_SEND_2; 
+
+
+						if (NUM_DIMS_REG == 2) past_done <= 1;
 						rstn_1 <= 0; 
 					end
 
@@ -251,6 +269,8 @@ module pvp_fsm_gen
 					past_mosi <= mosi_o;
 					past_select_mux <= select_mux;
 					dwell_counter <= dwell_counter + 1;
+
+					past_done <= done;
 
 					on_off <= (dwell_counter == (2*(LOADING_SPI-1) + 10)) ? 1 : 0;
 
@@ -264,6 +284,9 @@ module pvp_fsm_gen
 					begin
 						if (NUM_DIMS_REG < 4) next_state <= WAIT;
 						else next_state <= S_SEND_3; 
+
+
+						if (NUM_DIMS_REG == 3) past_done <= 1;
 						rstn_2 <= 0; 
 					end
 
@@ -274,6 +297,8 @@ module pvp_fsm_gen
 					past_mosi <= mosi_o;
 					past_select_mux <= select_mux;
 					dwell_counter <= dwell_counter + 1; 
+
+					past_done <= done;
 
 
 					on_off <= (dwell_counter == (3*(LOADING_SPI-1) + 10)) ? 1 : 0;
@@ -287,6 +312,8 @@ module pvp_fsm_gen
 					else if ((dwell_counter == ((LOADING_SPI-1)*4)) & !top_3)    
 					begin
 						next_state <= S_STALL; 
+
+						if (NUM_DIMS_REG == 4) past_done <= 1;
 					end 
 
 				end
@@ -318,10 +345,8 @@ module pvp_fsm_gen
 	// readout controls AWG readout
 	assign readout_o 	 = (dwell_counter > CYCLES_TILL_READOUT_REG); // CHANGE TO CYCLES_TILL_READOUT
 
-	assign done = ((dwell_counter == (LOADING_SPI-1)) & top_0 & (NUM_DIMS_REG == 1)) | 
-				  ((dwell_counter == (LOADING_SPI-1)*2) & top_1 & (NUM_DIMS_REG == 2)) |
-				  ((dwell_counter == (LOADING_SPI-1)*3) & top_2 & (NUM_DIMS_REG == 3)) |
-				  ((dwell_counter == (LOADING_SPI-1)*4) & top_3 & (NUM_DIMS_REG == 4));
+	assign done = past_done;
+
 	 // if all the DACs have all finished running, then we are done
 
 	assign wait_to_next_cycle = ((dwell_counter >= ((NUM_DIMS_REG-1) * LOADING_SPI)) & (dwell_counter < DWELL_CYCLES_REG)) ? 1 : 0; // if we're waiting for the next cycle to start

@@ -24,7 +24,7 @@ module spi
     */
     input clk;
     input rstn;
-    input [31:0] DATA_IN;
+    input [23:0] DATA_IN;
     input TRIGGER;
     output sdo;
     output cs;
@@ -46,8 +46,8 @@ module spi
             cs_o <= 0;
         end 
         if (TRIGGER) begin // start the transmission
-            sdo_o <= DATA_IN[31];
-            counter <= 30;
+            sdo_o <= DATA_IN[23];
+            counter <= 22;
             cs_o <= 1;
         end else if (cs & (counter > 8'h00)) begin // increment the counter, output the data in the designated bit
             sdo_o <= DATA_IN[counter];

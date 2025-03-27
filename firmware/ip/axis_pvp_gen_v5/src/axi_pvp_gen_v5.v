@@ -102,7 +102,7 @@ module axi_pvp_gen_v5
 	/********************/
 
 	// connected from FSM to axil_slv
-	wire [31:0] mosi_output;
+	wire [23:0] mosi_output;
 
 	// Non AXI inputs
 	wire TRIGGER_PVP_REG;
