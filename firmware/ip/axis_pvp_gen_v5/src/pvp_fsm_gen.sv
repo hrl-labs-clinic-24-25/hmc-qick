@@ -317,7 +317,7 @@ module pvp_fsm_gen
 					end 
 
 				end
-				default: begin dwell_counter <= 0; next_state <= WAIT; end
+				default: begin dwell_counter <= 0; next_state <= WAIT; rstn_0 <= 1;  rstn_1 <= 1;  rstn_2 <= 1;  rstn_3 <= 1;  end
 			endcase
 		end
 	end

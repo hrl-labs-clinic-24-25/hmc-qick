@@ -1035,7 +1035,7 @@
       <spirit:file>
         <spirit:name>src/dds_compiler_0/dds_compiler_0.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:userFileType>CELL_NAME_signal_gen_top_i/signal_gen_i/GEN_dds[0].dds_i/dds_compiler_0</spirit:userFileType>
+        <spirit:userFileType>CELL_NAME_signal_gen_top_i/signal_gen_i/GEN_dds[0].dds_i</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/latency_reg.v</spirit:name>
@@ -1080,7 +1080,7 @@
       <spirit:file>
         <spirit:name>src/axis_signal_gen_v5.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_1e94d0d3</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_8ed0f135</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -1098,7 +1098,7 @@
       <spirit:file>
         <spirit:name>src/dds_compiler_0/dds_compiler_0.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:userFileType>CELL_NAME_signal_gen_top_i/signal_gen_i/GEN_dds[0].dds_i/dds_compiler_0</spirit:userFileType>
+        <spirit:userFileType>CELL_NAME_signal_gen_top_i/signal_gen_i/GEN_dds[0].dds_i</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/latency_reg.v</spirit:name>
@@ -1193,7 +1193,7 @@
       <xilinx:displayName>AXIS Signal Generator V5</xilinx:displayName>
       <xilinx:definitionSource>package_project</xilinx:definitionSource>
       <xilinx:coreRevision>6</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2022-02-14T20:44:43Z</xilinx:coreCreationDateTime>
+      <xilinx:coreCreationDateTime>2025-03-25T05:33:28Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@58bce5b2_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axis_signal_gen_v5</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@2584a4ac_ARCHIVE_LOCATION">/home/lstefana/v20.2/ip/axis_signal_gen_v5</xilinx:tag>
@@ -1257,7 +1257,7 @@
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
-      <xilinx:xilinxVersion>2020.2</xilinx:xilinxVersion>
+      <xilinx:xilinxVersion>2023.1</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="15f072e0"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="769c350d"/>
       <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="7208dbda"/>
