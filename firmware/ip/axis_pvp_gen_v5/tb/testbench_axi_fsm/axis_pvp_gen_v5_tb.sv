@@ -25,11 +25,6 @@ module axis_pvp_gen_v5_tb ();
 
     always begin
         clk = #(clk_period/2) ~clk;
-
-        if ((init_counter > 1000) & done) begin
-            $display("DONE");
-            $stop;
-        end
     end
 
     initial
@@ -163,7 +158,7 @@ module axis_pvp_gen_v5_tb ();
 
 		// Non AXI-LITE 
 		.TRIGGER_AWG_REG (init_transaction), // trigger for AWG
-		.select_mux  (mux), // DAC demuxing set of 5 pins
+		//.select_mux  (mux), // DAC demuxing set of 5 pins
         .COPI (COPI),
 		.SCK (SCK),
 		.CS (CS),

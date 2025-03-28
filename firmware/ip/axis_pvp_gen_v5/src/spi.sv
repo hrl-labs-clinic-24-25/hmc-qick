@@ -39,30 +39,30 @@ module spi
     logic cs_o;
 
     // POSEDGE CLOCK TEST - Phase = 1, Polarity = 0 and 
-    always @(negedge clk) begin
+    always @(posedge clk) begin
         if (~rstn) begin
             sdo_o <= 0;
             counter <= 0;
-            cs_o <= 0;
+            cs_o <= 1;
         end 
         if (TRIGGER) begin // start the transmission
             sdo_o <= DATA_IN[23];
-            counter <= 22;
-            cs_o <= 1;
-        end else if (cs & (counter > 8'h00)) begin // increment the counter, output the data in the designated bit
-            sdo_o <= DATA_IN[counter];
+            counter <= 23;
+            cs_o <= 0;
+        end else if (~cs & (counter > 8'h00)) begin // increment the counter, output the data in the designated bit
+            sdo_o <= DATA_IN[counter - 8'h01];
             counter <= counter - 1'b1;
-            cs_o <= 1;
+            cs_o <= 0;
         end else begin
             sdo_o <= 0; //freeze counter so that it doesn't overflow and restart the sweep
             counter <= 0; 
-            cs_o <= 0;
+            cs_o <= 1;
         end
     end
 
     assign cs = cs_o; // chip select
     assign sdo = sdo_o; // serial data out
-    assign sck = cs ? clk : 1'b0; // the clock is 0 if not transmitting; if it is, it sends out the clock
+    assign sck = ~cs ? clk : 1'b0; // the clock is 0 if not transmitting; if it is, it sends out the clock
 
 endmodule
 
