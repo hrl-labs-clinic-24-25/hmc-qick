@@ -15,7 +15,8 @@ module pvp_fsm_gen
 		rstn,
 		clk,
 
-		// start the fsm
+		// start the fsm or configure a DAC
+		CONFIG_REG,
         TRIGGER_PVP_REG,
 
 		// Inputs from PYNQ registers
@@ -49,7 +50,7 @@ module pvp_fsm_gen
 	/**************/
 	
 	// Define the states for the FSM
-	parameter WAIT = 4'b0000, S_SEND_0 = 4'b0001, S_SEND_1 = 4'b0010, S_SEND_2 = 4'b0100, S_SEND_3 = 4'b1000, S_WAIT = 4'b1110, S_STALL = 4'b1101;
+	parameter WAIT = 4'b0000, CONFIG_STATE = 4'b0101, S_SEND_0 = 4'b0001, S_SEND_1 = 4'b0010, S_SEND_2 = 4'b0100, S_SEND_3 = 4'b1000, S_WAIT = 4'b1110, S_STALL = 4'b1101, NULL_STATE = 4'b1111;
 
 	/*********/
 	/* Ports */
@@ -76,7 +77,8 @@ module pvp_fsm_gen
 	input [4:0]  DEMUX_2_REG;
 	input [4:0]  DEMUX_3_REG;
 
-	input TRIGGER_PVP_REG;
+	input TRIGGER_PVP_REG;   // 1 if triggered, 0 if not
+	input [28:0] CONFIG_REG; // for configuring the DACs: [28:24] is demux value, [23:0] is the SPI message. won't run unless its != 0
 
 	output [23:0] mosi_o;  // could potentially be reduced to 24
 	output [4:0]  select_mux;
@@ -174,23 +176,57 @@ module pvp_fsm_gen
 					rstn_0		  <= 0;
 					past_mosi	  <= 0;
 					past_select_mux	  <= 0;
-					
-					if (TRIGGER_PVP_REG & !done)   next_state <= S_STALL;
-					else          		  		   next_state <= WAIT;
-
 
 					past_done <= done;
+					
+					/////////////////////////
+					/// NEXT STATE LOGIC ////
+					/////////////////////////
 
+					// run the pvp plot generator
+					if (TRIGGER_PVP_REG & !done)       		      						  next_state <= S_STALL;
+
+					// need to configure one of the DACs, so enter config state
+					else if (CONFIG_REG != 0 & !done) 									  next_state <= CONFIG_STATE;
+
+					// finished configuring/running pvp, but haven't turned off trigger or configuration
+					else if ((TRIGGER_PVP_REG & done) | ((CONFIG_REG != 0) & done)) 	  next_state <= WAIT;
+
+					// finished running trigger pvp and config register; turn off the done sign so that we can run the program again
+					else if ((!TRIGGER_PVP_REG & done) | (CONFIG_REG == 0) & done)  begin next_state <= WAIT; past_done <= 0; end
+
+					// continue running WAIT state
+					else          		  		        		  						  next_state <= WAIT;
 				end
+				CONFIG_STATE: begin
+					next_state <= CONFIG_STATE;
+					dwell_counter <= 0;
+					on_off <= (dwell_counter == (9)) ? 1 : 0;
+
+					// configure the DACs
+					if (CONFIG_REG != 0 & dwell_counter <= (LOADING_SPI - 1)) begin
+						past_select_mux <= CONFIG_REG[28:24];
+						next_mosi  <= CONFIG_REG[23:0];
+						dwell_counter <= dwell_counter + 1;
+						past_done <= 0;
+					end
+					else begin
+						next_state <= WAIT;
+						dwell_counter <= 0;
+						past_done <= 1;
+					end
+				end
+
 				S_STALL: begin
 					
 					rstn_3 <= 1;
 					rstn_2 <= 1;
 					rstn_1 <= 1;
 					rstn_0 <= 1;
+					past_done <= done;
 
 					 // will only load the next DACs if the TRIGGER_PVP_REG is still 1 (i.e. gives user control to stop partway through the pvp generation)
-					if (TRIGGER_PVP_REG)
+					if (TRIGGER_PVP_REG & !done)
 						if (wait_to_next_cycle) begin
 							next_state <= S_STALL;
 							dwell_counter <= dwell_counter + 1;
@@ -205,8 +241,6 @@ module pvp_fsm_gen
 
 					past_mosi   <= mosi_o;
 					past_select_mux <= select_mux;
-
-					past_done <= done;
 
 				end
 				S_SEND_0: begin

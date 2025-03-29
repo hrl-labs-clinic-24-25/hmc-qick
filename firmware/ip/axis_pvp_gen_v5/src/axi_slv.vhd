@@ -49,6 +49,7 @@ entity axi_slv is
 		START_VAL_3_REG 	: out std_logic_vector (19 downto 0);
 
 		TRIGGER_PVP_REG 	: out std_logic;
+		CONFIG_REG     		: out std_logic_vector (28 downto 0);
 
 		DWELL_CYCLES_REG 	: out std_logic_vector (15 downto 0);
 		CYCLES_TILL_READOUT_REG : out std_logic_vector (15 downto 0);
@@ -530,18 +531,19 @@ begin
 	START_VAL_3_REG <= slv_reg3(19 downto 0);
 
 	TRIGGER_PVP_REG <= slv_reg4(0);
+	CONFIG_REG <= slv_reg5(28 downto 0);
 
-	DWELL_CYCLES_REG <= slv_reg5(15 downto 0);
-	CYCLES_TILL_READOUT_REG <= slv_reg6(15 downto 0);
+	DWELL_CYCLES_REG <= slv_reg6(15 downto 0);
+	CYCLES_TILL_READOUT_REG <= slv_reg7(15 downto 0);
 
-	STEP_SIZE_REG <= slv_reg7(19 downto 0);
-	PVP_WIDTH_REG <= slv_reg8(9 downto 0);
-	NUM_DIMS_REG <= slv_reg9(2 downto 0);
+	STEP_SIZE_REG <= slv_reg8(19 downto 0);
+	PVP_WIDTH_REG <= slv_reg9(9 downto 0);
+	NUM_DIMS_REG <= slv_reg10(2 downto 0);
 
-	DEMUX_0_REG <= slv_reg10(4 downto 0);
-	DEMUX_1_REG <= slv_reg11(4 downto 0);
-	DEMUX_2_REG <= slv_reg12(4 downto 0);
-	DEMUX_3_REG <= slv_reg13(4 downto 0);
+	DEMUX_0_REG <= slv_reg11(4 downto 0);
+	DEMUX_1_REG <= slv_reg12(4 downto 0);
+	DEMUX_2_REG <= slv_reg13(4 downto 0);
+	DEMUX_3_REG <= slv_reg14(4 downto 0);
 
 end rtl;
 

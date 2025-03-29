@@ -42,7 +42,7 @@ module axi_pvp_gen_v5
 
 		// Non AXI-LITE 
 		TRIGGER_AWG_REG, // trigger for AWG
-		// select_mux,
+		select_mux,
 		done,
 		COPI,
 		SCK, // SPI Clock
@@ -87,7 +87,7 @@ module axi_pvp_gen_v5
 
 	// Non AXI-LITE outputs
 	output 			TRIGGER_AWG_REG; // trigger for AWG ** test that output registers don't cause net contention in Vivado (March 7)
-	// output [4:0]  	select_mux;
+	output [4:0]  	select_mux;
 	output 			done;
 
 	output 			COPI;
@@ -104,9 +104,8 @@ module axi_pvp_gen_v5
 	// connected from FSM to axil_slv
 	wire [23:0] mosi_output;
 
-	wire [4:0] select_mux;
-
 	// Non AXI inputs
+	wire [28:0] CONFIG_REG;
 	wire TRIGGER_PVP_REG;
 
 	// starting value for the DACs
@@ -181,6 +180,7 @@ module axi_pvp_gen_v5
 		.START_VAL_3_REG	(START_VAL_3_REG	),
 
 		.TRIGGER_PVP_REG	(TRIGGER_PVP_REG	),
+		.CONFIG_REG		    (CONFIG_REG		),
 
 		.DWELL_CYCLES_REG	(DWELL_CYCLES_REG	), 
 		.CYCLES_TILL_READOUT_REG (CYCLES_TILL_READOUT_REG),
@@ -202,6 +202,7 @@ module axi_pvp_gen_v5
 				.clk				(s_axi_aclk),
 
 				.TRIGGER_PVP_REG   	(TRIGGER_PVP_REG),
+				.CONFIG_REG			(CONFIG_REG),
 			
 				.START_VAL_0_REG 	(START_VAL_0_REG),
 				.START_VAL_1_REG 	(START_VAL_1_REG),

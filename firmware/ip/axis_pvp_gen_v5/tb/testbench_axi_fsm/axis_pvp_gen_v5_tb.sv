@@ -158,7 +158,7 @@ module axis_pvp_gen_v5_tb ();
 
 		// Non AXI-LITE 
 		.TRIGGER_AWG_REG (init_transaction), // trigger for AWG
-		//.select_mux  (mux), // DAC demuxing set of 5 pins
+		.select_mux  (mux), // DAC demuxing set of 5 pins
         .COPI (COPI),
 		.SCK (SCK),
 		.CS (CS),
