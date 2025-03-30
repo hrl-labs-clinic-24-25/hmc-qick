@@ -205,7 +205,6 @@ module pvp_fsm_gen
 
 					// configure the DACs
 					if (CONFIG_REG != 0 & dwell_counter <= (LOADING_SPI - 1)) begin
-						past_select_mux <= CONFIG_REG[28:24];
 						next_mosi  <= CONFIG_REG[23:0];
 						dwell_counter <= dwell_counter + 1;
 						past_done <= 0;
@@ -372,7 +371,7 @@ module pvp_fsm_gen
 
 	// assign the mosi and output for demuxing to DACs based on current state
 	assign mosi_o = next_mosi; //((curr_state==S_STALL) | (dwell_counter==0)) ? past_mosi   : ((curr_state==S_SEND_0) & dwell_counter>0) ? mosi_0 : (curr_state==S_SEND_1) ? mosi_1                : (curr_state==S_SEND_2) ? mosi_2 			   : (curr_state==S_SEND_3) ? mosi_3 				: 0;
-	assign select_mux = ((curr_state==S_STALL) | (dwell_counter==0)) ? past_select_mux :  (curr_state==S_SEND_0) ? DEMUX_0_REG     : (curr_state==S_SEND_1) ? DEMUX_1_REG : (curr_state==S_SEND_2) ? DEMUX_2_REG : (curr_state==S_SEND_3) ? DEMUX_3_REG : 4'b1111; // this is hard to debug if we're always seeing first DAC and none of second (lol)
+	assign select_mux = ((curr_state==S_STALL) | (dwell_counter==0)) ? past_select_mux :  (curr_state == CONFIG_STATE) ? CONFIG_REG[28:24] : (curr_state==S_SEND_0) ? DEMUX_0_REG     : (curr_state==S_SEND_1) ? DEMUX_1_REG : (curr_state==S_SEND_2) ? DEMUX_2_REG : (curr_state==S_SEND_3) ? DEMUX_3_REG : 4'b1111; // this is hard to debug if we're always seeing first DAC and none of second (lol)
 
 	assign trigger_spi_o = on_off;
 
