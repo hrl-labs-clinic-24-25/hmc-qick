@@ -91,7 +91,7 @@ module pvp_fsm_gen
 	/* Internal signals */
 	/********************/
 
-	parameter LOADING_SPI = 50;
+	parameter LOADING_SPI = 200;
 	
 	logic on_off;
 
@@ -152,7 +152,7 @@ module pvp_fsm_gen
 		rstn_1 <= 1;
 		rstn_0 <= 1;
 		dwell_counter <= 0;
-		next_mosi <= ((curr_state==S_STALL) | (dwell_counter==0)) ? past_mosi   : ((curr_state==S_SEND_0) & dwell_counter>0) ? mosi_0 : (curr_state==S_SEND_1) ? mosi_1                : (curr_state==S_SEND_2) ? mosi_2 			   : (curr_state==S_SEND_3) ? mosi_3 				: 0;
+		next_mosi <= ((curr_state==S_STALL) | (dwell_counter==0)) ? past_mosi   : ((curr_state==CONFIG_STATE) & dwell_counter>0) ? CONFIG_REG[23:0] : ((curr_state==S_SEND_0) & dwell_counter>0) ? mosi_0 : (curr_state==S_SEND_1) ? mosi_1                : (curr_state==S_SEND_2) ? mosi_2 			   : (curr_state==S_SEND_3) ? mosi_3 				: 0;
 	
 		on_off <= 0;
 
@@ -201,11 +201,10 @@ module pvp_fsm_gen
 				CONFIG_STATE: begin
 					next_state <= CONFIG_STATE;
 					dwell_counter <= 0;
-					on_off <= (dwell_counter == (9)) ? 1 : 0;
+					on_off <= ((dwell_counter >= 9) & (dwell_counter <= 13)) ? 1 : 0;
 
 					// configure the DACs
 					if (CONFIG_REG != 0 & dwell_counter <= (LOADING_SPI - 1)) begin
-						next_mosi  <= CONFIG_REG[23:0];
 						dwell_counter <= dwell_counter + 1;
 						past_done <= 0;
 					end
@@ -251,7 +250,7 @@ module pvp_fsm_gen
 
 					past_done <= done;
 
-					on_off <= (dwell_counter == (9)) ? 1 : 0;
+					on_off <= ((dwell_counter >= 9) & (dwell_counter <= 16)) ? 1 : 0;
 
 					// cycle until dwell counter has been spent. If we're not at the top of the stack, return to stall
 					if ((dwell_counter == (LOADING_SPI-1)) & !top_0)      // inside DAC 1 loop
@@ -277,7 +276,7 @@ module pvp_fsm_gen
 
 					past_done <= done;
 
-					on_off <= (dwell_counter == ((LOADING_SPI-1) + 10)) ? 1 : 0;
+					on_off <= ((dwell_counter >= (LOADING_SPI-1)+10) & (dwell_counter <= (LOADING_SPI-1)+17)) ? 1 : 0;
 
 					// cycle until dwell counter has been spent. If we're not at the top of the stack, return to S_STALL
 
@@ -305,7 +304,7 @@ module pvp_fsm_gen
 
 					past_done <= done;
 
-					on_off <= (dwell_counter == (2*(LOADING_SPI-1) + 10)) ? 1 : 0;
+					on_off <= ((dwell_counter >= 2*(LOADING_SPI-1)+10) & (dwell_counter <= 2*(LOADING_SPI-1)+17)) ? 1 : 0;
 
 					// cycle until dwell counter has been spent. If we're not at the top of the stack, return to S_STALL
 
@@ -333,8 +332,7 @@ module pvp_fsm_gen
 
 					past_done <= done;
 
-
-					on_off <= (dwell_counter == (3*(LOADING_SPI-1) + 10)) ? 1 : 0;
+					on_off <= ((dwell_counter >= 3*(LOADING_SPI-1)+10) & (dwell_counter <= 3*(LOADING_SPI-1)+17)) ? 1 : 0;
 
 					// cycle until dwell counter has been spent. If we're not at the top of the stack, return to stall
 					if ((dwell_counter == ((LOADING_SPI-1)*4)) & top_3)   // inside DAC 1 loop

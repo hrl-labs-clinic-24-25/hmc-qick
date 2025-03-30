@@ -34,12 +34,26 @@ module spi
     * Internal Logic
     */
     logic [7:0] counter; // 8 bit counter, 0 to 32
+    logic [3:0] counter_div; // 4 bit counter for dividing the clock
+
+    logic divided_clk;
 
     logic sdo_o;
     logic cs_o;
 
-    // POSEDGE CLOCK TEST - Phase = 1, Polarity = 0 and 
     always @(posedge clk) begin
+        if (~rstn) begin
+            counter_div <= 0;
+            divided_clk <= 0;
+        end else begin
+            if (counter_div == 4'b11)  begin divided_clk <= ~divided_clk; counter_div <= 0; end
+            else                   begin divided_clk <=  divided_clk; counter_div <= counter_div + 1; end
+        end
+    end
+    
+
+    // POSEDGE CLOCK TEST - Phase = 1, Polarity = 0 and 
+    always @(posedge divided_clk) begin
         if (~rstn) begin
             sdo_o <= 0;
             counter <= 0;
@@ -62,7 +76,7 @@ module spi
 
     assign cs = cs_o; // chip select
     assign sdo = sdo_o; // serial data out
-    assign sck = ~cs ? clk : 1'b0; // the clock is 0 if not transmitting; if it is, it sends out the clock
+    assign sck = ~cs ? divided_clk : 1'b0; // the clock is 0 if not transmitting; if it is, it sends out the clock
 
 endmodule
 
