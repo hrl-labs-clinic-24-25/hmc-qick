@@ -47,7 +47,7 @@ module axi_pvp_gen_v5
 
 		LDACN,
 		CLRN,
-		RSTN,
+		RESETN,
 
 		COPI,
 		SCK, // SPI Clock
@@ -97,7 +97,7 @@ module axi_pvp_gen_v5
 	
 	output 			LDACN; //  ldac bar
 	output			CLRN;  // clear bar
-	output			RSTN;  // reset bar
+	output			RESETN;  // reset bar
 	output 			COPI;
 	output 			SCK; // SPI Clock
 	output 			CS; // SPI Chip Select
@@ -248,7 +248,7 @@ module axi_pvp_gen_v5
 				.trigger_spi_o 		(trigger_spi_o),
 				.ldacn				(LDACN),
 				.clrn				(CLRN),
-				.resetn				(RSTN),
+				.resetn				(RESETN),
 				.done 				(done)
 
 				
