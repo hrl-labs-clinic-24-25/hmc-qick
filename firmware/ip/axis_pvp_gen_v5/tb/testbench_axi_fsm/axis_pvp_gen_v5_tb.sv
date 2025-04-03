@@ -43,23 +43,46 @@ module axis_pvp_gen_v5_tb ();
     logic                        S_AXI_AWVALID;
     logic                        S_AXI_AWREADY;
 
-    logic [3 : 0] S_AXI_WSTRB;
+    logic [3 : 0]                  S_AXI_WSTRB;
     logic                          S_AXI_WVALID;
     logic                          S_AXI_WREADY;
-    logic [31:0] S_AXI_WDATA;
+    logic [31:0]                   S_AXI_WDATA;
 
     logic [1 : 0]                S_AXI_BRESP;
     logic                        S_AXI_BVALID;
     logic                        S_AXI_BREADY;
 
-    logic [5 : 0]  S_AXI_ARADDR;
+    logic [5 : 0]                 S_AXI_ARADDR;
     logic [2 : 0]                 S_AXI_ARPROT;
     logic                         S_AXI_ARVALID;
     logic                         S_AXI_ARREADY;
 
-    logic [31:0] S_AXI_RDATA;
-    logic [1:0] S_AXI_RRESP;
-    logic  S_AXI_RREADY;
+    logic [31:0]                  S_AXI_RDATA;
+    logic [1:0]                   S_AXI_RRESP;
+    logic                         S_AXI_RREADY;
+
+    logic [5 : 0]                S00_AXI_AWADDR;
+    logic [2 : 0]                S00_AXI_AWPROT;
+    logic                        S00_AXI_AWVALID;
+    logic                        S00_AXI_AWREADY;
+
+    logic [3 : 0]                  S00_AXI_WSTRB;
+    logic                          S00_AXI_WVALID;
+    logic                          S00_AXI_WREADY;
+    logic [31:0]                   S00_AXI_WDATA;
+
+    logic [1 : 0]                S00_AXI_BRESP;
+    logic                        S00_AXI_BVALID;
+    logic                        S00_AXI_BREADY;
+
+    logic [5 : 0]                 S00_AXI_ARADDR;
+    logic [2 : 0]                 S00_AXI_ARPROT;
+    logic                         S00_AXI_ARVALID;
+    logic                         S00_AXI_ARREADY;
+
+    logic [31:0]                  S00_AXI_RDATA;
+    logic [1:0]                   S00_AXI_RRESP;
+    logic                         S00_AXI_RREADY;
 
     logic         init_transaction;
     logic [31:0]  outsig;
@@ -87,7 +110,7 @@ module axis_pvp_gen_v5_tb ();
        .AXI_ADDR_WIDTH(6),
        .AXI_DATA_WIDTH(32)
        )
-   axi_lite_master_i
+   axi_lite_master_0
      (
       .init_transaction(init_transaction),
       .output_data (outsig),
@@ -123,6 +146,50 @@ module axis_pvp_gen_v5_tb ();
       .M_AXI_RRESP(S_AXI_RRESP),
       .M_AXI_RVALID(S_AXI_RVALID),
       .M_AXI_RREADY(S_AXI_RREADY)
+
+      );
+
+      axi_lite_master
+     #(
+       .AXI_ADDR_WIDTH(6),
+       .AXI_DATA_WIDTH(32)
+       )
+   axi_lite_master_1
+     (
+      .init_transaction(init_transaction),
+      .output_data (outsig),
+
+      .M_AXI_ACLK(clk),
+      .M_AXI_ARESETN(rstn),
+
+      // aw
+      .M_AXI_AWADDR(S00_AXI_AWADDR),
+      .M_AXI_AWPROT(S00_AXI_AWPROT),
+      .M_AXI_AWVALID(S00_AXI_AWVALID),
+      .M_AXI_AWREADY(S00_AXI_AWREADY),
+
+      // w
+      .M_AXI_WDATA(S00_AXI_WDATA),
+      .M_AXI_WSTRB(S00_AXI_WSTRB),
+      .M_AXI_WVALID(S00_AXI_WVALID),
+      .M_AXI_WREADY(S00_AXI_WREADY),
+
+      // b resp
+      .M_AXI_BRESP(S00_AXI_BRESP),
+      .M_AXI_BVALID(S00_AXI_BVALID),
+      .M_AXI_BREADY(S00_AXI_BREADY),
+
+      // ar
+      .M_AXI_ARADDR(S00_AXI_ARADDR),
+      .M_AXI_ARPROT(S00_AXI_ARPROT),
+      .M_AXI_ARVALID(S00_AXI_ARVALID),
+      .M_AXI_ARREADY(S00_AXI_ARREADY),
+
+      // r
+      .M_AXI_RDATA(S00_AXI_RDATA),
+      .M_AXI_RRESP(S00_AXI_RRESP),
+      .M_AXI_RVALID(S00_AXI_RVALID),
+      .M_AXI_RREADY(S00_AXI_RREADY)
 
       );
 

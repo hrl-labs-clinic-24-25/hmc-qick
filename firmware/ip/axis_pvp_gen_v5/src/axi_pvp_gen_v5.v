@@ -40,6 +40,33 @@ module axi_pvp_gen_v5
 		s_axi_rvalid,
 		s_axi_rready,
 
+		s00_axi_aclk,
+		s00_axi_aresetn,
+
+		s00_axi_awaddr,
+		s00_axi_awprot,
+		s00_axi_awvalid,
+		s00_axi_awready,
+
+		s00_axi_wdata,
+		s00_axi_wstrb,
+		s00_axi_wvalid,
+		s00_axi_wready,
+
+		s00_axi_bresp,
+		s00_axi_bvalid,
+		s00_axi_bready,
+
+		s00_axi_araddr,
+		s00_axi_arprot,
+		s00_axi_arvalid,
+		s00_axi_arready,
+
+		s00_axi_rdata,
+		s00_axi_rresp,
+		s00_axi_rvalid,
+		s00_axi_rready,
+
 		// Non AXI-LITE 
 		TRIGGER_AWG_REG, // trigger for AWG
 		select_mux,
@@ -57,7 +84,7 @@ module axi_pvp_gen_v5
 	parameter DATA_WIDTH	= 32;
 	parameter ADDR_WIDTH	= 6;
 
-	// AXI Slave I/F for configuration.
+	// AXI BUS 1 -- Slave I/F for configuration.
 	input 				s_axi_aclk;
 	input 				s_axi_aresetn;
 
@@ -75,8 +102,6 @@ module axi_pvp_gen_v5
 	output 				s_axi_bvalid;
 	input 			    s_axi_bready;
 
-
-
 	input [5:0]		    s_axi_araddr;
 	input [2:0]			s_axi_arprot;
 	input 				s_axi_arvalid;
@@ -86,6 +111,34 @@ module axi_pvp_gen_v5
 	output [1:0]		s_axi_rresp;
 	output 				s_axi_rvalid;
 	input 				s_axi_rready;
+
+	// AXI BUS 2 -- user control
+	input 				s00_axi_aresetn;
+	input 				s00_axi_aclk;
+
+	input [5:0] 		s00_axi_awaddr;
+	input [2:0]			s00_axi_awprot;
+	input 				s00_axi_awvalid;
+	output 				s00_axi_awready;
+
+	input [31:0]		s00_axi_wdata;
+	input [3:0]			s00_axi_wstrb;
+	input				s00_axi_wvalid;
+	output 				s00_axi_wready;
+
+	output [1:0]		s00_axi_bresp;
+	output 				s00_axi_bvalid;
+	input 			    s00_axi_bready;
+
+	input [5:0]		    s00_axi_araddr;
+	input [2:0]			s00_axi_arprot;
+	input 				s00_axi_arvalid;
+	output 				s00_axi_arready;
+
+	output [31:0]		s00_axi_rdata;
+	output [1:0]		s00_axi_rresp;
+	output 				s00_axi_rvalid;
+	input 				s00_axi_rready;
 
 	// Non AXI-LITE outputs
 	output 			TRIGGER_AWG_REG; // trigger for AWG ** test that output registers don't cause net contention in Vivado (March 7)
@@ -206,37 +259,37 @@ module axi_pvp_gen_v5
 
 	s00_axi_slv s00_axi_slv_i
 	(
-		.aclk			(s_axi_aclk	 	),
-		.aresetn		(s_axi_aresetn	),
+		.aclk			(s00_axi_aclk	 	),
+		.aresetn		(s00_axi_aresetn	),
 
 		// Write Address Channel.
-		.awaddr			(s_axi_awaddr 	),
-		.awprot			(s_axi_awprot 	),
-		.awvalid		(s_axi_awvalid	),
-		.awready		(s_axi_awready	),
+		.awaddr			(s00_axi_awaddr 	),
+		.awprot			(s00_axi_awprot 	),
+		.awvalid		(s00_axi_awvalid	),
+		.awready		(s00_axi_awready	),
 
 		// Write Data Channel.
-		.wdata			(s_axi_wdata	),
-		.wstrb			(s_axi_wstrb	),
-		.wvalid			(s_axi_wvalid   ),
-		.wready			(s_axi_wready	),
+		.wdata			(s00_axi_wdata	),
+		.wstrb			(s00_axi_wstrb	),
+		.wvalid			(s00_axi_wvalid   ),
+		.wready			(s00_axi_wready	),
 
 		// Write Response Channel.
-		.bresp			(s_axi_bresp	),
-		.bvalid			(s_axi_bvalid	),
-		.bready			(s_axi_bready	),
+		.bresp			(s00_axi_bresp	),
+		.bvalid			(s00_axi_bvalid	),
+		.bready			(s00_axi_bready	),
 
 		// Read Address Channel.
-		.araddr			(s_axi_araddr 	),
-		.arprot			(s_axi_arprot 	),
-		.arvalid		(s_axi_arvalid	),
-		.arready		(s_axi_arready	),
+		.araddr			(s00_axi_araddr 	),
+		.arprot			(s00_axi_arprot 	),
+		.arvalid		(s00_axi_arvalid	),
+		.arready		(s00_axi_arready	),
 
 		// Read Data Channel.
-		.rdata			(s_axi_rdata	),
-		.rresp			(s_axi_rresp	),
-		.rvalid			(s_axi_rvalid	),
-		.rready			(s_axi_rready	),
+		.rdata			(s00_axi_rdata	),
+		.rresp			(s00_axi_rresp	),
+		.rvalid			(s00_axi_rvalid	),
+		.rready			(s00_axi_rready	),
 
 		// Registers.
 		.CTRL_REG 			(CTRL_REG),
