@@ -46,6 +46,7 @@ module pvp_fsm_gen
 		trigger_spi_o,  // for SPI output
 		ldacn,
 		clrn,
+		resetn, // for resetting the DAC
 		done
 	);
 
@@ -90,6 +91,7 @@ module pvp_fsm_gen
 	output [4:0]  select_mux;
 	output 		  ldacn;
 	output 		  clrn;
+	output		  resetn;
 
 	output done;
 	output readout_o;
@@ -166,8 +168,9 @@ module pvp_fsm_gen
 
 	assign {ldacn_user, clrn_user, rstn_user, trigger_pvp} = CTRL_REG;
 	assign ldacn = (MODE_REG == 2'b11) ? ldacn_blip : ldacn_fsm;
-	assign reset = (rstn & ((MODE_REG == 2'b11) ? rstn_user : 1'b1)); // allows user to control reset if you're in MODE 3
+	assign resetn = (((MODE_REG == 2'b11) ? rstn_user : 1'b1)); // allows user to control reset the DAC if you're in MODE 3
 	assign clrn = (MODE_REG == 2'b11) ? clrn_user : 1'b1;
+	
 
 	always @(posedge clk) begin
 		ldacn_blip <= 1;
@@ -194,7 +197,7 @@ module pvp_fsm_gen
 	
 		on_off <= 0;
 
-		if (~reset) begin
+		if (~rstn) begin
 			// State register.
 			next_state 	<= WAIT;
 			past_mosi <= 0;

@@ -44,11 +44,16 @@ module axi_pvp_gen_v5
 		TRIGGER_AWG_REG, // trigger for AWG
 		select_mux,
 		done,
+
 		LDACN,
 		CLRN,
+		RSTN,
+
 		COPI,
 		SCK, // SPI Clock
-		CS // SPI Chip Select
+		CS, // SPI Chip Select
+
+		test_timing
 	);
 
 	/*********/
@@ -91,11 +96,13 @@ module axi_pvp_gen_v5
 	output 			done;
 	
 	output 			LDACN; //  ldac bar
-	output			CLRN; // clear bar
+	output			CLRN;  // clear bar
+	output			RSTN;  // reset bar
 	output 			COPI;
 	output 			SCK; // SPI Clock
 	output 			CS; // SPI Chip Select
-	//we do NOT put mosi here because it comes out via m_axi
+	
+	output			test_timing;
 
 
 
@@ -131,6 +138,8 @@ module axi_pvp_gen_v5
 	////////////////////
 	// second subordinate
 	wire [3:0]	CTRL_REG;
+	assign test_timing = CTRL_REG[0]; // for oscilloscope use
+
 	wire [1:0]	MODE_REG; // 0; default pvp. 1: pvp up/down. 2. pvp spiral. 3. user controlled only (allows user to set LDAC)
 
 	wire 	   done;			 // trigger for SPI
@@ -239,6 +248,7 @@ module axi_pvp_gen_v5
 				.trigger_spi_o 		(trigger_spi_o),
 				.ldacn				(LDACN),
 				.clrn				(CLRN),
+				.resetn				(RSTN),
 				.done 				(done)
 
 				
