@@ -113,9 +113,6 @@ module axi_pvp_gen_v5
 	input 				s_axi_rready;
 
 	// AXI BUS 2 -- user control
-	input 				s00_axi_aresetn;
-	input 				s00_axi_aclk;
-
 	input [5:0] 		s00_axi_awaddr;
 	input [2:0]			s00_axi_awprot;
 	input 				s00_axi_awvalid;
@@ -259,8 +256,8 @@ module axi_pvp_gen_v5
 
 	s00_axi_slv s00_axi_slv_i
 	(
-		.aclk			(s00_axi_aclk	 	),
-		.aresetn		(s00_axi_aresetn	),
+		.aclk			(s_axi_aclk	 	),
+		.aresetn		(s_axi_aresetn	),
 
 		// Write Address Channel.
 		.awaddr			(s00_axi_awaddr 	),
