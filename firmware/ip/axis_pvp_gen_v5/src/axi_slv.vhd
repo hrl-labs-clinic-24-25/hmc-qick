@@ -60,7 +60,10 @@ entity axi_slv is
 		DEMUX_0_REG 	: out std_logic_vector (4 downto 0);
 		DEMUX_1_REG 	: out std_logic_vector (4 downto 0);
 		DEMUX_2_REG 	: out std_logic_vector (4 downto 0);
-		DEMUX_3_REG 	: out std_logic_vector (4 downto 0)
+		DEMUX_3_REG 	: out std_logic_vector (4 downto 0);
+
+		CTRL_REG		: out std_logic_vector (3 downto 0);
+		MODE_REG		: out std_logic_vector (1 downto 0)
 	);
 end axi_slv;
 
@@ -542,6 +545,9 @@ begin
 	DEMUX_1_REG <= slv_reg11(4 downto 0);
 	DEMUX_2_REG <= slv_reg12(4 downto 0);
 	DEMUX_3_REG <= slv_reg13(4 downto 0);
+
+	CTRL_REG <= slv_reg14(3 downto 0);
+	MODE_REG <= slv_reg15(1 downto 0);
 
 end rtl;
 
