@@ -44,6 +44,8 @@ module axi_pvp_gen_v5
 		TRIGGER_AWG_REG, // trigger for AWG
 		select_mux,
 		done,
+		LDACN,
+		CLRN,
 		COPI,
 		SCK, // SPI Clock
 		CS // SPI Chip Select
@@ -89,7 +91,9 @@ module axi_pvp_gen_v5
 	output 			TRIGGER_AWG_REG; // trigger for AWG ** test that output registers don't cause net contention in Vivado (March 7)
 	output [4:0]  	select_mux;
 	output 			done;
-
+	
+	output 			LDACN; //  ldac bar
+	output			CLRN; // clear bar
 	output 			COPI;
 	output 			SCK; // SPI Clock
 	output 			CS; // SPI Chip Select
@@ -106,7 +110,6 @@ module axi_pvp_gen_v5
 
 	// Non AXI inputs
 	wire [28:0] CONFIG_REG;
-	wire TRIGGER_PVP_REG;
 
 	// starting value for the DACs
 	wire [19:0] START_VAL_0_REG;
@@ -118,7 +121,7 @@ module axi_pvp_gen_v5
 	wire [19:0] STEP_SIZE_REG;
 	wire [2:0]  NUM_DIMS_REG;
 	wire [9:0]  PVP_WIDTH_REG;
-	wire [15:0] DWELL_CYCLES_REG;         // at minimum, must be 50 * 4 cycles (200 cycles)
+	wire [31:0] DWELL_CYCLES_REG;         // at minimum, must be 50 * 4 cycles (200 cycles)
 	wire [15:0] CYCLES_TILL_READOUT_REG;
 
 	// Address for Demux to DACs
@@ -126,8 +129,14 @@ module axi_pvp_gen_v5
 	wire [4:0] DEMUX_1_REG;
 	wire [4:0] DEMUX_2_REG;
 	wire [4:0] DEMUX_3_REG;
+
+	////////////////////
+	// second subordinate
+	wire [3:0]	CTRL_REG;
+	wire [1:0]	MODE_REG; // 0; default pvp. 1: pvp up/down. 2. pvp spiral. 3. user controlled only (allows user to set LDAC)
+
 	wire 	   done;			 // trigger for SPI
-	wire trigger_spi_o;
+	wire 	   trigger_spi_o;
 
 
 	/**************/
@@ -179,7 +188,6 @@ module axi_pvp_gen_v5
 		.START_VAL_2_REG	(START_VAL_2_REG	),
 		.START_VAL_3_REG	(START_VAL_3_REG	),
 
-		.TRIGGER_PVP_REG	(TRIGGER_PVP_REG	),
 		.CONFIG_REG		    (CONFIG_REG		),
 
 		.DWELL_CYCLES_REG	(DWELL_CYCLES_REG	), 
@@ -192,6 +200,48 @@ module axi_pvp_gen_v5
 		.DEMUX_1_REG 		(DEMUX_1_REG),
 		.DEMUX_2_REG 		(DEMUX_2_REG),
 		.DEMUX_3_REG 		(DEMUX_3_REG)
+
+		// need to add in LDACN
+	);
+
+	s00_axi_slv s00_axi_slv_i
+	(
+		.aclk			(s_axi_aclk	 	),
+		.aresetn		(s_axi_aresetn	),
+
+		// Write Address Channel.
+		.awaddr			(s_axi_awaddr 	),
+		.awprot			(s_axi_awprot 	),
+		.awvalid		(s_axi_awvalid	),
+		.awready		(s_axi_awready	),
+
+		// Write Data Channel.
+		.wdata			(s_axi_wdata	),
+		.wstrb			(s_axi_wstrb	),
+		.wvalid			(s_axi_wvalid   ),
+		.wready			(s_axi_wready	),
+
+		// Write Response Channel.
+		.bresp			(s_axi_bresp	),
+		.bvalid			(s_axi_bvalid	),
+		.bready			(s_axi_bready	),
+
+		// Read Address Channel.
+		.araddr			(s_axi_araddr 	),
+		.arprot			(s_axi_arprot 	),
+		.arvalid		(s_axi_arvalid	),
+		.arready		(s_axi_arready	),
+
+		// Read Data Channel.
+		.rdata			(s_axi_rdata	),
+		.rresp			(s_axi_rresp	),
+		.rvalid			(s_axi_rvalid	),
+		.rready			(s_axi_rready	),
+
+		// Registers.
+		.CTRL_REG 			(CTRL_REG),
+		.MODE_REG		    (MODE_REG)
+
 	);
 
 
@@ -201,7 +251,6 @@ module axi_pvp_gen_v5
 				.rstn				(s_axi_aresetn),
 				.clk				(s_axi_aclk),
 
-				.TRIGGER_PVP_REG   	(TRIGGER_PVP_REG),
 				.CONFIG_REG			(CONFIG_REG),
 			
 				.START_VAL_0_REG 	(START_VAL_0_REG),
@@ -221,10 +270,15 @@ module axi_pvp_gen_v5
 				.DEMUX_2_REG		(DEMUX_2_REG),
 				.DEMUX_3_REG		(DEMUX_3_REG),
 
+				.CTRL_REG			(CTRL_REG),
+				.MODE_REG 			(MODE_REG),
+
 				.mosi_o				(mosi_output),
 				.select_mux			(select_mux), 
 				.readout_o			(TRIGGER_AWG_REG),
 				.trigger_spi_o 		(trigger_spi_o),
+				.ldacn				(LDACN),
+				.clrn				(CLRN),
 				.done 				(done)
 
 				

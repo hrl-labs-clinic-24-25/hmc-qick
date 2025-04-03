@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity axi_slv is
+entity s00_axi_slv is
 	Generic 
 	(
 		DATA_WIDTH	: integer	:= 32;
@@ -43,28 +43,12 @@ entity axi_slv is
 		rready			: in std_logic;
 
 		-- Registers.
-		START_VAL_0_REG 	: out std_logic_vector (19 downto 0);
-		START_VAL_1_REG 	: out std_logic_vector (19 downto 0);
-		START_VAL_2_REG 	: out std_logic_vector (19 downto 0);
-		START_VAL_3_REG 	: out std_logic_vector (19 downto 0);
-
-		CONFIG_REG     		: out std_logic_vector (28 downto 0);
-
-		DWELL_CYCLES_REG 	: out std_logic_vector (31 downto 0);
-		CYCLES_TILL_READOUT_REG : out std_logic_vector (15 downto 0);
-
-		STEP_SIZE_REG 	: out std_logic_vector (19 downto 0);
-		PVP_WIDTH_REG 	: out std_logic_vector (9 downto 0);
-		NUM_DIMS_REG 	: out std_logic_vector (2 downto 0);
-
-		DEMUX_0_REG 	: out std_logic_vector (4 downto 0);
-		DEMUX_1_REG 	: out std_logic_vector (4 downto 0);
-		DEMUX_2_REG 	: out std_logic_vector (4 downto 0);
-		DEMUX_3_REG 	: out std_logic_vector (4 downto 0)
+		CTRL_REG 	: out std_logic_vector (3 downto 0);
+		MODE_REG 	: out std_logic_vector (1 downto 0)
 	);
-end axi_slv;
+end s00_axi_slv;
 
-architecture rtl of axi_slv is
+architecture rtl of s00_axi_slv is
 
 	-- AXI4LITE signals
 	signal axi_awaddr	: std_logic_vector(ADDR_WIDTH-1 downto 0);
@@ -524,24 +508,8 @@ begin
 	-- Register Map.
 
 	-- Output Registers.
-	START_VAL_0_REG <= slv_reg0(19 downto 0);
-	START_VAL_1_REG <= slv_reg1(19 downto 0);
-	START_VAL_2_REG <= slv_reg2(19 downto 0);
-	START_VAL_3_REG <= slv_reg3(19 downto 0);
-
-	CONFIG_REG <= slv_reg4(28 downto 0);
-
-	DWELL_CYCLES_REG <= slv_reg5(31 downto 0);
-	CYCLES_TILL_READOUT_REG <= slv_reg6(15 downto 0);
-
-	STEP_SIZE_REG <= slv_reg7(19 downto 0);
-	PVP_WIDTH_REG <= slv_reg8(9 downto 0);
-	NUM_DIMS_REG <= slv_reg9(2 downto 0);
-
-	DEMUX_0_REG <= slv_reg10(4 downto 0);
-	DEMUX_1_REG <= slv_reg11(4 downto 0);
-	DEMUX_2_REG <= slv_reg12(4 downto 0);
-	DEMUX_3_REG <= slv_reg13(4 downto 0);
-
+	CTRL_REG <= slv_reg0(3 downto 0);
+	MODE_REG <= slv_reg1(1 downto 0);
+	
 end rtl;
 

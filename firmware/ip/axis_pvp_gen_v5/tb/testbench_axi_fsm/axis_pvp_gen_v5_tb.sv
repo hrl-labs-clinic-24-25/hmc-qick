@@ -10,14 +10,14 @@
 /**
 
 Based on the test bench in the corresponding video https://www.youtube.com/watch?v=qqI9QIkGFIQ 
-
-*/
+ 50535, 248615
+*/ 
 module axis_pvp_gen_v5_tb ();
 
     logic clk = 0;
     logic rstn;
 
-    localparam freq = 50.0e6;
+    localparam freq = 100.0e6;
     localparam clk_period = (1/freq)/1e-9;
 
     logic done;
