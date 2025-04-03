@@ -67,6 +67,8 @@ module axis_pvp_gen_v5_tb ();
     logic COPI;
     logic CS;
     logic SCK;
+    logic LDACN;
+    logic CLRN;
 
 
     logic [4:0] mux;
@@ -161,6 +163,8 @@ module axis_pvp_gen_v5_tb ();
 		.select_mux  (mux), // DAC demuxing set of 5 pins
         .COPI (COPI),
 		.SCK (SCK),
+		.LDACN (LDACN),
+		.CLRN (CLRN),
 		.CS (CS),
         .done (done)
     );

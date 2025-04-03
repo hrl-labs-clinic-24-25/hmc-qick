@@ -167,17 +167,17 @@ module pvp_fsm_gen
 	assign {ldacn_user, clrn_user, rstn_user, trigger_pvp} = CTRL_REG;
 	assign ldacn = (MODE_REG == 2'b11) ? ldacn_blip : ldacn_fsm;
 	assign reset = (rstn & ((MODE_REG == 2'b11) ? rstn_user : 1'b1)); // allows user to control reset if you're in MODE 3
+	assign clrn = (MODE_REG == 2'b11) ? clrn_user : 1'b1;
 
 	always @(posedge clk) begin
-		ldac_counter <= 0;
 		ldacn_blip <= 1;
 		if (~ldacn_user) begin
-			if (ldac_counter < HOLD_SIGNAL) begin
-				ldacn_blip <= 0;
-				ldac_counter <= ldac_counter + 1;
-			end else begin
+			if (  (curr_state == CONFIG_STATE) & ((dwell_counter < (DWELL_CYCLES_REG - HOLD_SIGNAL)) | (dwell_counter > DWELL_CYCLES_REG))  ) begin
 				ldacn_blip <= 1;
-				ldac_counter <= ldac_counter;
+			end else if ((curr_state == CONFIG_STATE) & (dwell_counter < DWELL_CYCLES_REG)) begin
+				ldacn_blip <= 0;
+			end else begin
+				ldacn_blip <= 0;
 			end
 		end
 	end
