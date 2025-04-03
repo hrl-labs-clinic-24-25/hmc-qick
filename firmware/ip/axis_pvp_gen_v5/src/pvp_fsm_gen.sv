@@ -102,8 +102,8 @@ module pvp_fsm_gen
 	/* Internal signals */
 	/********************/
 
-	parameter LOADING_SPI = 300;
-	parameter HOLD_SIGNAL = 50;
+	parameter LOADING_SPI = 400;
+	parameter HOLD_SIGNAL = 100;
 	
 	logic on_off;
 
@@ -243,7 +243,7 @@ module pvp_fsm_gen
 				end
 				CONFIG_STATE: begin
 					next_state <= CONFIG_STATE;
-					on_off <= ((dwell_counter >= 9) & (dwell_counter <= 13)) ? 1 : 0;
+					on_off <= ((dwell_counter >= 99) & (dwell_counter <= 116)) ? 1 : 0;
 
 					next_cycle <= 1;
 
@@ -297,7 +297,7 @@ module pvp_fsm_gen
 					past_done <= done;
 					next_cycle <= 1;
 
-					on_off <= ((dwell_counter >= 9) & (dwell_counter <= 16)) ? 1 : 0;
+					on_off <= ((dwell_counter >= 99) & (dwell_counter <= 116)) ? 1 : 0;
 
 					// cycle until dwell counter has been spent. If we're not at the top of the stack, return to stall
 					if ((dwell_counter == (LOADING_SPI-1)) & !top_0)      // inside DAC 1 loop
@@ -324,7 +324,7 @@ module pvp_fsm_gen
 					past_done <= done;
 					next_cycle <= 1;
 
-					on_off <= ((dwell_counter >= (LOADING_SPI-1)+10) & (dwell_counter <= (LOADING_SPI-1)+17)) ? 1 : 0;
+					on_off <= ((dwell_counter >= (LOADING_SPI-1)+100) & (dwell_counter <= (LOADING_SPI-1)+117)) ? 1 : 0;
 
 					// cycle until dwell counter has been spent. If we're not at the top of the stack, return to S_STALL
 
@@ -353,7 +353,7 @@ module pvp_fsm_gen
 					past_done <= done;
 					next_cycle <= 1;
 
-					on_off <= ((dwell_counter >= 2*(LOADING_SPI-1)+10) & (dwell_counter <= 2*(LOADING_SPI-1)+17)) ? 1 : 0;
+					on_off <= ((dwell_counter >= 2*(LOADING_SPI-1)+100) & (dwell_counter <= 2*(LOADING_SPI-1)+117)) ? 1 : 0;
 
 					// cycle until dwell counter has been spent. If we're not at the top of the stack, return to S_STALL
 
@@ -382,7 +382,7 @@ module pvp_fsm_gen
 					past_done <= done;
 					next_cycle <= 1;
 
-					on_off <= ((dwell_counter >= 3*(LOADING_SPI-1)+10) & (dwell_counter <= 3*(LOADING_SPI-1)+17)) ? 1 : 0;
+					on_off <= ((dwell_counter >= 3*(LOADING_SPI-1)+100) & (dwell_counter <= 3*(LOADING_SPI-1)+117)) ? 1 : 0;
 
 					// cycle until dwell counter has been spent. If we're not at the top of the stack, return to stall
 					if ((dwell_counter == ((LOADING_SPI-1)*4)) & top_3)   // inside DAC 1 loop
@@ -430,7 +430,7 @@ module pvp_fsm_gen
 
 	 // if all the DACs have all finished running, then we are done
 	assign wait_to_next_cycle = ((dwell_counter >= LOADING_SPI) & (dwell_counter < DWELL_CYCLES_REG)) ? 1 : 0; // if we're waiting for the next cycle to start
-	assign ldacn_fsm 	      = (curr_state != WAIT & wait_to_next_cycle & (dwell_counter > (DWELL_CYCLES_REG - HOLD_SIGNAL)) & (dwell_counter < DWELL_CYCLES_REG)) ? 1'b0 : 1'b1;
+	assign ldacn_fsm 	      = ((curr_state != WAIT & wait_to_next_cycle & (dwell_counter > (DWELL_CYCLES_REG - HOLD_SIGNAL)) & (dwell_counter < DWELL_CYCLES_REG) ) | ((curr_state == WAIT) & done)) ? 1'b0 : 1'b1;
 
 	no_mem_sweep_fsm 
 		
