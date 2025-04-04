@@ -167,23 +167,21 @@ module pvp_fsm_gen
 	// S_STALL  -- middle step between each DAC increment
 
 	assign {ldacn_user, clrn_user, rstn_user, trigger_pvp} = CTRL_REG;
-	assign ldacn =    (MODE_REG == 2'b11) ? ldacn_blip : ldacn_fsm;
+	assign ldacn = (MODE_REG == 2'b11) ? ldacn_blip : ldacn_fsm;
 	assign resetn = (((MODE_REG == 2'b11) ? rstn_user : 1'b1)); // allows user to control reset the DAC if you're in MODE 3
-	assign clrn =     (MODE_REG == 2'b11) ? clrn_user : 1'b1;
+	assign clrn = (MODE_REG == 2'b11) ? clrn_user : 1'b1;
 	
 
 	always @(posedge clk) begin
 		ldacn_blip <= 1;
 		if (~ldacn_user) begin
-			if (  (curr_state == CONFIG_STATE) & ((dwell_counter < (DWELL_CYCLES_REG - HOLD_SIGNAL)) | (dwell_counter > (DWELL_CYCLES_REG)))  ) begin
+			if (  (curr_state == CONFIG_STATE) & ((dwell_counter < (DWELL_CYCLES_REG - HOLD_SIGNAL)) | (dwell_counter > DWELL_CYCLES_REG))  ) begin
 				ldacn_blip <= 1;
 			end else if ((curr_state == CONFIG_STATE) & (dwell_counter < DWELL_CYCLES_REG)) begin
 				ldacn_blip <= 0;
 			end else begin
 				ldacn_blip <= 0;
 			end
-		end else begin
-			ldacn_blip <= 1;
 		end
 	end
 
@@ -250,7 +248,7 @@ module pvp_fsm_gen
 					next_cycle <= 1;
 
 					// configure the DACs
-					if (CONFIG_REG != 0 & dwell_counter < (DWELL_CYCLES_REG)) begin
+					if (CONFIG_REG != 0 & dwell_counter <= (DWELL_CYCLES_REG)) begin
 						dwell_counter <= dwell_counter + 1;
 						past_done <= 0;
 					end
@@ -431,10 +429,8 @@ module pvp_fsm_gen
 	assign done = past_done;
 
 	 // if all the DACs have all finished running, then we are done
-	assign wait_to_next_cycle = ((dwell_counter >= LOADING_SPI) & (dwell_counter <= (DWELL_CYCLES_REG+1))) ? 1 : 0; // if we're waiting for the next cycle to start
-
-	assign ldacn_fsm 	      = (((curr_state != WAIT) & (wait_to_next_cycle) & (dwell_counter > (DWELL_CYCLES_REG - HOLD_SIGNAL) & (dwell_counter <= (DWELL_CYCLES_REG +1)))) | ((curr_state == WAIT) & done)) ? 1'b0 : 1'b1;
-	//  | ((next_state == WAIT) & (done == 0) | ((curr_state == WAIT) & done))) ? 1'b0 : 1'b1;
+	assign wait_to_next_cycle = ((dwell_counter >= LOADING_SPI) & (dwell_counter < DWELL_CYCLES_REG)) ? 1 : 0; // if we're waiting for the next cycle to start
+	assign ldacn_fsm 	      = (curr_state != WAIT & wait_to_next_cycle & (dwell_counter > (DWELL_CYCLES_REG - HOLD_SIGNAL)) & (dwell_counter < DWELL_CYCLES_REG)) ? 1'b0 : 1'b1;
 
 	no_mem_sweep_fsm 
 		

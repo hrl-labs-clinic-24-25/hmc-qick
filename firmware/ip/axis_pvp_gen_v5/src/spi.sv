@@ -47,7 +47,7 @@ module spi
             divided_clk <= 0;
         end else begin
             if (counter_div == 4'b11)  begin divided_clk <= ~divided_clk; counter_div <= 0; end
-            else                   begin divided_clk <=  divided_clk; counter_div <= counter_div + 1; end
+            else                       begin divided_clk <=  divided_clk; counter_div <= counter_div + 1; end
         end
     end
     
@@ -59,7 +59,7 @@ module spi
             counter <= 0;
             cs_o <= 1;
         end 
-        if (TRIGGER) begin // start the transmission
+        if (TRIGGER & (counter == 0)) begin // start the transmission
             sdo_o <= DATA_IN[23];
             counter <= 23;
             cs_o <= 0;
