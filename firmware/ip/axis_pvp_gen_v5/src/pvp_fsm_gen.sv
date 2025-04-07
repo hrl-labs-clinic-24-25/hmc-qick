@@ -55,7 +55,7 @@ module pvp_fsm_gen
 	/**************/
 	
 	// Define the states for the FSM
-	parameter WAIT = 4'b0000, CONFIG_STATE = 4'b0101, S_SEND_0 = 4'b0001, S_SEND_1 = 4'b0010, S_SEND_2 = 4'b0100, S_SEND_3 = 4'b1000, S_WAIT = 4'b1110, S_STALL = 4'b1101, NULL_STATE = 4'b1111;
+	parameter WAIT = 4'b0000, CONFIG_STATE = 4'b0101, S_SEND_0 = 4'b0001, S_SEND_1 = 4'b0010, S_SEND_2 = 4'b0100, S_SEND_3 = 4'b1000, S_STALL = 4'b1101, NULL_STATE = 4'b1111;
 
 	/*********/
 	/* Ports */
@@ -102,8 +102,8 @@ module pvp_fsm_gen
 	/* Internal signals */
 	/********************/
 
-	parameter LOADING_SPI = 400;
-	parameter HOLD_SIGNAL = 100;
+	parameter LOADING_SPI = 9'd400;
+	parameter HOLD_SIGNAL = 9'd100;
 	
 	logic on_off;
 
@@ -149,10 +149,12 @@ module pvp_fsm_gen
 	logic [31:0] next_mosi;
 
 	logic wait_to_next_cycle;
-	logic first_cycle, next_cycle;           // used for ldacn: confirms that we haven't just entered fsm from WAIT
 
 	logic [31:0] ldac_counter;
 	logic 		 ldacn_blip;
+
+	logic        last_0, last_1, last_2, last_3; // when the last number we reached was at the top of 0, 1, 2, or 3, we raise this flag.
+	logic		 init_load; // used to set all the DACs to their starting values at the beginning of the FSM
 
 	/***************/
 	/* FSM Machine */
@@ -167,23 +169,11 @@ module pvp_fsm_gen
 	// S_STALL  -- middle step between each DAC increment
 
 	assign {ldacn_user, clrn_user, rstn_user, trigger_pvp} = CTRL_REG;
-	assign ldacn = (MODE_REG == 2'b11) ? ldacn_blip : ldacn_fsm;
+	assign ldacn = (MODE_REG == 2'b11) ? ldacn_user : ldacn_fsm;
 	assign resetn = (((MODE_REG == 2'b11) ? rstn_user : 1'b1)); // allows user to control reset the DAC if you're in MODE 3
 	assign clrn = (MODE_REG == 2'b11) ? clrn_user : 1'b1;
-	
 
-	always @(posedge clk) begin
-		ldacn_blip <= 1;
-		if (~ldacn_user) begin
-			if (  (curr_state == CONFIG_STATE) & ((dwell_counter < (DWELL_CYCLES_REG - HOLD_SIGNAL)) | (dwell_counter > DWELL_CYCLES_REG))  ) begin
-				ldacn_blip <= 1;
-			end else if ((curr_state == CONFIG_STATE) & (dwell_counter < DWELL_CYCLES_REG)) begin
-				ldacn_blip <= 0;
-			end else begin
-				ldacn_blip <= 0;
-			end
-		end
-	end
+	
 
 	// FINITE STATE MACHINE
 	always @(posedge clk) begin
@@ -192,6 +182,13 @@ module pvp_fsm_gen
 		rstn_2 <= 1;
 		rstn_1 <= 1;
 		rstn_0 <= 1;
+		init_load <= init_load;
+
+		last_0 <= last_0;
+		last_1 <= last_1;
+		last_2 <= last_2;
+		last_3 <= last_3;
+
 		dwell_counter <= dwell_counter;
 		next_mosi <= ((curr_state==S_STALL) | (dwell_counter==0)) ? past_mosi   : ((curr_state==CONFIG_STATE) & dwell_counter>0) ? CONFIG_REG[23:0] : ((curr_state==S_SEND_0) & dwell_counter>0) ? mosi_0 : (curr_state==S_SEND_1) ? mosi_1                : (curr_state==S_SEND_2) ? mosi_2 			   : (curr_state==S_SEND_3) ? mosi_3 				: 0;
 	
@@ -202,6 +199,11 @@ module pvp_fsm_gen
 			next_state 	<= WAIT;
 			past_mosi <= 0;
 			past_select_mux <= 0;
+
+			last_0 <= 0;
+			last_1 <= 0;
+			last_2 <= 0;
+			last_3 <= 0;
 
 			dwell_counter <= 0;
 		end 
@@ -219,9 +221,14 @@ module pvp_fsm_gen
 					past_select_mux	  <= 0;
 
 					past_done <= done;
-					next_cycle <= 0;
 
-					
+					init_load <= 1; // if the first value isn't loaded yet, we need to go through every dimension of the SPI to set their starting value
+
+					last_0 <= 0;
+					last_1 <= 0;
+					last_2 <= 0;
+					last_3 <= 0;
+
 					/////////////////////////
 					/// NEXT STATE LOGIC ////
 					/////////////////////////
@@ -245,8 +252,6 @@ module pvp_fsm_gen
 					next_state <= CONFIG_STATE;
 					on_off <= ((dwell_counter >= 99) & (dwell_counter <= 116)) ? 1 : 0;
 
-					next_cycle <= 1;
-
 					// configure the DACs
 					if (CONFIG_REG != 0 & dwell_counter <= (DWELL_CYCLES_REG)) begin
 						dwell_counter <= dwell_counter + 1;
@@ -267,8 +272,6 @@ module pvp_fsm_gen
 					rstn_0 <= 1;
 					past_done <= done;
 
-					next_cycle <= 0;
-
 					 // will only load the next DACs if the trigger_pvp is still 1 (i.e. gives user control to stop partway through the pvp generation)
 					if (trigger_pvp & !done)
 						if (wait_to_next_cycle) begin
@@ -279,8 +282,18 @@ module pvp_fsm_gen
 							dwell_counter <= 0;
 						end
 					else begin
-						next_state <= S_STALL;
-						dwell_counter <= dwell_counter;
+						if (trigger_pvp != 1) begin
+							next_state <= S_STALL;
+							dwell_counter <= dwell_counter;
+						end else begin
+							if (wait_to_next_cycle) begin
+								next_state <= S_STALL;
+								dwell_counter <= dwell_counter + 1;
+							end else begin
+								next_state <= WAIT;
+								dwell_counter <= dwell_counter;
+							end
+						end
 					end
 
 					past_mosi   <= mosi_o;
@@ -295,21 +308,24 @@ module pvp_fsm_gen
 					dwell_counter <= dwell_counter + 1; 
 
 					past_done <= done;
-					next_cycle <= 1;
+
+					if (NUM_DIMS_REG == 1) init_load <= 0;
 
 					on_off <= ((dwell_counter >= 99) & (dwell_counter <= 116)) ? 1 : 0;
 
 					// cycle until dwell counter has been spent. If we're not at the top of the stack, return to stall
 					if ((dwell_counter == (LOADING_SPI-1)) & !top_0)      // inside DAC 1 loop
 					begin 
-						next_state <= S_STALL; 
+						if ((last_0 == 1) | (init_load & (NUM_DIMS_REG > 1))) next_state <= S_SEND_1;  // the previous DAC was at the top of the DAC0 stack, which means that we can go to the next DAC now
+						else 			   next_state <= S_STALL; 
 					end
-					else if ((dwell_counter == (LOADING_SPI-1)) & top_0)  // if we've' gone full through list, go to next DAC
-					begin 
-						if (NUM_DIMS_REG == 1) next_state <= WAIT;
-						else next_state <= S_SEND_1;
+					else if ((dwell_counter == (LOADING_SPI-1)) & top_0)  // if we've' gone full through list, set up to go to next DAC
+					begin
+						next_state <= S_STALL;
+						last_0 <= 1;
 
-						if (NUM_DIMS_REG == 1) past_done <= 1;
+						if (NUM_DIMS_REG == 1) begin past_done <= 1; end
+						
 						rstn_0 <= 0; 
 					end 
 
@@ -321,8 +337,11 @@ module pvp_fsm_gen
 					past_select_mux <= select_mux;
 					dwell_counter <= dwell_counter + 1; 
 
+					last_0 <= 0;
+
 					past_done <= done;
-					next_cycle <= 1;
+					
+					if (NUM_DIMS_REG == 2) init_load <= 0;
 
 					on_off <= ((dwell_counter >= (LOADING_SPI-1)+100) & (dwell_counter <= (LOADING_SPI-1)+117)) ? 1 : 0;
 
@@ -330,15 +349,15 @@ module pvp_fsm_gen
 
 					if ((dwell_counter == ((LOADING_SPI-1)*2)) & !top_1)      // inside DAC 1 loop
 					begin
-						next_state <= S_STALL; 
+						if (last_1 == 1 | (init_load & (NUM_DIMS_REG > 2))) next_state <= S_SEND_2;  // the previous DAC was at the top of the DAC0 stack, which means that we can go to the next DAC now
+						else 			 next_state <= S_STALL; 
 					end 
 					else if ((dwell_counter == (LOADING_SPI-1)*2) & top_1)  // if we've' gone full through list, go to next DAC
 					begin 
-						if (NUM_DIMS_REG == 2) next_state <= WAIT;
-						else 				   next_state <= S_SEND_2; 
+						next_state <= S_STALL;
+						last_1 <= 1;
 
-
-						if (NUM_DIMS_REG == 2) past_done <= 1;
+						if (NUM_DIMS_REG == 2) begin past_done <= 1; end
 						rstn_1 <= 0; 
 					end
 
@@ -351,7 +370,10 @@ module pvp_fsm_gen
 					dwell_counter <= dwell_counter + 1;
 
 					past_done <= done;
-					next_cycle <= 1;
+					
+					if (NUM_DIMS_REG == 3) init_load <= 0;
+
+					last_1 <= 0;
 
 					on_off <= ((dwell_counter >= 2*(LOADING_SPI-1)+100) & (dwell_counter <= 2*(LOADING_SPI-1)+117)) ? 1 : 0;
 
@@ -359,15 +381,15 @@ module pvp_fsm_gen
 
 					if ((dwell_counter == ((LOADING_SPI-1)*3)) & !top_2)    // inside DAC 1 loop  
 					begin
-						next_state <= S_STALL; 
+						if (last_2 == 1 | (init_load & (NUM_DIMS_REG > 3))) next_state <= S_SEND_3;  // the previous DAC was at the top of the DAC0 stack, which means that we can go to the next DAC now
+						else 			 next_state <= S_STALL; 
 					end 
 					else if ((dwell_counter == ((LOADING_SPI-1)*3)) & top_2)   // if we've' gone full through list, go to next DAC
 					begin
-						if (NUM_DIMS_REG < 4) next_state <= WAIT;
-						else next_state <= S_SEND_3; 
+						next_state <= S_STALL;
+						last_2 <= 1;
 
-
-						if (NUM_DIMS_REG == 3) past_done <= 1;
+						if (NUM_DIMS_REG == 3) begin past_done <= 1; end
 						rstn_2 <= 0; 
 					end
 
@@ -380,21 +402,24 @@ module pvp_fsm_gen
 					dwell_counter <= dwell_counter + 1; 
 
 					past_done <= done;
-					next_cycle <= 1;
+					
+					if (NUM_DIMS_REG == 4) init_load <= 0;
+
+					last_2 <= 0;
 
 					on_off <= ((dwell_counter >= 3*(LOADING_SPI-1)+100) & (dwell_counter <= 3*(LOADING_SPI-1)+117)) ? 1 : 0;
 
 					// cycle until dwell counter has been spent. If we're not at the top of the stack, return to stall
-					if ((dwell_counter == ((LOADING_SPI-1)*4)) & top_3)   // inside DAC 1 loop
-					begin 
-						next_state <= WAIT; 
-						rstn_3 <= 0; 
-						past_done <= 1;
-					end 
-					else if ((dwell_counter == ((LOADING_SPI-1)*4)) & !top_3)    
+					if ((dwell_counter == ((LOADING_SPI-1)*4)) & !top_3)    
 					begin
 						next_state <= S_STALL; 
-						past_done <= 0;
+					end 
+					else if ((dwell_counter == ((LOADING_SPI-1)*4)) & top_3)   // inside DAC 1 loop
+					begin 
+						next_state <= S_STALL;
+						last_3 <= 1;
+						past_done <= 1;
+						rstn_3 <= 0; 
 					end 
 
 				end
@@ -430,7 +455,7 @@ module pvp_fsm_gen
 
 	 // if all the DACs have all finished running, then we are done
 	assign wait_to_next_cycle = ((dwell_counter >= LOADING_SPI) & (dwell_counter < DWELL_CYCLES_REG)) ? 1 : 0; // if we're waiting for the next cycle to start
-	assign ldacn_fsm 	      = (curr_state != WAIT & wait_to_next_cycle & (dwell_counter > (DWELL_CYCLES_REG - HOLD_SIGNAL)) & (dwell_counter < DWELL_CYCLES_REG)) ? 1'b0 : 1'b1;
+	assign ldacn_fsm 	      = ((curr_state != WAIT) & wait_to_next_cycle & (dwell_counter > (DWELL_CYCLES_REG - HOLD_SIGNAL)) & (dwell_counter < DWELL_CYCLES_REG)) ? 1'b0 : 1'b1;
 
 	no_mem_sweep_fsm 
 		

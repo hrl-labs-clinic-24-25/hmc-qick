@@ -34,7 +34,7 @@ module spi
     * Internal Logic
     */
     logic [7:0] counter; // 8 bit counter, 0 to 32
-    logic [3:0] counter_div; // 4 bit counter for dividing the clock
+    logic [1:0] counter_div; // 4 bit counter for dividing the clock
 
     logic divided_clk;
 
@@ -46,7 +46,7 @@ module spi
             counter_div <= 0;
             divided_clk <= 0;
         end else begin
-            if (counter_div == 4'b11)  begin divided_clk <= ~divided_clk; counter_div <= 0; end
+            if (counter_div == 2'b11)  begin divided_clk <= ~divided_clk; counter_div <= 0; end
             else                       begin divided_clk <=  divided_clk; counter_div <= counter_div + 1; end
         end
     end
