@@ -46,7 +46,7 @@ module spi
             counter_div <= 0;
             divided_clk <= 0;
         end else begin
-            if (counter_div == 2'b11)  begin divided_clk <= ~divided_clk; counter_div <= 0; end
+            if (counter_div == 2'b10)  begin divided_clk <= ~divided_clk; counter_div <= 0; end
             else                       begin divided_clk <=  divided_clk; counter_div <= counter_div + 1; end
         end
     end
