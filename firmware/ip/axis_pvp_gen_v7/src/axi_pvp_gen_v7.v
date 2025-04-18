@@ -40,10 +40,6 @@ module axi_pvp_gen_v7
 		s_axi_rvalid,
 		s_axi_rready,
 
-		s0_axis_tdata_o,
-		s0_axis_tvalid_o,
-		s0_axis_tready_i,
-
 		// Non AXI-LITE 
 		TRIGGER_AWG_REG, // trigger for AWG
 		select_mux,
@@ -93,12 +89,6 @@ module axi_pvp_gen_v7
 	output [1:0]		s_axi_rresp;
 	output 				s_axi_rvalid;
 	input 				s_axi_rready;
-
-	// s0 for controlling FSM data loading
-
-	input [31:0]		s0_axis_tdata_o;
-	input 				s0_axis_tvalid_o;
-	output 				s0_axis_tready_i;
 
 	// Non AXI-LITE outputs
 	output 			TRIGGER_AWG_REG; // trigger for AWG ** test that output registers don't cause net contention in Vivado (March 7)
