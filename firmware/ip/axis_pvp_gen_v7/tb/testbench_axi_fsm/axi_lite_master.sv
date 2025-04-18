@@ -16,7 +16,7 @@
 
 module axi_lite_master
   #(
-    parameter integer AXI_ADDR_WIDTH = 6,
+    parameter integer AXI_ADDR_WIDTH = 7,
     parameter integer AXI_DATA_WIDTH = 32
     )
    (

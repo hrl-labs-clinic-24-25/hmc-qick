@@ -1,6 +1,6 @@
 /***
   no_mem_sweep is a deterministic module that counts up from a given start value in increments of the given step value for 
-  a given number of cycles. it formats the output as the 32 bit commands that will be sent via SPI to a given DAC.
+  a given number of cycles. it formats the output as the 24 bit commands that will be sent via SPI to a given DAC.
 
   no_mem_sweep_tb is a testbench to test the operation of the above module
 
@@ -11,76 +11,109 @@
   @author: Cameron Hernandez
         cahernandez@g.hmc.edu
   @version: 2/26/2025
-  
+
   @author: Zoe Worrall
         zworrall@g.hmc.edu
-  @vrsion: 3/4/2025
-
+  @version: 4/16/2025 -- edited slightly to integrate better with pvp_fsm, v7
+  
 */
 
 
 module no_mem_sweep_fsm
                     (
-                        start,
-                        step,
-                        clk,
-                        enable,
-                        rstn,
-                        top,
-                        // base,
-                        mosi,
-                        DEPTH
+                        input logic [9:0] DEPTH,
+
+                        input logic clk, rstn, 
+                        input logic [19:0] start, 
+                        input logic [18:0] step,
+                        input logic [7:0] index, //index for sweep
+                        input logic enable, direction,
+                        input logic [1:0] mode,
+
+                        output logic [31:0] mosi,
+                        output logic top, base
                     );
 
-/**
-* Input Logic
-*/
-input [19:0] start;
-input [19:0] step;
-input clk, enable, rstn;
-output top; //, base;
-output [31:0] mosi;
-input [9:0] DEPTH;
+    parameter [3:0] start_bits = 4'b0001;
+    logic [7:0] counter;
+    logic [19:0] curr_val, next_val, top_val, base_val;
+    logic [19:0] potential_val;
 
-parameter [3:0] start_bits = 4'b0001;
-
-logic [7:0]  counter;
-logic [19:0] curr_val, next_val;
-
-always @(posedge clk) begin
-    if (~rstn) begin
-        curr_val <= 0;
-        counter  <= 0;
+    // Compute boundaries based on mode.
+    // For mode 2 ("Spiral"), adjust the boundaries using 'index'.
+    // For other modes, use fixed boundaries.
+    always_comb begin
+        if (mode == 2) begin
+            base_val = start + (index * step);
+            top_val  = start + ((DEPTH - index) * step);
+        end else begin
+            base_val = start;
+            top_val  = start + ((DEPTH) * step);
+        end
     end
-    else if (enable) begin
-        if (counter < DEPTH) begin
-            curr_val <= next_val;
-            counter <= counter + 1;
-        end
-        else begin
-            curr_val <= curr_val;
-            counter <= counter; //freeze counter so that it doesn't overflow and restart the sweep
-        end
-    end 
-end
 
-assign next_val = start + step*counter;
-assign mosi = {start_bits, curr_val};     // start_bits is 4, curr_val is 20 bits
-assign top = (curr_val == (start + (DEPTH-1)*step)); // indicate 1 before top (works with FSM)
-// assign base = (curr_val == start);
+    // Compute the potential next value (without boundary checks).
+    assign next_val = direction ? (curr_val + {1'b0, step}) : (curr_val - {1'b0, step});
 
+    always_ff @(posedge clk) begin
+        if (~rstn) begin
+            curr_val <= base_val;
+            counter <= 0;
+        end
+        else if (enable) begin
+            case (mode)
+                2'b10: begin //"Spiral" increment mode
+
+                    if (direction && (curr_val < top_val)) begin
+                        curr_val <= next_val;
+                        counter <= counter + 1;
+                    end 
+                    else if (!direction && (curr_val > base_val)) begin
+                        curr_val <= next_val;
+                        counter <= counter - 1;
+                    end
+                    else begin
+                        curr_val <= curr_val;
+                        counter <= counter; // Freeze counter to prevent overflow
+                    end
+                end
+                2'b01: begin // "Top-Bottom" increment mode
+                    if (direction == 1 && counter < DEPTH) begin
+                        curr_val <= next_val;
+                        counter <= counter + 1;
+                    end 
+                    else if (direction == 0 && counter > 0) begin
+                        curr_val <= next_val;
+                        counter <= counter - 1;
+                    end
+                end
+                2'b00: begin // Default mode (increment only)
+                    if (counter < DEPTH) begin
+                        curr_val <= next_val;
+                        counter <= counter + 1;
+                    end
+                end
+                default: begin
+                    // Handle unexpected mode values (optional)
+                end
+            endcase
+        end
+    end
+
+    assign mosi = ({{{2'h00}}, start_bits, curr_val});
+    assign top = (mode == 2)? ((curr_val == (start + (DEPTH-index)*step))) : (direction) ? (curr_val == (start + (DEPTH-1)*step)) : (curr_val == (start - (DEPTH-1)*step)); // indicate 1 before top (works with FSM)
+    assign base =(mode == 2)? ((curr_val == (start + index*step))) : ((curr_val == start));
 endmodule
 
 
 module no_mem_sweep_tb();
-    logic rstn;
-    logic clk;
-    logic enable;
+    logic rstn, clk, enable;
     logic [19:0] start, step;
     logic [31:0] mosi;
+    logic [1:0] mode;
 
-    // test generation of 16 evenly spaced steps
-    no_mem_sweep #(16) dut ( .rstn(rstn), .clk(clk), .start(start), .step(step), .enable(enable), .mosi(mosi));
+    // test generation of 256 evenly spaced steps
+    no_mem_sweep #(4) dut (.rstn(rstn), .clk(clk), .start(start), .step(step), .enable(enable), .mode(mode), .mosi(mosi));
 
     // generate testbench clock
     always begin 
@@ -95,31 +128,42 @@ module no_mem_sweep_tb();
         step = 2;
 	    rstn = 0; 
         enable = 0;
+        mode = 1; //toggle between "Default" (mode = 0), "Top-Bottom" (mode = 1),"Sweep" (mode = 2) increment
         #12; 
         
         rstn = 1; 
 
-        //Test 1: enable is low, so mosi should remain unchanged
-        #10;
-        $display("Test 1, enalbe is off, mosi value is = %d", mosi);
+        $display("MOSI STARTING VALUE IS:", mosi);
 
-        //Test 2: enable is now high, so mosi should change
+        if (mode == 0)begin
+            $display("Default mode (increment only)");
+        end
+        else if (mode == 1)begin
+            $display("Testing Top-Bottom mode");
+        end
+        else begin
+            $display("Testing Spiral mode");
+        end
+
         enable = 1;
-        #10;
-        $display("Test 2, enable is on, mosi value is = %d", mosi);
 
-        //Test 3: enable is low, mosi should remain unchanged
-        enable = 0;
-        #10
-        $display("Test 3, enalbe is off, mosi value is = %d", mosi);
-
-        //Test 4: enable is now high, so mosi should change
-        enable = 1;
-        #10;
-        $display("Test 4, enable is on, mosi value is = %d", mosi);
-
-
+        #110; // Counter will hit the max (256) during this amount of delay time
+        $finish;
 	end
+
+    // Prints time, counter, current value, direciton, and mosi values every clock cycle
+    initial begin
+       if (mode == 0 | mode == 2)begin
+            // Prints time, counter, current value, direciton, and mosi values every clock cycle
+            $monitor("Time = %0t: counter = %d, curr_val = %d, mosi = %d",
+            $time, dut.counter, dut.curr_val, mosi);
+       end
+       else begin
+            // Prints time, counter, current value, direciton, and mosi values every clock cycle
+            $monitor("Time = %0t: counter = %d, curr_val = %d, direction = %d, mosi = %d",
+                $time, dut.counter, dut.curr_val, dut.direction, mosi);
+       end
+    end
 
     // apply test vectors on rising edge of clk 
     always @(posedge clk) 

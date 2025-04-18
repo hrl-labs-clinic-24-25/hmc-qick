@@ -70,7 +70,7 @@ module axi_pvp_gen_v7
 	input 				s_axi_aclk;
 	input 				s_axi_aresetn;
 
-	input [5:0] 		s_axi_awaddr;
+	input [6:0] 		s_axi_awaddr;
 	input [2:0]			s_axi_awprot;
 	input 				s_axi_awvalid;
 	output 				s_axi_awready;
@@ -84,7 +84,7 @@ module axi_pvp_gen_v7
 	output 				s_axi_bvalid;
 	input 			    s_axi_bready;
 
-	input [5:0]		    s_axi_araddr;
+	input [6:0]		    s_axi_araddr;
 	input [2:0]			s_axi_arprot;
 	input 				s_axi_arvalid;
 	output 				s_axi_arready;
@@ -124,7 +124,6 @@ module axi_pvp_gen_v7
 	wire [23:0] mosi_output;
 
 	// Non AXI inputs
-	wire [28:0] CONFIG_REG;
 
 	// starting value for the DACs
 	wire [19:0] START_VAL_0_REG;
@@ -132,25 +131,35 @@ module axi_pvp_gen_v7
 	wire [19:0] START_VAL_2_REG;
 	wire [19:0] START_VAL_3_REG;
 
-	// Adjust these to change PvP Plot
-	wire [19:0] STEP_SIZE_REG;
-	wire [2:0]  NUM_DIMS_REG;
-	wire [9:0]  PVP_WIDTH_REG;
-	wire [31:0] DWELL_CYCLES_REG;         // at minimum, must be 50 * 4 cycles (200 cycles)
-	wire [15:0] CYCLES_TILL_READOUT_REG;
+	// step size of each DAC
+	wire [19:0] STEP_SIZE_0_REG;
+	wire [19:0] STEP_SIZE_1_REG;
+	wire [19:0] STEP_SIZE_2_REG;
+	wire [19:0] STEP_SIZE_3_REG;
 
-	// Address for Demux to DACs
+	// Demux code for each DAC
 	wire [4:0] DEMUX_0_REG;
 	wire [4:0] DEMUX_1_REG;
 	wire [4:0] DEMUX_2_REG;
 	wire [4:0] DEMUX_3_REG;
 
-	////////////////////
-	// second subordinate        11       10        9      		8		  7:6	   5:4		3:2		1:0
-	wire [11:0]	CTRL_REG;  // [ LDACN    CLRN     RSTN      TRIG_PVP     DAC0     DAC1     DAC2     DAC3 ]
-	assign test_timing = CTRL_REG[8]; // for oscilloscope use
+	// Group that the DAC belongs to
+	wire [1:0] DAC_0_GROUP_REG;
+	wire [1:0] DAC_1_GROUP_REG;
+	wire [1:0] DAC_2_GROUP_REG;
+	wire [1:0] DAC_3_GROUP_REG;
 
-	wire [1:0]	MODE_REG; // 0; default pvp. 1: pvp up/down. 2. pvp spiral. 3. user controlled only (allows user to set LDAC)
+	// configurations for DACs
+	wire [3:0]  CTRL_REG; // [ ldacn, rstn, clrn, trigger_pvp ]
+	wire [1:0]  MODE_REG; // 0; default pvp. 1: pvp up/down. 2. pvp spiral. 3. user controlled only (allows user to set LDAC)
+	wire [28:0] CONFIG_REG; // [ demux value + 24 bits to a DAC ]
+
+	wire [31:0] DWELL_CYCLES_REG; // time to wait till next SPI signal loaded
+	wire [15:0] CYCLES_TILL_READOUT_REG; // time to wait until allowed to start "reading" (when implemented with AWGs)
+	wire [9:0]  PVP_WIDTH_REG; // square plot width
+	wire [2:0]  NUM_DIMS_REG; // how many DACs are in use (0 - 4)
+	
+	assign test_timing = CTRL_REG[8]; // for oscilloscope use
 
 	wire 	   done;			 // trigger for SPI
 	wire 	   trigger_spi_o;
@@ -200,27 +209,35 @@ module axi_pvp_gen_v7
 		.rready			(s_axi_rready	),
 
 		// Registers.
-		.START_VAL_0_REG	(START_VAL_0_REG	),
-		.START_VAL_1_REG	(START_VAL_1_REG	),
-		.START_VAL_2_REG	(START_VAL_2_REG	),
-		.START_VAL_3_REG	(START_VAL_3_REG	),
+		
+		.START_VAL_0_REG  (START_VAL_0_REG),
+		.START_VAL_1_REG  (START_VAL_1_REG),
+		.START_VAL_2_REG  (START_VAL_2_REG),
+		.START_VAL_3_REG  (START_VAL_3_REG),
 
-		.CONFIG_REG		    (CONFIG_REG		),
+		.STEP_SIZE_0_REG  (STEP_SIZE_0_REG),
+		.STEP_SIZE_1_REG  (STEP_SIZE_1_REG),
+		.STEP_SIZE_2_REG  (STEP_SIZE_2_REG),
+		.STEP_SIZE_3_REG  (STEP_SIZE_3_REG),
 
-		.DWELL_CYCLES_REG	(DWELL_CYCLES_REG	), 
+		.DEMUX_0_REG 	  (DEMUX_0_REG),
+		.DEMUX_1_REG 	  (DEMUX_1_REG),
+		.DEMUX_2_REG 	  (DEMUX_2_REG),
+		.DEMUX_3_REG 	  (DEMUX_3_REG),
+
+		.DAC_0_GROUP_REG  (DAC_0_GROUP_REG),
+		.DAC_1_GROUP_REG  (DAC_1_GROUP_REG),
+		.DAC_2_GROUP_REG  (DAC_2_GROUP_REG),
+		.DAC_3_GROUP_REG  (DAC_3_GROUP_REG),
+
+		.CTRL_REG  		  (CTRL_REG),
+		.MODE_REG		  (MODE_REG),
+		.CONFIG_REG       (CONFIG_REG),
+
+		.DWELL_CYCLES_REG 		(DWELL_CYCLES_REG),
 		.CYCLES_TILL_READOUT_REG (CYCLES_TILL_READOUT_REG),
-		.STEP_SIZE_REG		(STEP_SIZE_REG	),
-		.PVP_WIDTH_REG		(PVP_WIDTH_REG), 
-		.NUM_DIMS_REG 		(NUM_DIMS_REG),
-
-		.DEMUX_0_REG 		(DEMUX_0_REG),
-		.DEMUX_1_REG 		(DEMUX_1_REG),
-		.DEMUX_2_REG 		(DEMUX_2_REG),
-		.DEMUX_3_REG 		(DEMUX_3_REG),
-
-		.CTRL_REG 			(CTRL_REG),
-		.MODE_REG		    (MODE_REG)
-
+		.PVP_WIDTH_REG 			(PVP_WIDTH_REG),
+		.NUM_DIMS_REG 			(NUM_DIMS_REG)
 		// need to add in LDACN
 	);
 
@@ -267,14 +284,23 @@ module axi_pvp_gen_v7
 				.DWELL_CYCLES_REG		 (DWELL_CYCLES_REG),
 				.CYCLES_TILL_READOUT_REG (CYCLES_TILL_READOUT_REG),
 
-				.STEP_SIZE_REG      (STEP_SIZE_REG),
-				.PVP_WIDTH_REG      (PVP_WIDTH_REG),
-				.NUM_DIMS_REG 		(NUM_DIMS_REG),
+				.STEP_SIZE_0_REG      (STEP_SIZE_0_REG),
+				.STEP_SIZE_1_REG      (STEP_SIZE_1_REG),
+				.STEP_SIZE_2_REG      (STEP_SIZE_2_REG),
+				.STEP_SIZE_3_REG      (STEP_SIZE_3_REG),
 
 				.DEMUX_0_REG		(DEMUX_0_REG),
 				.DEMUX_1_REG		(DEMUX_1_REG),
 				.DEMUX_2_REG		(DEMUX_2_REG),
 				.DEMUX_3_REG		(DEMUX_3_REG),
+
+				.DAC_0_GROUP_REG		(DAC_0_GROUP_REG),
+				.DAC_1_GROUP_REG		(DAC_1_GROUP_REG),
+				.DAC_2_GROUP_REG		(DAC_2_GROUP_REG),
+				.DAC_3_GROUP_REG        (DAC_3_GROUP_REG),
+
+				.PVP_WIDTH_REG      (PVP_WIDTH_REG),
+				.NUM_DIMS_REG 		(NUM_DIMS_REG),
 
 				.CTRL_REG			(CTRL_REG),
 				.MODE_REG 			(MODE_REG),

@@ -31,17 +31,26 @@ module pvp_fsm_gen
 		START_VAL_2_REG,
 		START_VAL_3_REG,
 
-		DWELL_CYCLES_REG,        // the number of clock cycles to wait before moving to next DAC. LOADING_SPI > 50
-		CYCLES_TILL_READOUT_REG, // the number of clock cycles until AWG can be run
-
-		STEP_SIZE_REG,
-		PVP_WIDTH_REG,  // ** change to PVP_WIDTH
-		NUM_DIMS_REG,
+		STEP_SIZE_0_REG,
+		STEP_SIZE_1_REG,
+		STEP_SIZE_2_REG,
+		STEP_SIZE_3_REG,
 
 		DEMUX_0_REG,
 		DEMUX_1_REG,
 		DEMUX_2_REG,
 		DEMUX_3_REG,
+
+		DAC_0_GROUP_REG,
+		DAC_1_GROUP_REG,
+		DAC_2_GROUP_REG,
+		DAC_3_GROUP_REG,
+
+		DWELL_CYCLES_REG,        // the number of clock cycles to wait before moving to next DAC. LOADING_SPI > 50
+		CYCLES_TILL_READOUT_REG, // the number of clock cycles until AWG can be run
+
+		PVP_WIDTH_REG,  // ** change to PVP_WIDTH
+		NUM_DIMS_REG,
 
 		CTRL_REG,
 		MODE_REG,
@@ -76,23 +85,32 @@ module pvp_fsm_gen
 	input [19:0] START_VAL_2_REG;
 	input [19:0] START_VAL_3_REG;
 
-	// assume that CYCLES_TILL_READOUT_REG is less than LOADING_SPI
-	input [31:0] DWELL_CYCLES_REG;
-	input [15:0] CYCLES_TILL_READOUT_REG; // the number of clock cycles until AWG can be run
-
-	input [19:0] STEP_SIZE_REG;
-	input [9:0]  PVP_WIDTH_REG;
-	input [2:0]  NUM_DIMS_REG;
+	input [19:0] STEP_SIZE_0_REG;
+	input [19:0] STEP_SIZE_1_REG;
+	input [19:0] STEP_SIZE_2_REG;
+	input [19:0] STEP_SIZE_3_REG;
 
 	input [4:0]  DEMUX_0_REG;
 	input [4:0]  DEMUX_1_REG;
 	input [4:0]  DEMUX_2_REG;
 	input [4:0]  DEMUX_3_REG;
 
+	input [1:0]  DAC_0_GROUP_REG;
+	input [1:0]  DAC_1_GROUP_REG;
+	input [1:0]  DAC_2_GROUP_REG;
+	input [1:0]  DAC_3_GROUP_REG;
+
+	// assume that CYCLES_TILL_READOUT_REG is less than LOADING_SPI
+	input [31:0] DWELL_CYCLES_REG;
+	input [15:0] CYCLES_TILL_READOUT_REG; // the number of clock cycles until AWG can be run
+
+	input [9:0]  PVP_WIDTH_REG;
+	input [2:0]  NUM_DIMS_REG;
+
+
 	input [28:0] CONFIG_REG; // for configuring the DACs: [28:24] is demux value, [23:0] is the SPI message. won't run unless its != 0
 
-			               //   1      1     1       1              2          2           2          2        = 12 bits
-	input  [11:0] CTRL_REG; // [LDACN, CLRN, RSTN, TRIGGER_PVP, DAC0_Group, DAC1_Group, DAC2_Group, DAC3_Group]
+	input  [3:0] CTRL_REG; // [LDACN, CLRN, RSTN, TRIGGER_PVP]
 	input  [1:0] MODE_REG;
 
 	output [23:0] mosi_o;  // could potentially be reduced to 24
@@ -130,10 +148,10 @@ module pvp_fsm_gen
 	logic		 top_2;
 	logic 		 top_3;
 
-	// logic 		 base_0;
-	// logic		 base_1;
-	// logic 		 base_2;
-	// logic 		 base_3;
+	logic 		 base_0;
+	logic		 base_1;
+	logic 		 base_2;
+	logic 		 base_3;
 
 	logic 		 dac0_en;
 	logic 		 dac1_en;
@@ -204,7 +222,13 @@ module pvp_fsm_gen
 	// S_SEND_3 -- send to DAC 3
 	// S_STALL  -- middle step between each DAC increment
 
-	assign {ldacn_user, clrn_user, rstn_user, trigger_pvp, dac_0_group, dac_1_group, dac_2_group, dac_3_group} = CTRL_REG;
+	assign {ldacn_user, clrn_user, rstn_user, trigger_pvp} = CTRL_REG;
+
+	assign dac_0_group = DAC_0_GROUP_REG;
+	assign dac_1_group = DAC_1_GROUP_REG;
+	assign dac_2_group = DAC_2_GROUP_REG;
+	assign dac_3_group = DAC_3_GROUP_REG;
+
 	assign ldacn = (MODE_REG == 2'b11) ? ldacn_user : ldacn_fsm;
 	assign resetn = (((MODE_REG == 2'b11) ? rstn_user : 1'b1)); // allows user to control reset the DAC if you're in MODE 3
 	assign clrn = (MODE_REG == 2'b11) ? clrn_user : 1'b1;
@@ -388,11 +412,11 @@ module pvp_fsm_gen
 						last_0 <= 1;
 
 						if ((NUM_DIMS_REG == 1) & (last_0)) begin past_done <= 1; end
-						
+
 						rstn_0 <= ~group0[3];
 						rstn_1 <= ~group0[2];
 						rstn_2 <= ~group0[1];
-						rstn_3 <= ~group0[0];
+						rstn_3 <= ~group0[0]; 
 					end 
 
 				end
@@ -513,15 +537,15 @@ module pvp_fsm_gen
 
 	// whether or not the DAC is enabled (i.e. move to the next step if enabled)
 	// If the DAC is in a group, then it will update when that group is enabled.
-	assign group_0_en = ((dwell_counter ==             0) & (curr_state == S_SEND_0)) | (curr_state == WAIT);
-	assign group_1_en = ((dwell_counter ==   LOADING_SPI*number_group_0) & (curr_state == S_SEND_1)) | (curr_state == WAIT);
-	assign group_2_en = ((dwell_counter ==   LOADING_SPI*(number_group_0+number_group_1)) & (curr_state == S_SEND_2)) | (curr_state == WAIT);
-	assign group_3_en = ((dwell_counter ==   LOADING_SPI*(number_group_0+number_group_1)) & (curr_state == S_SEND_3)) | (curr_state == WAIT);
+	assign group_0_en = ((dwell_counter ==             0) & (curr_state == S_SEND_0) & (~last_0)) | (curr_state == WAIT);
+	assign group_1_en = ((dwell_counter ==   LOADING_SPI*number_group_0) & (curr_state == S_SEND_1) & (~last_1)) | (curr_state == WAIT);
+	assign group_2_en = ((dwell_counter ==   LOADING_SPI*(number_group_0+number_group_1)) & (curr_state == S_SEND_2) & (~last_2)) | (curr_state == WAIT);
+	assign group_3_en = ((dwell_counter ==   LOADING_SPI*(number_group_0+number_group_1)) & (curr_state == S_SEND_3) & (~last_3)) | (curr_state == WAIT);
 
-	assign dac0_en = (dac_0_group == 2'b00) ? group_0_en : (dac_0_group == 2'b01) ? group_1_en : (dac_0_group == 2'b10) ? group_2_en : (dac_0_group == 2'b11) ? group_3_en : 0;
-	assign dac1_en = (dac_1_group == 2'b00) ? group_0_en : (dac_1_group == 2'b01) ? group_1_en : (dac_1_group == 2'b10) ? group_2_en : (dac_1_group == 2'b11) ? group_3_en : 0;
-	assign dac2_en = (dac_2_group == 2'b00) ? group_0_en : (dac_2_group == 2'b01) ? group_1_en : (dac_2_group == 2'b10) ? group_2_en : (dac_2_group == 2'b11) ? group_3_en : 0;
-	assign dac3_en = (dac_3_group == 2'b00) ? group_0_en : (dac_3_group == 2'b01) ? group_1_en : (dac_3_group == 2'b10) ? group_2_en : (dac_3_group == 2'b11) ? group_3_en : 0;
+	assign dac0_en = init_load ? 1'b0 : (dac_0_group == 2'b00) ? group_0_en : (dac_0_group == 2'b01) ? group_1_en : (dac_0_group == 2'b10) ? group_2_en : (dac_0_group == 2'b11) ? group_3_en : 0;
+	assign dac1_en = init_load ? 1'b0 : (dac_1_group == 2'b00) ? group_0_en : (dac_1_group == 2'b01) ? group_1_en : (dac_1_group == 2'b10) ? group_2_en : (dac_1_group == 2'b11) ? group_3_en : 0;
+	assign dac2_en = init_load ? 1'b0 : (dac_2_group == 2'b00) ? group_0_en : (dac_2_group == 2'b01) ? group_1_en : (dac_2_group == 2'b10) ? group_2_en : (dac_2_group == 2'b11) ? group_3_en : 0;
+	assign dac3_en = init_load ? 1'b0 : (dac_3_group == 2'b00) ? group_0_en : (dac_3_group == 2'b01) ? group_1_en : (dac_3_group == 2'b10) ? group_2_en : (dac_3_group == 2'b11) ? group_3_en : 0;
 
 	// assign the mosi and output for demuxing to DACs based on current state
 	assign mosi_o = next_mosi; //((curr_state==S_STALL) | (dwell_counter==0)) ? past_mosi   : ((curr_state==S_SEND_0) & dwell_counter>0) ? mosi_0 : (curr_state==S_SEND_1) ? mosi_1                : (curr_state==S_SEND_2) ? mosi_2 			   : (curr_state==S_SEND_3) ? mosi_3 				: 0;
@@ -541,14 +565,30 @@ module pvp_fsm_gen
 	assign wait_to_next_cycle = ((dwell_counter >= LOADING_SPI) & (dwell_counter < DWELL_CYCLES_REG)) ? 1 : 0; // if we're waiting for the next cycle to start
 	assign ldacn_fsm 	      = ((curr_state != WAIT) & wait_to_next_cycle & (dwell_counter > (DWELL_CYCLES_REG - HOLD_SIGNAL)) & (dwell_counter < DWELL_CYCLES_REG)) ? 1'b0 : 1'b1;
 
+/**
+parameter DEPTH = 256)
+                    (input logic [19:0] start, step,
+                    input logic [7:0] index, //index for sweep
+                    input logic clk, rstn, enable, direction,
+                    input logic [1:0] mode,
+                    output logic [31:0] mosi,
+                    output logic top, base
+*/
+
 	no_mem_sweep_fsm 
 		no_mem_sweep_0 (
 			.rstn		(rstn_0),
 			.clk		(clk),
+
 			.enable     (dac0_en),
+			.direction  ((STEP_SIZE_0_REG[19])),
+			.mode       (MODE_REG),
+			.index		(8'b0),
+
 			.start		(START_VAL_0_REG),
-			.step       (STEP_SIZE_REG),
-			// .base       (base_0),
+			.step       (STEP_SIZE_0_REG[18:0]),
+
+		    .base       (base_0),
 			.top        (top_0),
 			.mosi		(mosi_0),
 			.DEPTH	    (PVP_WIDTH_REG)
@@ -558,10 +598,16 @@ module pvp_fsm_gen
 		no_mem_sweep_1 (
 			.rstn		(rstn_1),
 			.clk		(clk),
+
 			.enable     (dac1_en),
+			.direction  ((STEP_SIZE_1_REG[19])),
+			.mode       (MODE_REG),
+			.index		(8'b0),
+
 			.start		(START_VAL_1_REG),
-			.step       (STEP_SIZE_REG),
-			// .base       (base_1),
+			.step       (STEP_SIZE_1_REG[18:0]),
+			
+			.base       (base_1),
 			.top        (top_1),
 			.mosi		(mosi_1),
 			.DEPTH	    (PVP_WIDTH_REG)
@@ -571,10 +617,16 @@ module pvp_fsm_gen
 		no_mem_sweep_2 (
 			.rstn		(rstn_2),
 			.clk		(clk),
+
 			.enable     (dac2_en),
+			.direction  ((STEP_SIZE_2_REG[19])),
+			.mode       (MODE_REG),
+			.index		(8'b0),
+
 			.start		(START_VAL_2_REG),
-			.step       (STEP_SIZE_REG),
-			// .base       (base_2),
+			.step       (STEP_SIZE_2_REG[18:0]),
+
+			.base       (base_2),
 			.top        (top_2),
 			.mosi		(mosi_2),
 			.DEPTH	    (PVP_WIDTH_REG)
@@ -584,10 +636,16 @@ module pvp_fsm_gen
 		no_mem_sweep_3 (
 			.rstn		(rstn_3),
 			.clk		(clk),
+
 			.enable     (dac3_en),
+			.direction  ((STEP_SIZE_3_REG[19])),
+			.mode       (MODE_REG),
+			.index		(8'b0),
+
 			.start		(START_VAL_3_REG),
-			.step       (STEP_SIZE_REG),
-			// .base       (base_3),
+			.step       (STEP_SIZE_3_REG[18:0]),
+
+			.base       (base_3),
 			.top        (top_3),
 			.mosi		(mosi_3),
 			.DEPTH	    (PVP_WIDTH_REG)

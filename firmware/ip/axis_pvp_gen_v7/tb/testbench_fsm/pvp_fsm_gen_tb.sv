@@ -19,6 +19,16 @@ module pvp_fsm_gen_tb ();
     logic [19:0] START_VAL_2_REG;
     logic [19:0] START_VAL_3_REG;
 
+    logic [19:0] STEP_SIZE_0_REG;
+    logic [19:0] STEP_SIZE_1_REG;
+    logic [19:0] STEP_SIZE_2_REG;
+    logic [19:0] STEP_SIZE_3_REG;
+
+    logic [1:0] DAC_0_GROUP_REG;
+    logic [1:0] DAC_1_GROUP_REG;
+    logic [1:0] DAC_2_GROUP_REG;
+    logic [1:0] DAC_3_GROUP_REG;
+
     logic [31:0] DWELL_CYCLES_REG;
     logic [15:0] CYCLES_TILL_READOUT_REG;
     logic [19:0] STEP_SIZE_REG;
@@ -32,7 +42,7 @@ module pvp_fsm_gen_tb ();
 
                             //   11       10        9      		8		  7:6	   5:4		3:2		1:0
 	                       // [ LDACN    CLRN     RSTN      TRIG_PVP     DAC0     DAC1     DAC2     DAC3 ]
-    logic [11:0] CTRL_REG;
+    logic [3:0] CTRL_REG;
     logic [1:0]  MODE_REG;
     logic [28:0] CONFIG_REG;
 
@@ -56,48 +66,56 @@ module pvp_fsm_gen_tb ();
         begin
 
             rstn = 0;
-            #100
+            #1000
             rstn = 1;
-            #100;
+            #1000;
 
             START_VAL_0_REG = 20'b0000_0000_0000_1111_0000;
             START_VAL_1_REG = 20'b0000_0000_1111_0000_0000;
             START_VAL_2_REG = 20'b0000_1111_0000_0000_0000;
             START_VAL_3_REG = 20'b1111_0000_0000_0000_0000;
+
+
+            STEP_SIZE_0_REG =  { 1'b1, 19'd1 };
+            STEP_SIZE_1_REG =  { 1'b0, 19'd1 };
+            STEP_SIZE_2_REG =  { 1'b0, 19'd1 };
+            STEP_SIZE_3_REG =  { 1'b0, 19'd1 };
             
-            DWELL_CYCLES_REG = 32'd50_00;
-            CYCLES_TILL_READOUT_REG = 16'd10;
-            STEP_SIZE_REG = 20'h0001;
-
-            PVP_WIDTH_REG = 3;
-            NUM_DIMS_REG = 2;
-
             DEMUX_0_REG = 5'b00001;
             DEMUX_1_REG = 5'b00010;
             DEMUX_2_REG = 5'b00100;
             DEMUX_3_REG = 5'b01000;
 
+            DAC_0_GROUP_REG = 2'b00;
+            DAC_1_GROUP_REG = 2'b01;
+            DAC_2_GROUP_REG = 2'b11;
+            DAC_3_GROUP_REG = 2'b11;
+
+            DWELL_CYCLES_REG = 32'd50_000;
+            CYCLES_TILL_READOUT_REG = 16'd10;
+            STEP_SIZE_REG = 1;
+
+            PVP_WIDTH_REG = 3;
+            NUM_DIMS_REG = 2;
+
+
             MODE_REG = 2'b00;
             CONFIG_REG = 29'b000_0_00_00_00_00_00_00_00_00;
-            CTRL_REG = 8'b0000_00_00_00_01;
+            CTRL_REG = 8'b0000;
 
-            #100;
+            #1000;
 
-            CTRL_REG = 8'b0000_00_00_01_01;
+            CTRL_REG = 4'b0001;
 
-            #100;
-
-            CTRL_REG[8] = 1;
-
-            for (int i = 0; i < 500000; i++) begin
+            while (CTRL_REG != 0) begin
                 #20;
-                if (done)  CTRL_REG[8] = 0;
+                if (done)  CTRL_REG[0] = 0;
             end
 
             // confirming that you can stop a trial while its running
-            CTRL_REG[8] = 0;
+            CTRL_REG[0] = 0;
             #10000;
-            CTRL_REG[8] = 1;
+            CTRL_REG[0] = 1;
             #10000;
         end
 
@@ -116,17 +134,27 @@ pvp_fsm_gen
 		.START_VAL_2_REG,
 		.START_VAL_3_REG,
 
-        .DWELL_CYCLES_REG,
-        .CYCLES_TILL_READOUT_REG,
+		.STEP_SIZE_0_REG,
+		.STEP_SIZE_1_REG,
+		.STEP_SIZE_2_REG,
+		.STEP_SIZE_3_REG,
 
-        .STEP_SIZE_REG,
-        .PVP_WIDTH_REG,
-        .NUM_DIMS_REG,
-        
 		.DEMUX_0_REG,
 		.DEMUX_1_REG,
 		.DEMUX_2_REG,
 		.DEMUX_3_REG,
+
+        .DAC_0_GROUP_REG,
+        .DAC_1_GROUP_REG,
+        .DAC_2_GROUP_REG,
+        .DAC_3_GROUP_REG,
+
+        .DWELL_CYCLES_REG,
+        .CYCLES_TILL_READOUT_REG,
+
+        .PVP_WIDTH_REG,
+        .NUM_DIMS_REG,
+        
 
         .CTRL_REG,
         .MODE_REG,
