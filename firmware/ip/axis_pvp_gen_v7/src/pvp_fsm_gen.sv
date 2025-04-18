@@ -403,7 +403,8 @@ module pvp_fsm_gen
 					// cycle until dwell counter has been spent. If we're not at the top of the stack, return to stall
 					if ((dwell_counter == number_group_0*(LOADING_SPI-1)) & !top_g0)      // inside DAC 1 loop
 					begin 
-						if ((last_0 == 1) | (init_load & (NUM_DIMS_REG > 1))) next_state <= S_SEND_1;  // the previous DAC was at the top of the DAC0 stack, which means that we can go to the next DAC now
+						if ((last_0 == 1) & (NUM_DIMS_REG == 1)) begin past_done <= 1; next_state <= WAIT; end
+						else if ((last_0 == 1) | (init_load & (NUM_DIMS_REG > 1))) next_state <= S_SEND_1;  // the previous DAC was at the top of the DAC0 stack, which means that we can go to the next DAC now
 						else 			   begin next_state <= S_STALL; init_load <= 0; end
 					end
 					else if ((dwell_counter == number_group_0*(LOADING_SPI-1)) & top_g0)  // if we've' gone full through list, set up to go to next DAC
@@ -439,7 +440,8 @@ module pvp_fsm_gen
 
 					if ((dwell_counter == ((number_group_0+number_group_1)*(LOADING_SPI-1))) & !top_g1)      // inside DAC 1 loop
 					begin
-						if (last_1 == 1 | (init_load & (NUM_DIMS_REG > 2))) next_state <= S_SEND_2;  // the previous DAC was at the top of the DAC0 stack, which means that we can go to the next DAC now
+						if ((last_1 == 1) & (NUM_DIMS_REG == 2)) begin past_done <= 1; next_state <= WAIT; end
+						else if (last_1 == 1 | (init_load & (NUM_DIMS_REG > 2))) next_state <= S_SEND_2;  // the previous DAC was at the top of the DAC0 stack, which means that we can go to the next DAC now
 						else 			   begin next_state <= S_STALL; init_load <= 0; end
 					end 
 					else if ((dwell_counter == (number_group_0+number_group_1)*(LOADING_SPI-1)) & top_g1)  // if we've' gone full through list, go to next DAC
@@ -474,7 +476,8 @@ module pvp_fsm_gen
 
 					if ((dwell_counter == ((number_group_0+number_group_1+number_group_2)*(LOADING_SPI-1))) & !top_g2)    // inside DAC 1 loop  
 					begin
-						if (last_2 == 1 | (init_load & (NUM_DIMS_REG > 3))) next_state <= S_SEND_3;  // the previous DAC was at the top of the DAC0 stack, which means that we can go to the next DAC now
+						if ((last_2 == 1) & (NUM_DIMS_REG == 3)) begin past_done <= 1; next_state <= WAIT; end
+						else if (last_2 == 1 | (init_load & (NUM_DIMS_REG > 3))) next_state <= S_SEND_3;  // the previous DAC was at the top of the DAC0 stack, which means that we can go to the next DAC now
 						else 			   begin next_state <= S_STALL; init_load <= 0; end
 					end 
 					else if ((dwell_counter == ((number_group_0+number_group_1+number_group_2)*(LOADING_SPI-1))) & top_g2)   // if we've' gone full through list, go to next DAC
@@ -505,15 +508,15 @@ module pvp_fsm_gen
 					on_off <= ((dwell_counter >= 3*(LOADING_SPI-1)+100) & (dwell_counter <= 3*(LOADING_SPI-1)+117)) ? 1 : 0;
 
 					// cycle until dwell counter has been spent. If we're not at the top of the stack, return to stall
-					if ((dwell_counter == ((number_group_0+number_group_1+number_group_2+number_group_3)*(LOADING_SPI-1)*4)) & !top_g3)    
+					if ((dwell_counter == ((number_group_0+number_group_1+number_group_2+number_group_3)*(LOADING_SPI-1))) & !top_g3)    
 					begin
-						next_state <= S_STALL; init_load <= 0;
+						if ((last_3 == 1) & (NUM_DIMS_REG == 4)) begin past_done <= 1; next_state <= WAIT; end
+						else 		begin next_state <= S_STALL; init_load <= 0; end
 					end 
-					else if ((dwell_counter == ((number_group_0+number_group_1+number_group_2+number_group_3)*(LOADING_SPI-1)*4)) & top_g3)   // inside DAC 1 loop
+					else if ((dwell_counter == ((number_group_0+number_group_1+number_group_2+number_group_3)*(LOADING_SPI-1))) & top_g3)   // inside DAC 1 loop
 					begin 
 						next_state <= S_STALL;
 						last_3 <= 1;
-						if (last_3) past_done <= 1;
 						
 						rstn_0 <= ~group3[3];
 						rstn_1 <= ~group3[2];
@@ -540,7 +543,7 @@ module pvp_fsm_gen
 	assign group_0_en = ((dwell_counter ==             0) & (curr_state == S_SEND_0) & (~last_0)) | (curr_state == WAIT);
 	assign group_1_en = ((dwell_counter ==   LOADING_SPI*number_group_0) & (curr_state == S_SEND_1) & (~last_1)) | (curr_state == WAIT);
 	assign group_2_en = ((dwell_counter ==   LOADING_SPI*(number_group_0+number_group_1)) & (curr_state == S_SEND_2) & (~last_2)) | (curr_state == WAIT);
-	assign group_3_en = ((dwell_counter ==   LOADING_SPI*(number_group_0+number_group_1)) & (curr_state == S_SEND_3) & (~last_3)) | (curr_state == WAIT);
+	assign group_3_en = ((dwell_counter ==   LOADING_SPI*(number_group_0+number_group_1+number_group_2)) & (curr_state == S_SEND_3) & (~last_3)) | (curr_state == WAIT);
 
 	assign dac0_en = init_load ? 1'b0 : (dac_0_group == 2'b00) ? group_0_en : (dac_0_group == 2'b01) ? group_1_en : (dac_0_group == 2'b10) ? group_2_en : (dac_0_group == 2'b11) ? group_3_en : 0;
 	assign dac1_en = init_load ? 1'b0 : (dac_1_group == 2'b00) ? group_0_en : (dac_1_group == 2'b01) ? group_1_en : (dac_1_group == 2'b10) ? group_2_en : (dac_1_group == 2'b11) ? group_3_en : 0;
