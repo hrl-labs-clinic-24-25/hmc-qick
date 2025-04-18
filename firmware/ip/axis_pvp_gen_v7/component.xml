@@ -2,7 +2,7 @@
 <spirit:component xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <spirit:vendor>user.org</spirit:vendor>
   <spirit:library>user</spirit:library>
-  <spirit:name>axi_pvp_gen_v5</spirit:name>
+  <spirit:name>axi_pvp_gen_v7</spirit:name>
   <spirit:version>3.0</spirit:version>
   <spirit:busInterfaces>
     <spirit:busInterface>
@@ -235,7 +235,7 @@
         <spirit:displayName>Synthesis</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:synthesis</spirit:envIdentifier>
         <spirit:language>Verilog</spirit:language>
-        <spirit:modelName>axi_pvp_gen_v5</spirit:modelName>
+        <spirit:modelName>axi_pvp_gen_v7</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_anylanguagesynthesis_xilinx_com_ip_dds_compiler_6_0__ref_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -267,7 +267,7 @@
         <spirit:name>xilinx_anylanguagebehavioralsimulation</spirit:name>
         <spirit:displayName>Simulation</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:simulation</spirit:envIdentifier>
-        <spirit:modelName>axi_pvp_gen_v5</spirit:modelName>
+        <spirit:modelName>axi_pvp_gen_v7</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_anylanguagebehavioralsimulation_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -728,7 +728,7 @@
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/axi_pvp_gen_v5.v</spirit:name>
+        <spirit:name>src/axi_pvp_gen_v7.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:userFileType>CHECKSUM_ddc2dfea</spirit:userFileType>
       </spirit:file>
@@ -746,7 +746,7 @@
     <spirit:fileSet>
       <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>xgui/axi_pvp_gen_v5_v3_0.tcl</spirit:name>
+        <spirit:name>xgui/axi_pvp_gen_v7_v3_0.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
         <spirit:userFileType>CHECKSUM_38e78f29</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
@@ -771,7 +771,7 @@
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/axi_pvp_gen_v5.v</spirit:name>
+        <spirit:name>src/axi_pvp_gen_v7.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
       </spirit:file>
     </spirit:fileSet>
@@ -780,7 +780,7 @@
   <spirit:parameters>
     <spirit:parameter>
       <spirit:name>Component_Name</spirit:name>
-      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">axi_pvp_gen_v5_0</spirit:value>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">axi_pvp_gen_v7_0</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>DATA_WIDTH</spirit:name>
@@ -805,8 +805,7 @@
       <xilinx:definitionSource>package_project</xilinx:definitionSource>
       <xilinx:coreRevision>6</xilinx:coreRevision>
       <xilinx:upgrades>
-        <xilinx:canUpgradeFrom>user.org:user:axi_pvp_gen_v2:1.0</xilinx:canUpgradeFrom>
-        <xilinx:canUpgradeFrom>user.org:user:axi_pvp_gen_v5:2.0</xilinx:canUpgradeFrom>
+        <xilinx:canUpgradeFrom>user.org:user:axi_pvp_gen_v7:1.0</xilinx:canUpgradeFrom>
       </xilinx:upgrades>
       <xilinx:coreCreationDateTime>2025-03-27T06:55:04Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
