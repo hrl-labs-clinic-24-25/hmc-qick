@@ -244,7 +244,7 @@ module pvp_fsm_gen
 		group3 = { dac_0_group==3, dac_1_group==3, dac_2_group==3, dac_3_group==3 };
 
 		if 		(curr_state == S_STALL)  which_dac = 0;
-		else if (curr_state == S_SEND_0) which_dac = (which_period==0) ? ((group0[3]) ? 0 : (group0[2]) ? 1 : (group0[1]) ? 2 : 3) : (which_period==1) ? (group0[2]) ? 1 : (group0[1]) ? 2 : 3: (which_period==2) ? (group0[1]) ? 2 : 3 : 3;
+		else if (curr_state == S_SEND_0) which_dac = (which_period==0) ? ((group0[3]) ? 0 : (group0[2]) ? 1 : (group0[1]) ? 2 : 3) : (which_period==1) ? (group0[3] & group0[2]) ? 1 : (group0[1]) ? 2 : 3: (which_period==2) ? (group0[1]) ? 2 : 3 : 3;
 		else if (curr_state == S_SEND_1) which_dac = (which_period==1) ? ((group1[3]) ? 0 : (group1[2]) ? 1 : (group1[1]) ? 2 : 3) : (which_period==2) ? (group1[3] & group1[2]) ? 1 : ((group1[3] ^ group1[2]) & group1[1]) ? 2 : 3 : ((group1[3] ^ group1[2] ^ group1[1]) & group1[0]) ? 2 : 3; // double check
 		else if (curr_state == S_SEND_2) which_dac = (which_period==2) ? ((group2[3]) ? 0 : (group2[2]) ? 1 : (group2[1]) ? 2 : 3) : (group2[2]) ? 1 : (group2[1]) ? 2 : 3;
 		else 							 which_dac = (group2[0]) ? 0 : (group2[1]) ? 1 : (group2[2]) ? 2 : 3;
