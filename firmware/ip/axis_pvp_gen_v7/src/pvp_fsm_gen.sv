@@ -55,6 +55,9 @@ module pvp_fsm_gen
 		CTRL_REG,
 		MODE_REG,
 
+		TRIGGER_USER_REG, // trigger from the user
+		trigger_pmod, // trigger from PMOD
+
     	// parameter inputs.
 		mosi_o,
         select_mux,
@@ -72,6 +75,8 @@ module pvp_fsm_gen
 	
 	// Define the states for the FSM
 	parameter WAIT = 4'b0000, CONFIG_STATE = 4'b0101, S_SEND_0 = 4'b0001, S_SEND_1 = 4'b0010, S_SEND_2 = 4'b0100, S_SEND_3 = 4'b1000, S_STALL = 4'b1101, NULL_STATE = 4'b1111;
+
+	parameter WAIT_TRIG = 2'b0, FIRST_TRIGGER = 2'b1, WAIT_DONE_TRIG = 2'b11;
 
 	/*********/
 	/* Ports */
@@ -110,8 +115,11 @@ module pvp_fsm_gen
 
 	input [28:0] CONFIG_REG; // for configuring the DACs: [28:24] is demux value, [23:0] is the SPI message. won't run unless its != 0
 
-	input  [3:0] CTRL_REG; // [LDACN, CLRN, RSTN, TRIGGER_PVP]
+	input  [3:0] CTRL_REG; // [LDACN, CLRN, RSTN, TRIGGER_SELECT] // trigger select choses whether you are triggering from PMOD or from the Jupyter Notebook
 	input  [1:0] MODE_REG;
+
+	input        TRIGGER_USER_REG; // trigger from the user
+	input		 trigger_pmod; // trigger from PMOD (i.e. AWGs)
 
 	output [23:0] mosi_o;  // could potentially be reduced to 24
 	output [4:0]  select_mux;
@@ -165,7 +173,8 @@ module pvp_fsm_gen
 	logic 		ldacn_user;
 	logic		clrn_user;
 	logic		rstn_user;
-	logic		trigger_pvp;
+	logic		trigger_from; // where you get the trigger from (either the PMOD[0] or the Jupyter Notebook [1]), and the actual pin keeping the system running/iterating
+	logic       trigger_pvp; 
 
 	// the group can be either 00, 01, 02, or 03.
 	logic [1:0] dac_0_group, dac_1_group, dac_2_group, dac_3_group;
@@ -202,7 +211,10 @@ module pvp_fsm_gen
 
 	logic [1:0] which_dac, which_period;
 
-	logic wait_to_next_cycle;
+	logic 		wait_to_next_cycle;
+	
+	logic [1:0] dac_g0, dac_g1, dac_g2, dac_g3;
+	logic [1:0] dac_no_g0, dac_no_g1, dac_no_g2, dac_no_g3;
 
 	logic [31:0] ldac_counter;
 	logic 		 ldacn_blip;
@@ -222,18 +234,54 @@ module pvp_fsm_gen
 	// S_SEND_3 -- send to DAC 3
 	// S_STALL  -- middle step between each DAC increment
 
-	assign {ldacn_user, clrn_user, rstn_user, trigger_pvp} = CTRL_REG;
+	assign {ldacn_user, clrn_user, rstn_user, trigger_from} = CTRL_REG;
+
+
 
 	assign dac_0_group = DAC_0_GROUP_REG;
 	assign dac_1_group = DAC_1_GROUP_REG;
 	assign dac_2_group = DAC_2_GROUP_REG;
 	assign dac_3_group = DAC_3_GROUP_REG;
 
-	assign ldacn = (MODE_REG == 2'b11) ? ldacn_user : ldacn_fsm;
+	assign ldacn = (MODE_REG == 2'b11) ?    ldacn_user : ldacn_fsm;
 	assign resetn = (((MODE_REG == 2'b11) ? rstn_user : 1'b1)); // allows user to control reset the DAC if you're in MODE 3
-	assign clrn = (MODE_REG == 2'b11) ? clrn_user : 1'b1;
+	assign clrn = (MODE_REG == 2'b11) ?     clrn_user : 1'b1;
+	assign trigger_fsm = (trigger_from) ? TRIGGER_USER_REG : trigger_pmod;
 
 
+	////////////////// MINI TRIGGER FSM //////////////////
+
+	/// TRIGGER DEVICE TO START LOADING A PVP PLOT
+	logic [8:0] trigger_counter;
+	logic [1:0] trig_state, next_trig_state;
+	always_ff @(posedge clk) begin
+		case (trig_state)
+			WAIT_TRIG: begin
+				trigger_counter <= 0;
+				if (trigger_fsm) next_trig_state <= FIRST_TRIGGER;
+				else             next_trig_state <= WAIT_TRIG;
+			end
+			FIRST_TRIGGER: begin
+				trigger_counter <= trigger_counter + 1;
+				if (trigger_counter == NUM_DIMS_REG*HOLD_SIGNAL) next_trig_state <= WAIT_DONE_TRIG;
+				else								next_trig_state <= FIRST_TRIGGER;
+			end
+			WAIT_DONE_TRIG: begin
+				trigger_counter <= 0;
+				if (trigger_fsm)  next_trig_state <= WAIT_DONE_TRIG;
+				else 			  next_trig_state <= WAIT_TRIG;
+			end
+			default: next_trig_state <= WAIT_TRIG;
+		endcase
+	end
+
+	assign trig_state = next_trig_state;
+	assign trigger_pvp = (next_trig_state==FIRST_TRIGGER);
+
+	//////////////////////////////////////////////////////
+
+
+	// LOGIC FOR GROUPS IN THE DAC LOADING
 	always_comb begin
 		which_period = (dwell_counter < LOADING_SPI) ? 2'b00 : (dwell_counter < 2*LOADING_SPI) ? 2'b01 : (dwell_counter < 3*LOADING_SPI) ? 2'b10 : 2'b11;
 
@@ -243,12 +291,84 @@ module pvp_fsm_gen
 		group2 = { dac_0_group==2, dac_1_group==2, dac_2_group==2, dac_3_group==2 };
 		group3 = { dac_0_group==3, dac_1_group==3, dac_2_group==3, dac_3_group==3 };
 
-		if 		(curr_state == S_STALL)  which_dac = 0;
-		else if (curr_state == S_SEND_0) which_dac = (which_period==0) ? ((group0[3]) ? 0 : (group0[2]) ? 1 : (group0[1]) ? 2 : 3) : (which_period==1) ? (group0[3] & group0[2]) ? 1 : (group0[1]) ? 2 : 3: (which_period==2) ? (group0[1]) ? 2 : 3 : 3;
-		else if (curr_state == S_SEND_1) which_dac = (which_period==1) ? ((group1[3]) ? 0 : (group1[2]) ? 1 : (group1[1]) ? 2 : 3) : (which_period==2) ? (group1[3] & group1[2]) ? 1 : ((group1[3] ^ group1[2]) & group1[1]) ? 2 : 3 : ((group1[3] ^ group1[2] ^ group1[1]) & group1[0]) ? 2 : 3; // double check
-		else if (curr_state == S_SEND_2) which_dac = (which_period==2) ? ((group2[3]) ? 0 : (group2[2]) ? 1 : (group2[1]) ? 2 : 3) : (group2[2]) ? 1 : (group2[1]) ? 2 : 3;
-		else 							 which_dac = (group2[0]) ? 0 : (group2[1]) ? 1 : (group2[2]) ? 2 : 3;
+		dac_g0 = ((group0[3]) ? 0 : (group0[2]) ? 1 : (group0[1]) ? 2 : 3);
+		dac_g1 = ((group1[3]) ? 0 : (group1[2]) ? 1 : (group1[1]) ? 2 : 3);
+		dac_g2 = ((group2[3]) ? 0 : (group2[2]) ? 1 : (group2[1]) ? 2 : 3);
+		dac_g3 = ((group3[3]) ? 0 : (group3[2]) ? 1 : (group3[1]) ? 2 : 3);
+
+		dac_no_g0 = ((~group0[3]) ? (group0[1]) ? 2 : 3 : (group0[2]) ? 1 : (group0[1]) ? 2 : 3);
+		dac_no_g1 = ((~group1[3]) ? (group1[1]) ? 2 : 3 : (group1[2]) ? 1 : (group1[1]) ? 2 : 3);
+		dac_no_g2 = ((~group2[3]) ? (group2[1]) ? 2 : 3 : (group2[2]) ? 1 : (group2[1]) ? 2 : 3);
+		dac_no_g3 = ((~group3[3]) ? (group3[1]) ? 2 : 3 : (group3[2]) ? 1 : (group3[1]) ? 2 : 3);
+		
+
+		case(NUM_DIMS_REG)
+
+			1: // Case where there is only one dimension
+			begin 
+					if 		    (curr_state == S_STALL)  which_dac = 0;
+					else 							     which_dac = (which_period==0) ? dac_g0 : (which_period==1) ? (group0[2]) ? 1 : (group0[1]) ? 2 : 3: (which_period==2) ? (group0[1]) ? 2 : 3 : 3;
+			end
+
+			2: // Case where there are two dimensions
+			begin
+
+				if (number_group_0 == 1) begin
+					if 		(curr_state == S_STALL)  which_dac = 0;
+					else if (curr_state == S_SEND_0) which_dac =  dac_g0;
+					else 							 which_dac =  ((which_period==1) ? dac_g1 : (which_period==2) ? dac_no_g1 : (~group1[3] | ~group1[2] | ~group1[1]) ? 3 : group1[1] ? 2 : 3);
+				end
+				else if (number_group_0 == 2) begin
+					if 		(curr_state == S_STALL)  which_dac = 0;
+					else if (curr_state == S_SEND_0) which_dac =  (which_period==1) ? dac_g0 : dac_no_g0;
+					else 							 which_dac =  (which_period==2) ? dac_g1 : dac_no_g1;
+				end
+				else begin // 3 dacs in Group 0 begin
+					if       (curr_state == S_STALL)  which_dac = 0;
+					else if  (curr_state == S_SEND_0) which_dac = (which_period==0) ? dac_g0 : (which_period==1) ? dac_no_g0 : (~group0[3] | ~group0[2] | ~group0[1]) ? 3 : group0[1] ? 2 : 3;
+					else 							  which_dac = dac_g1;
+				end
+			end
+
+			3: // Case where there are three dimensions
+			begin
+
+				// if (number_group_0 == 1) begin
+				// 	if 		(curr_state == S_STALL)  which_dac = 0;
+				// 	else if (curr_state == S_SEND_0) which_dac = dac_g0 : (which_period==1) ? dac_g0 : (which_period==2) ? (~group0[3] | ~group0[2] | ~group0[1]) ? 3 : group0[1] ? 2 : 3 : (~group0[3] | ~group0[2] | ~group0[1]) ? 3 : group0[1] ? 2 : 3;
+				// 	else 							 which_dac = (which_period==2) ? (~group1[3] | ~group1[2] | ~group1[1]) ? 2 : 3 : (~group1[3] | ~group1[2] | ~group1[1]) ? 3 : group1[1] ? 2 : 3;
+
+
+				// 	if 		(curr_state == S_STALL)  which_dac = 0;
+
+				// 	else if (curr_state == S_SEND_0) which_dac = (which_period==0) ? ((group0[3]) ? 0 : (group0[2]) ? 1 : (group0[1]) ? 2 : 3) : ((~group0[3]) ? (group0[1]) ? 2 : 3 : (group0[2]) ? 1 : (group0[1]) ? 2 : 3);
+									
+				// 	else if (curr_state == S_SEND_1) which_dac = (which_period==1) ? ((group1[3]) ? 0 : (group1[2]) ? 1 : (group1[1]) ? 2 : 3) : (which_period==2) ? (~group1[3]) ? (group1[1]) ? 2 : 3 : (group1[2]) ? 1 : (group1[1]) ? 2 : 3 : (~group1[3] | ~group1[2] | ~group1[1]) ? 3 : group1[1] ? 2 : 3;
+					
+				// 	else 							 which_dac = (which_period==2) ? (~group2[3] | ~group2[2] | ~group2[1]) ? 2 : 3 : 3;
+			end
+
+			// Case where there are four dimensions
+			4:
+			begin
+					if 		(curr_state == S_STALL)  which_dac = 0;
+					else if (curr_state == S_SEND_0) which_dac = ((group0[3]) ? 0 : (group0[2]) ? 1 : (group0[1]) ? 2 : 3);
+					else if (curr_state == S_SEND_1) which_dac = ((group1[3]) ? 0 : (group1[2]) ? 1 : (group1[1]) ? 2 : 3);
+					else if (curr_state == S_SEND_2) which_dac = ((group2[3]) ? 0 : (group2[2]) ? 1 : (group2[1]) ? 2 : 3);
+					else                             which_dac = ((group3[3]) ? 0 : (group3[2]) ? 1 : (group3[1]) ? 2 : 3);
+			end
+
+			default: which_dac = 0;
+		endcase
+
+		// if 		(curr_state == S_STALL)  which_dac = 0;
+		// else if (curr_state == S_SEND_0) which_dac = (which_period==0) ? ((group0[3]) ? 0 : (group0[2]) ? 1 : (group0[1]) ? 2 : 3) : (which_period==1) ? (group0[2]) ? 1 : (group0[1]) ? 2 : 3: (which_period==2) ? (group0[1]) ? 2 : 3 : 3;
+		// else if (curr_state == S_SEND_1) which_dac = (which_period==1) ? ((group1[3]) ? 0 : (group1[2]) ? 1 : (group1[1]) ? 2 : 3) : (which_period==2) ? (group1[3] & group1[2]) ? 1 : ((group1[3] ^ group1[2]) & group1[1]) ? 2 : 3 : ((group1[3] ^ group1[2] ^ group1[1]) & group1[0]) ? 2 : 3; // double check
+		// else if (curr_state == S_SEND_2) which_dac = (which_period==2) ? ((group2[3]) ? 0 : (group2[2]) ? 1 : (group2[1]) ? 2 : 3) : (group2[2]) ? 1 : (group2[1]) ? 2 : 3;
+		// else 							 which_dac = (group2[0]) ? 0 : (group2[1]) ? 1 : (group2[2]) ? 2 : 3;
 	end
+
+
 
 	// next MUX and MOSI logic
 	always_ff @(posedge clk) begin
@@ -349,6 +469,13 @@ module pvp_fsm_gen
 					end
 				end
 
+
+
+					//////////////////////////
+					/// STALL STATE LOGIC ////
+					//////////////////////////
+
+				// stall state; all pvp cycles start here
 				S_STALL: begin
 					
 					rstn_3 <= 1;
@@ -357,34 +484,32 @@ module pvp_fsm_gen
 					rstn_0 <= 1;
 					past_done <= done;
 
+
 					 // will only load the next DACs if the trigger_pvp is still 1 (i.e. gives user control to stop partway through the pvp generation)
-					if (trigger_pvp & !done)
-						if (wait_to_next_cycle) begin
-							next_state <= S_STALL;
-							dwell_counter <= dwell_counter + 1;
-						end else begin
+					if (trigger_pvp & !done & !wait_to_next_cycle) begin
 							next_state <= S_SEND_0;
 							dwell_counter <= 0;
-						end
-					else begin
-						if (trigger_pvp != 1) begin
-							next_state <= S_STALL;
-							dwell_counter <= dwell_counter;
-						end else begin
+					end else begin
 							if (wait_to_next_cycle) begin
 								next_state <= S_STALL;
 								dwell_counter <= dwell_counter + 1;
-							end else begin
+							end else if (done) begin
 								next_state <= WAIT;
 								dwell_counter <= dwell_counter;
 							end
-						end
+							else begin
+								next_state <= S_STALL;
+								dwell_counter <= dwell_counter;
+							end 
 					end
 
 					past_mosi   <= mosi_o;
 					past_select_mux <= select_mux;
-
 				end
+
+
+
+
 				S_SEND_0: begin
 
 					next_state <= S_SEND_0;

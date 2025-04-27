@@ -74,7 +74,10 @@ entity axi_slv is
 		DWELL_CYCLES_REG 		: out std_logic_vector (31 downto 0);
 		CYCLES_TILL_READOUT_REG : out std_logic_vector (15 downto 0);
 		PVP_WIDTH_REG 			: out std_logic_vector (9 downto 0);
-		NUM_DIMS_REG 			: out std_logic_vector (2 downto 0)
+		NUM_DIMS_REG 			: out std_logic_vector (2 downto 0);
+
+		-------------------------------------------------------------
+		TRIGGER_USER_REG     : out std_logic
 
 	);
 end axi_slv;
@@ -778,6 +781,10 @@ begin
 	CYCLES_TILL_READOUT_REG <= slv_reg20(15 downto 0);
 	PVP_WIDTH_REG <= slv_reg21(9 downto 0);
 	NUM_DIMS_REG <= slv_reg22(2 downto 0);
+
+	------------------------------------------------------------
+
+	TRIGGER_USER_REG <= slv_reg23(0);
 
 end rtl;
 

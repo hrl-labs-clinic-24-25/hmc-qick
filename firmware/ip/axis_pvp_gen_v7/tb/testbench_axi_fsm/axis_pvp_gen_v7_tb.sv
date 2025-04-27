@@ -154,7 +154,9 @@ module axis_pvp_gen_v7_tb ();
 		.s_axi_rready	(S_AXI_RREADY),
 
 		// Non AXI-LITE 
-		.TRIGGER_AWG_REG (init_transaction), // trigger for AWG
+		.trigger_pmod (init_transaction), // trigger from AWG
+
+        // outputs
 		.select_mux  (mux), // DAC demuxing set of 5 pins
         .COPI (COPI),
 		.SCK (SCK),

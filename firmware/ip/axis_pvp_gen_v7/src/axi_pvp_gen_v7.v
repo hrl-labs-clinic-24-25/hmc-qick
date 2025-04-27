@@ -40,20 +40,21 @@ module axi_pvp_gen_v7
 		s_axi_rvalid,
 		s_axi_rready,
 
-		// Non AXI-LITE 
-		TRIGGER_AWG_REG, // trigger for AWG
-		select_mux,
-		done,
+		// Non AXI-LITE input
+		trigger_pmod, // trigger from AWG
 
-		LDACN,
-		CLRN,
-		RESETN,
 
-		COPI,
+		// Non AXI-LITE outputs
+		select_mux, // demuxing to the PCBs
+		done,		// the "done" flag (raised high when PvP is finished)
+
+		LDACN,		// ran after every loading cycle of the SPI
+		CLRN,		// Clear all the DACs (not yet implemented)
+		RESETN,		// Resetn all the DACs (not yet implemented)
+
+		COPI, // SPI COPI signal (controller in peripheral out)
 		SCK, // SPI Clock
 		CS, // SPI Chip Select
-
-		test_timing
 	);
 
 	/*********/
@@ -90,8 +91,10 @@ module axi_pvp_gen_v7
 	output 				s_axi_rvalid;
 	input 				s_axi_rready;
 
+	// Non AXI-LITE input
+	input 			trigger_pmod; // trigger for AWG ** test that output registers don't cause net contention in Vivado (March 7)
+
 	// Non AXI-LITE outputs
-	output 			TRIGGER_AWG_REG; // trigger for AWG ** test that output registers don't cause net contention in Vivado (March 7)
 	output [4:0]  	select_mux;
 	output 			done;
 	
@@ -101,8 +104,6 @@ module axi_pvp_gen_v7
 	output 			COPI;
 	output 			SCK; // SPI Clock
 	output 			CS; // SPI Chip Select
-	
-	output			test_timing;
 
 
 
@@ -139,17 +140,17 @@ module axi_pvp_gen_v7
 	wire [1:0] DAC_2_GROUP_REG;
 	wire [1:0] DAC_3_GROUP_REG;
 
-	// configurations for DACs
-	wire [3:0]  CTRL_REG; // [ ldacn, rstn, clrn, trigger_pvp ]
-	wire [1:0]  MODE_REG; // 0; default pvp. 1: pvp up/down. 2. pvp spiral. 3. user controlled only (allows user to set LDAC)
-	wire [28:0] CONFIG_REG; // [ demux value + 24 bits to a DAC ]
+	wire       TRIGGER_USER_REG; // trigger from the user
 
-	wire [31:0] DWELL_CYCLES_REG; // time to wait till next SPI signal loaded
+	// configurations for DACs
+	wire [3:0]  CTRL_REG; 			// [ ldacn, rstn, clrn, trigger_pvp ]
+	wire [1:0]  MODE_REG; 			// 0; default pvp. 1: pvp up/down. 2. pvp spiral. 3. user controlled only (allows user to set LDAC)
+	wire [28:0] CONFIG_REG; 		// [ demux value + 24 bits to a DAC ]
+
+	wire [31:0] DWELL_CYCLES_REG; 	// time to wait till next SPI signal loaded
 	wire [15:0] CYCLES_TILL_READOUT_REG; // time to wait until allowed to start "reading" (when implemented with AWGs)
-	wire [9:0]  PVP_WIDTH_REG; // square plot width
-	wire [2:0]  NUM_DIMS_REG; // how many DACs are in use (0 - 4)
-	
-	assign test_timing = CTRL_REG[8]; // for oscilloscope use
+	wire [9:0]  PVP_WIDTH_REG; 			 // square plot width
+	wire [2:0]  NUM_DIMS_REG; 		     // how many DACs are in use (0 - 4)
 
 	wire 	   done;			 // trigger for SPI
 	wire 	   trigger_spi_o;
@@ -227,36 +228,11 @@ module axi_pvp_gen_v7
 		.DWELL_CYCLES_REG 		(DWELL_CYCLES_REG),
 		.CYCLES_TILL_READOUT_REG (CYCLES_TILL_READOUT_REG),
 		.PVP_WIDTH_REG 			(PVP_WIDTH_REG),
-		.NUM_DIMS_REG 			(NUM_DIMS_REG)
+		.NUM_DIMS_REG 			(NUM_DIMS_REG),
+
+		.TRIGGER_USER_REG       (TRIGGER_USER_REG)
 		// need to add in LDACN
 	);
-
-// Fifo.
-// fifo
-//     #(
-//         // Data width.
-//         .B	(160),
-        
-//         // Fifo depth.
-//         .N	(16)
-//     )
-//     fifo_i
-// 	( 
-//         .rstn	(aresetn	),
-//         .clk 	(aclk		),
-
-//         // Write I/F.
-//         .wr_en 	(fifo_wr_en	),
-//         .din    (fifo_din	),
-        
-//         // Read I/F.
-//         .rd_en 	(fifo_rd_en	),
-//         .dout  	(fifo_dout	),
-        
-//         // Flags.
-//         .full   (fifo_full	),
-//         .empty  (fifo_empty	)
-//     );
 
 	pvp_fsm_gen
 		fsm_i 
@@ -294,6 +270,9 @@ module axi_pvp_gen_v7
 
 				.CTRL_REG			(CTRL_REG),
 				.MODE_REG 			(MODE_REG),
+
+				.TRIGGER_USER_REG   (TRIGGER_USER_REG), // trigger from the user
+				.trigger_pmod		(trigger_pmod), // trigger from PMOD
 
 				.mosi_o				(mosi_output),
 				.select_mux			(select_mux), 
