@@ -140,7 +140,7 @@ module axi_pvp_gen_v7
 	wire [1:0] DAC_2_GROUP_REG;
 	wire [1:0] DAC_3_GROUP_REG;
 
-	wire       TRIGGER_USER_REG; // trigger from the user
+	wire [1:0]  TRIGGER_USER_REG; // trigger from the user
 
 	// configurations for DACs
 	wire [3:0]  CTRL_REG; 			// [ ldacn, rstn, clrn, trigger_pvp ]
@@ -271,7 +271,7 @@ module axi_pvp_gen_v7
 				.CTRL_REG			(CTRL_REG),
 				.MODE_REG 			(MODE_REG),
 
-				.TRIGGER_USER_REG   (TRIGGER_USER_REG), // trigger from the user
+				.TRIGGER_USER_REG   (TRIGGER_USER_REG[0]), // trigger from the user
 				.trigger_pmod		(trigger_pmod), // trigger from PMOD
 
 				.mosi_o				(mosi_output),

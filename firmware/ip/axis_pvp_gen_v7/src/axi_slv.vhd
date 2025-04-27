@@ -77,7 +77,7 @@ entity axi_slv is
 		NUM_DIMS_REG 			: out std_logic_vector (2 downto 0);
 
 		-------------------------------------------------------------
-		TRIGGER_USER_REG     : out std_logic
+		TRIGGER_USER_REG     : out std_logic_vector (1 downto 0)
 
 	);
 end axi_slv;
@@ -784,7 +784,7 @@ begin
 
 	------------------------------------------------------------
 
-	TRIGGER_USER_REG <= slv_reg23(0);
+	TRIGGER_USER_REG <= slv_reg23(1 downto 0);
 
 end rtl;
 
