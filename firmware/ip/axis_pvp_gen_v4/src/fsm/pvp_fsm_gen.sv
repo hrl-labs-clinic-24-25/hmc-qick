@@ -132,6 +132,7 @@ module pvp_fsm_gen
 	logic direction_1;
 	logic direction_2;
 	logic direction_3;
+	logic [7:0] count; // counter for the number of steps taken in spiral mode
 
 
 	/***************/
@@ -166,6 +167,7 @@ module pvp_fsm_gen
 			direction_2 <= 1;
 			direction_3 <= 1;
 			index <= 0;
+			count <= 0;
 
 			dwell_counter <= 0;
 		end 
@@ -214,11 +216,11 @@ module pvp_fsm_gen
 
 					case (MODE_REG)
 						2'b10: begin //"Spiral" increment mode							
-							if (top_1 & base_1 & (top_1 == base_1))begin //if index is half of DEPTH
+							if (count == PVP_WIDTH_REG)begin //if index is half of DEPTH
 								next_state <= WAIT;
 							end
 
-							else if (direction_0)begin 
+							else if (direction_0)begin 5
 								// cycle until dwell counter has been spent. If we're not at the top of the stack, return to stall
 								if ((dwell_counter == DWELL_CYCLES_REG) & !top_0)      // inside DAC 1 loop
 								begin 
@@ -345,6 +347,7 @@ module pvp_fsm_gen
 									dwell_counter <= 0; 
 									direction_1 <= 0;
 									index <= index + 1;
+									count <= count + 1;
 									if (NUM_DACS_REG < 2) next_state <= WAIT;
 									else next_state <= S_SEND_0;
 								end 
@@ -365,6 +368,7 @@ module pvp_fsm_gen
 								begin 
 									dwell_counter <= 0; 
 									direction_1 <= 1;
+									count <= count + 1;
 									if (NUM_DACS_REG < 2) next_state <= WAIT;
 									else next_state <= S_SEND_0;
 									rstn_1 <= 0; 

@@ -49,7 +49,7 @@ module pvp_fsm_gen_tb ();
 
     initial
         begin
-            MODE_REG = 2; // Cycle between Spiral, Top-Bottom, and Default
+            MODE_REG = 1; // Cycle between Spiral, Top-Bottom, and Default
             rstn = 0;
             #100
             rstn = 1;

@@ -1,6 +1,6 @@
 /***
   no_mem_sweep is a deterministic module that counts up from a given start value in increments of the given step value for 
-  a given number of cycles. it formats the output as the 24 bit commands that will be sent via SPI to a given DAC.
+  a given number of cycles. it formats the output as the 32 bit commands that will be sent via SPI to a given DAC.
 
   no_mem_sweep_tb is a testbench to test the operation of the above module
 
@@ -12,30 +12,52 @@
         cahernandez@g.hmc.edu
   @version: 2/26/2025
   
+  @author: Zoe Worrall
+        zworrall@g.hmc.edu
+  @vrsion: 3/4/2025
+
 */
 
 
-module no_mem_sweep_fsm #(parameter DEPTH = 256)
-                    (input logic [19:0] start, step,
-                    input logic [7:0] index, //index for sweep
-                    input logic clk, rstn, enable, direction,
-                    input logic [1:0] mode,
-                    output logic [31:0] mosi,
-                    output logic top, base
+module no_mem_sweep_fsm
+                    (
+                        start,
+                        step,
+                        index,
+                        clk,
+                        enable,
+                        rstn,
+                        direction,
+                        mode,
+                        top,
+                        base,
+                        mosi,
+                        DEPTH
                     );
 
-    parameter [3:0] start_bits = 4'b0001;
-    logic [7:0] counter;
-    logic [19:0] curr_val, next_val, top_val, base_val;
-    logic [19:0] potential_val;
+/**
+* Input Logic
+*/
+input [19:0] start;
+input [19:0] step;
+input [7:0] index;
+input [1:0] mode;
+input clk, enable, rstn, direction;
+output top, base;
+output [31:0] mosi;
+input [9:0] DEPTH;
 
-    // Compute boundaries based on mode.
-    // For mode 2 ("Spiral"), adjust the boundaries using 'index'.
-    // For other modes, use fixed boundaries.
+parameter [3:0] start_bits = 4'b0001;
+
+logic [7:0]  counter;
+logic [19:0] curr_val, next_val, top_val, base_val, potential_val;
+
+// Compute boundaries based on mode.
+    // For mode 2 ("Spiral"), adjust the boundaries
     always_comb begin
         if (mode == 2) begin
-            base_val = start + (index * step);
-            top_val  = start + ((DEPTH - index) * step);
+            base_val = start + (((DEPTH/2) - (index)) * step);
+            top_val  = start + (((DEPTH/2) + (index+1)) * step);
         end else begin
             base_val = start;
             top_val  = start + (DEPTH * step);
@@ -105,19 +127,21 @@ module no_mem_sweep_fsm #(parameter DEPTH = 256)
     end
 
     assign mosi = ({{{2'h00}}, start_bits, curr_val});
-    assign top = (mode == 2)? ((curr_val == (start + (DEPTH-index)*step))) : ((curr_val == (start + (DEPTH)*step))); // indicate 1 before top (works with FSM)
-    assign base =(mode == 2)? ((curr_val == (start + index*step))) : ((curr_val == start));
+    assign top = curr_val == top_val; // indicate 1 before top (works with FSM)
+    assign base = curr_val == base_val;
+
 endmodule
 
 
 module no_mem_sweep_tb();
-    logic rstn, clk, enable;
+    logic rstn;
+    logic clk;
+    logic enable;
     logic [19:0] start, step;
     logic [31:0] mosi;
-    logic [1:0] mode;
 
-    // test generation of 256 evenly spaced steps
-    no_mem_sweep #(4) dut (.rstn(rstn), .clk(clk), .start(start), .step(step), .enable(enable), .mode(mode), .mosi(mosi));
+    // test generation of 16 evenly spaced steps
+    no_mem_sweep #(16) dut ( .rstn(rstn), .clk(clk), .start(start), .step(step), .enable(enable), .mosi(mosi));
 
     // generate testbench clock
     always begin 
@@ -132,42 +156,31 @@ module no_mem_sweep_tb();
         step = 2;
 	    rstn = 0; 
         enable = 0;
-        mode = 1; //toggle between "Default" (mode = 0), "Top-Bottom" (mode = 1),"Sweep" (mode = 2) increment
         #12; 
         
         rstn = 1; 
 
-        $display("MOSI STARTING VALUE IS:", mosi);
+        //Test 1: enable is low, so mosi should remain unchanged
+        #10;
+        $display("Test 1, enalbe is off, mosi value is = %d", mosi);
 
-        if (mode == 0)begin
-            $display("Default mode (increment only)");
-        end
-        else if (mode == 1)begin
-            $display("Testing Top-Bottom mode");
-        end
-        else begin
-            $display("Testing Spiral mode");
-        end
-
+        //Test 2: enable is now high, so mosi should change
         enable = 1;
+        #10;
+        $display("Test 2, enable is on, mosi value is = %d", mosi);
 
-        #110; // Counter will hit the max (256) during this amount of delay time
-        $finish;
+        //Test 3: enable is low, mosi should remain unchanged
+        enable = 0;
+        #10
+        $display("Test 3, enalbe is off, mosi value is = %d", mosi);
+
+        //Test 4: enable is now high, so mosi should change
+        enable = 1;
+        #10;
+        $display("Test 4, enable is on, mosi value is = %d", mosi);
+
+
 	end
-
-    // Prints time, counter, current value, direciton, and mosi values every clock cycle
-    initial begin
-       if (mode == 0 | mode == 2)begin
-            // Prints time, counter, current value, direciton, and mosi values every clock cycle
-            $monitor("Time = %0t: counter = %d, curr_val = %d, mosi = %d",
-            $time, dut.counter, dut.curr_val, mosi);
-       end
-       else begin
-            // Prints time, counter, current value, direciton, and mosi values every clock cycle
-            $monitor("Time = %0t: counter = %d, curr_val = %d, direction = %d, mosi = %d",
-                $time, dut.counter, dut.curr_val, dut.direction, mosi);
-       end
-    end
 
     // apply test vectors on rising edge of clk 
     always @(posedge clk) 
