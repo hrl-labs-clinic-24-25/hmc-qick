@@ -46,7 +46,7 @@ module axi_pvp_gen_v7
 
 		// Non AXI-LITE outputs
 		select_mux, // demuxing to the PCBs
-		done,		// the "done" flag (raised high when PvP is finished)
+		// done,		// the "done" flag (raised high when PvP is finished)
 
 		LDACN,		// ran after every loading cycle of the SPI
 		CLRN,		// Clear all the DACs (not yet implemented)
@@ -96,7 +96,7 @@ module axi_pvp_gen_v7
 
 	// Non AXI-LITE outputs
 	output [4:0]  	select_mux;
-	output 			done;
+	// output 			done;
 	
 	output 			LDACN; //  ldac bar
 	output			CLRN;  // clear bar
@@ -140,7 +140,15 @@ module axi_pvp_gen_v7
 	wire [1:0] DAC_2_GROUP_REG;
 	wire [1:0] DAC_3_GROUP_REG;
 
-	wire [1:0]  TRIGGER_USER_REG; // trigger from the user
+	// Group that the DAC belongs to
+	wire 	   DAC_0_DIRECTION_REG;
+	wire       DAC_1_DIRECTION_REG;
+	wire       DAC_2_DIRECTION_REG;
+	wire       DAC_3_DIRECTION_REG;
+
+	wire 	 TRIGGER_USER_REG; // trigger from the user
+	wire     QUIT_PVP_REG;
+	wire     DONE_REG;
 
 	// configurations for DACs
 	wire [3:0]  CTRL_REG; 			// [ ldacn, rstn, clrn, trigger_pvp ]
@@ -221,6 +229,11 @@ module axi_pvp_gen_v7
 		.DAC_2_GROUP_REG  (DAC_2_GROUP_REG),
 		.DAC_3_GROUP_REG  (DAC_3_GROUP_REG),
 
+		.DAC_0_DIRECTION_REG  (DAC_0_DIRECTION_REG),
+		.DAC_1_DIRECTION_REG  (DAC_1_DIRECTION_REG),
+		.DAC_2_DIRECTION_REG  (DAC_2_DIRECTION_REG),
+		.DAC_3_DIRECTION_REG  (DAC_3_DIRECTION_REG),
+
 		.CTRL_REG  		  (CTRL_REG),
 		.MODE_REG		  (MODE_REG),
 		.CONFIG_REG       (CONFIG_REG),
@@ -230,7 +243,9 @@ module axi_pvp_gen_v7
 		.PVP_WIDTH_REG 			(PVP_WIDTH_REG),
 		.NUM_DIMS_REG 			(NUM_DIMS_REG),
 
-		.TRIGGER_USER_REG       (TRIGGER_USER_REG)
+		.TRIGGER_USER_REG       (TRIGGER_USER_REG),
+		.QUIT_PVP_REG (QUIT_PVP_REG),
+		.DONE_REG (DONE_REG)
 		// need to add in LDACN
 	);
 
@@ -265,14 +280,21 @@ module axi_pvp_gen_v7
 				.DAC_2_GROUP_REG		(DAC_2_GROUP_REG),
 				.DAC_3_GROUP_REG        (DAC_3_GROUP_REG),
 
+				.DAC_0_DIRECTION_REG		(DAC_0_DIRECTION_REG),
+				.DAC_1_DIRECTION_REG		(DAC_1_DIRECTION_REG),
+				.DAC_2_DIRECTION_REG		(DAC_2_DIRECTION_REG),
+				.DAC_3_DIRECTION_REG        (DAC_3_DIRECTION_REG),
+
 				.PVP_WIDTH_REG      (PVP_WIDTH_REG),
 				.NUM_DIMS_REG 		(NUM_DIMS_REG),
 
 				.CTRL_REG			(CTRL_REG),
 				.MODE_REG 			(MODE_REG),
 
-				.TRIGGER_USER_REG   (TRIGGER_USER_REG[0]), // trigger from the user
+				.TRIGGER_USER_REG   (TRIGGER_USER_REG), // trigger from the user
 				.trigger_pmod		(trigger_pmod), // trigger from PMOD
+
+				.QUIT_PVP_REG   	(QUIT_PVP_REG), // trigger from the user
 
 				.mosi_o				(mosi_output),
 				.select_mux			(select_mux), 
@@ -281,7 +303,7 @@ module axi_pvp_gen_v7
 				.ldacn				(LDACN),
 				.clrn				(CLRN),
 				.resetn				(RESETN),
-				.done 				(done)
+				.done 				(DONE_REG)
 
 				
 			);

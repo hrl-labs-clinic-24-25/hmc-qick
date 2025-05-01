@@ -25,9 +25,10 @@ module no_mem_sweep_fsm
 
                         input logic clk, rstn, 
                         input logic [19:0] start, 
-                        input logic [18:0] step,
+                        input logic [19:0] step,
                         input logic [7:0] index, //index for sweep
-                        input logic enable, direction,
+                        input logic enable,
+                        input logic direction,
                         input logic [1:0] mode,
 
                         output logic [31:0] mosi,
@@ -48,12 +49,12 @@ module no_mem_sweep_fsm
             top_val  = start + ((DEPTH - index) * step);
         end else begin
             base_val = start;
-            top_val  = start + ((DEPTH) * step);
+            top_val  = (direction) ? start + ((DEPTH) * step) : start - ((DEPTH) * step);
         end
     end
 
     // Compute the potential next value (without boundary checks).
-    assign next_val = direction ? (curr_val + {1'b0, step}) : (curr_val - {1'b0, step});
+    assign next_val = direction ? (curr_val + step) : (curr_val - step);
 
     always_ff @(posedge clk) begin
         if (~rstn) begin

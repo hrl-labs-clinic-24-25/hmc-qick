@@ -50,6 +50,11 @@ module pvp_fsm_gen
 		DAC_2_GROUP_REG,
 		DAC_3_GROUP_REG,
 
+		DAC_0_DIRECTION_REG,
+		DAC_1_DIRECTION_REG,
+		DAC_2_DIRECTION_REG,
+		DAC_3_DIRECTION_REG,
+
 		DWELL_CYCLES_REG,        // the number of clock cycles to wait before moving to next DAC. LOADING_SPI > 50
 		CYCLES_TILL_READOUT_REG, // the number of clock cycles until AWG can be run
 
@@ -61,6 +66,8 @@ module pvp_fsm_gen
 
 		TRIGGER_USER_REG, // trigger from the user
 		trigger_pmod, // trigger from PMOD
+
+		QUIT_PVP_REG,
 
     	// parameter inputs.
 		mosi_o,
@@ -109,6 +116,11 @@ module pvp_fsm_gen
 	input [1:0]  DAC_2_GROUP_REG;
 	input [1:0]  DAC_3_GROUP_REG;
 
+	input       DAC_0_DIRECTION_REG;
+	input       DAC_1_DIRECTION_REG;
+	input       DAC_2_DIRECTION_REG;
+	input       DAC_3_DIRECTION_REG;
+
 	// assume that CYCLES_TILL_READOUT_REG is less than LOADING_SPI
 	input [31:0] DWELL_CYCLES_REG;
 	input [15:0] CYCLES_TILL_READOUT_REG; // the number of clock cycles until AWG can be run
@@ -124,6 +136,7 @@ module pvp_fsm_gen
 
 	input        TRIGGER_USER_REG; // trigger from the user
 	input		 trigger_pmod; // trigger from PMOD (i.e. AWGs)
+	input 		 QUIT_PVP_REG; // in case someone just wants to get out of their current pvp plot
 
 	output [23:0] mosi_o;  // could potentially be reduced to 24
 	output [4:0]  select_mux;
@@ -367,6 +380,7 @@ module pvp_fsm_gen
 
 	assign trig_state = next_trig_state;
 	assign trigger_pvp = (next_trig_state==FIRST_TRIGGER);
+	
 
 	//////////////////////////////////////////////////////
 
@@ -417,15 +431,13 @@ module pvp_fsm_gen
 			// State register.
 			case(curr_state)
 				WAIT: begin
-					dwell_counter <= 0;
 					rstn_3 		  <= 0;
 					rstn_2 		  <= 0;
 					rstn_1 		  <= 0;
 					rstn_0		  <= 0;
 					past_mosi	  <= 0;
 					past_select_mux	  <= 0;
-
-					past_done <= done;
+					dwell_counter <= 0;
 
 					init_load <= 1; // if the first value isn't loaded yet, we need to go through every dimension of the SPI to set their starting value
 
@@ -438,8 +450,10 @@ module pvp_fsm_gen
 					/// NEXT STATE LOGIC ////
 					/////////////////////////
 
+					if (QUIT_PVP_REG)												 next_state <= WAIT;
+
 					// run the pvp plot generator
-					if (trigger_pvp & !done)       		      						  next_state <= S_STALL;
+					else if (trigger_pvp & !done)       		      				  next_state <= S_STALL;
 
 					// need to configure one of the DACs, so enter config state
 					else if (CONFIG_REG != 0 & !done) 								  next_state <= CONFIG_STATE;
@@ -486,7 +500,16 @@ module pvp_fsm_gen
 					past_done <= done;
 
 					 // will only load the next DACs if the trigger_pvp is still 1 (i.e. gives user control to stop partway through the pvp generation)
-					if (trigger_pvp & !done & !wait_to_next_cycle) begin
+					if (QUIT_PVP_REG) begin
+						next_state <= WAIT;
+						
+						rstn_0 <= ~group0[3];
+						rstn_1 <= ~group0[2];
+						rstn_2 <= ~group0[1];
+						rstn_3 <= ~group0[0]; 
+
+						dwell_counter <= 0;
+					end else if (trigger_pvp & !done & !wait_to_next_cycle) begin
 							next_state <= S_SEND_0;
 							dwell_counter <= 0;
 					end else begin
@@ -672,12 +695,12 @@ module pvp_fsm_gen
 			.clk		(clk),
 
 			.enable     (dac0_en),
-			.direction  ((STEP_SIZE_0_REG[19])),
+			.direction  (DAC_0_DIRECTION_REG),
 			.mode       (MODE_REG),
 			.index		(8'b0),
 
 			.start		(START_VAL_0_REG),
-			.step       (STEP_SIZE_0_REG[18:0]),
+			.step       (STEP_SIZE_0_REG),
 
 		    .base       (base_0),
 			.top        (top_0),
@@ -691,12 +714,12 @@ module pvp_fsm_gen
 			.clk		(clk),
 
 			.enable     (dac1_en),
-			.direction  ((STEP_SIZE_1_REG[19])),
+			.direction  (DAC_1_DIRECTION_REG),
 			.mode       (MODE_REG),
 			.index		(8'b0),
 
 			.start		(START_VAL_1_REG),
-			.step       (STEP_SIZE_1_REG[18:0]),
+			.step       (STEP_SIZE_1_REG),
 			
 			.base       (base_1),
 			.top        (top_1),
@@ -710,12 +733,12 @@ module pvp_fsm_gen
 			.clk		(clk),
 
 			.enable     (dac2_en),
-			.direction  ((STEP_SIZE_2_REG[19])),
+			.direction  (DAC_2_DIRECTION_REG),
 			.mode       (MODE_REG),
 			.index		(8'b0),
 
 			.start		(START_VAL_2_REG),
-			.step       (STEP_SIZE_2_REG[18:0]),
+			.step       (STEP_SIZE_2_REG),
 
 			.base       (base_2),
 			.top        (top_2),
@@ -729,12 +752,12 @@ module pvp_fsm_gen
 			.clk		(clk),
 
 			.enable     (dac3_en),
-			.direction  ((STEP_SIZE_3_REG[19])),
+			.direction  (DAC_3_DIRECTION_REG),
 			.mode       (MODE_REG),
 			.index		(8'b0),
 
 			.start		(START_VAL_3_REG),
-			.step       (STEP_SIZE_3_REG[18:0]),
+			.step       (STEP_SIZE_3_REG),
 
 			.base       (base_3),
 			.top        (top_3),

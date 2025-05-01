@@ -29,6 +29,11 @@ module pvp_fsm_gen_tb ();
     logic [1:0] DAC_2_GROUP_REG;
     logic [1:0] DAC_3_GROUP_REG;
 
+    logic  DAC_0_DIRECTION_REG;
+    logic  DAC_1_DIRECTION_REG;
+    logic  DAC_2_DIRECTION_REG;
+    logic  DAC_3_DIRECTION_REG;
+
     logic [31:0] DWELL_CYCLES_REG;
     logic [15:0] CYCLES_TILL_READOUT_REG;
     logic [19:0] STEP_SIZE_REG;
@@ -39,6 +44,9 @@ module pvp_fsm_gen_tb ();
     logic [4:0]  DEMUX_1_REG;
     logic [4:0]  DEMUX_2_REG;
     logic [4:0]  DEMUX_3_REG;
+
+    logic   TRIGGER_USER_REG;
+    logic trigger_pmod;
 
                             //   11       10        9      		8		  7:6	   5:4		3:2		1:0
 	                       // [ LDACN    CLRN     RSTN      TRIG_PVP     DAC0     DAC1     DAC2     DAC3 ]
@@ -76,10 +84,10 @@ module pvp_fsm_gen_tb ();
             START_VAL_3_REG = 20'b1111_0000_0000_0000_0000;
 
 
-            STEP_SIZE_0_REG =  { 1'b1, 19'd1 };
-            STEP_SIZE_1_REG =  { 1'b0, 19'd1 };
-            STEP_SIZE_2_REG =  { 1'b0, 19'd1 };
-            STEP_SIZE_3_REG =  { 1'b0, 19'd1 };
+            STEP_SIZE_0_REG =  20'd1;
+            STEP_SIZE_1_REG =  20'd2;
+            STEP_SIZE_2_REG = 20'd3;
+            STEP_SIZE_3_REG = 20'd4;
             
             DEMUX_0_REG = 5'b00001;
             DEMUX_1_REG = 5'b00010;
@@ -91,6 +99,11 @@ module pvp_fsm_gen_tb ();
             DAC_2_GROUP_REG = 2'b11;
             DAC_3_GROUP_REG = 2'b11;
 
+            DAC_0_DIRECTION_REG = 1'b0;
+            DAC_1_DIRECTION_REG = 1'b1;
+            DAC_2_DIRECTION_REG = 1'b1;
+            DAC_3_DIRECTION_REG = 1'b1;
+
             DWELL_CYCLES_REG = 32'd50_000;
             CYCLES_TILL_READOUT_REG = 16'd10;
             STEP_SIZE_REG = 1;
@@ -98,18 +111,20 @@ module pvp_fsm_gen_tb ();
             PVP_WIDTH_REG = 3;
             NUM_DIMS_REG = 2;
 
-
             MODE_REG = 2'b00;
             CONFIG_REG = 29'b000_0_00_00_00_00_00_00_00_00;
-            CTRL_REG = 8'b0000;
+            CTRL_REG = 8'b1110;
+
+            TRIGGER_USER_REG = 0;
+            trigger_pmod = 0;
 
             #1000;
 
-            CTRL_REG = 4'b0001;
-
             while (CTRL_REG != 0) begin
-                #20;
-                if (done)  CTRL_REG[0] = 0;
+                #10000;
+                trigger_pmod = 2'b1;
+                #10000;
+                trigger_pmod = 2'b0;
             end
 
             // confirming that you can stop a trial while its running
@@ -121,7 +136,6 @@ module pvp_fsm_gen_tb ();
 
     localparam AXI_ADDR_WIDTH = 32;
     localparam AXI_DATA_WIDTH = 32;
-
 
 pvp_fsm_gen
     fsm_i(
@@ -149,16 +163,23 @@ pvp_fsm_gen
         .DAC_2_GROUP_REG,
         .DAC_3_GROUP_REG,
 
+        .DAC_0_DIRECTION_REG,
+        .DAC_1_DIRECTION_REG,
+        .DAC_2_DIRECTION_REG,
+        .DAC_3_DIRECTION_REG,
+
         .DWELL_CYCLES_REG,
         .CYCLES_TILL_READOUT_REG,
 
         .PVP_WIDTH_REG,
         .NUM_DIMS_REG,
         
-
         .CTRL_REG,
         .MODE_REG,
         .CONFIG_REG,
+
+        .TRIGGER_USER_REG, // trigger from the user
+		.trigger_pmod,
 
     	// parameter inputs.
 		.mosi_o,

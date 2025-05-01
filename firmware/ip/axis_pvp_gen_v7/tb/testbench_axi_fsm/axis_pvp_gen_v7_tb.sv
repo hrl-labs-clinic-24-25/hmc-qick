@@ -20,7 +20,6 @@ module axis_pvp_gen_v7_tb ();
     localparam freq = 100.0e6;
     localparam clk_period = (1/freq)/1e-9;
 
-    logic done;
     logic [31:0]  init_counter;
 
     always begin
@@ -162,8 +161,8 @@ module axis_pvp_gen_v7_tb ();
 		.SCK (SCK),
 		.LDACN (LDACN),
 		.CLRN (CLRN),
-		.CS (CS),
-        .done (done)
+		.CS (CS)
+        // .done (done)
     );
 
 endmodule
