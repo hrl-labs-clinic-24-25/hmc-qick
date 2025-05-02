@@ -49,7 +49,7 @@ module no_mem_sweep_fsm
             top_val  = start + ((DEPTH - index) * step);
         end else begin
             base_val = start;
-            top_val  = (direction) ? start + ((DEPTH) * step) : start - ((DEPTH) * step);
+            top_val  = (direction) ? start + ((DEPTH-1) * step) : start - ((DEPTH-1) * step);
         end
     end
 
@@ -102,7 +102,7 @@ module no_mem_sweep_fsm
     end
 
     assign mosi = ({{{2'h00}}, start_bits, curr_val});
-    assign top = (mode == 2)? ((curr_val == (start + (DEPTH-index)*step))) : (direction) ? (curr_val == (start + (DEPTH-1)*step)) : (curr_val == (start - (DEPTH-1)*step)); // indicate 1 before top (works with FSM)
+    assign top = (mode == 2)? ((curr_val == (start + (DEPTH-index)*step))) : (curr_val == top_val); // indicate 1 before top (works with FSM)
     assign base =(mode == 2)? ((curr_val == (start + index*step))) : ((curr_val == start));
 endmodule
 
